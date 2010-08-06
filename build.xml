@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="stylekit-as3" default="test" basedir=".">
+	<property environment="env" />
+	
+	<property name="main.src.loc" location="${basedir}/src/main" />
+	<property name="test.src.loc" location="${basedir}/src/test" />
+	<property name="example.src.loc" location="${basedir}/src/example" />
+	
+	<property name="lib.loc" location="${basedir}/libs" />
+	<property name="output.loc" location="${basedir}/target" />
+	
+	<property name="bin.loc" location="${output.loc}/bin" />
+	<property name="dist.loc" location="${output.loc}/dist" />
+	
+	<property name="report.loc" location="${output.loc}/report" />
+	<property name="report.asdocs.loc" location="${report.loc}/asdocs" />
+	<property name="report.flexcover.loc" location="${report.loc}/flexcover" />
+	<property name="report.unit.loc" location="${report.loc}/unit" />
+	
+	<property name="FLEX_HOME" location="${env.FLEX_HOME}" />
+	<property name="FLEX_HEADLESS" location="${env.headless}" />
+	
+	<condition property="headless" value="${FLEX_HEADLESS}" else="false">
+		<isset property="FLEX_HEADLESS" />
+	</condition>
+	
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
+	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
+	
+	<target name="usage" description="Displays main targets of the build recipe">
+		<java classname="org.apache.tools.ant.Main">
+			<arg value="-projecthelp" />
+		</java>
+	</target>
+	
+	<target name="clean" description="Cleans the generated build files from the target">
+		<!-- when running the tests from flex builder, this file is created -->
+		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
+		
+		<!-- delete flex builder builds -->
+		<delete dir="${basedir}/bin" />
+		<delete dir="${output.loc}" />
+	</target>
+	
+	<target name="init" depends="clean">
+		<mkdir dir="${output.loc}" />
+		<mkdir dir="${bin.loc}" />
+		<mkdir dir="${report.loc}" />
+		<mkdir dir="${report.flexcover.loc}" />
+		<mkdir dir="${report.asdocs.loc}" />
+		<mkdir dir="${report.unit.loc}" />
+		<mkdir dir="${dist.loc}" />
+	</target>
+	
+	<target name="compile" depends="init" description="Compiles the main StyleKit-as3 SWC">
+		<compc output="${bin.loc}/stylekit-as3.swc" fork="false">
+			<source-path path-element="${main.src.loc}" />
+			<include-sources dir="${main.src.loc}" includes="*" />
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</compc>
+	</target>
+	
+	<target name="test-compile" description="Compiles the nessary SWF's for running the test specs">
+		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/stylekit-as3-specs.swf">
+			<source-path path-element="${main.src.loc}" />
+			<source-path path-element="${test.src.loc}" />
+			<library-path dir="${lib.loc}" append="true">
+				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
+				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
+				<!--<include name="flexunit-flexcoverlistener-4.1.0.53-sdk4.0.0.14159.swc" />-->
+			</library-path>
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</mxmlc>
+	</target>
+	
+	<target name="example" depends="compile" description="Compiles the example using the StyleKit-as3 library">
+		<mxmlc file="${example.src.loc}/StyleKitPlayer.as" output="${bin.loc}/stylekit-as3-example.swf" static-link-runtime-shared-libraries="true">
+			<source-path path-element="${example.src.loc}" />
+			<library-path dir="${bin.loc}" append="true">
+				<include name="smilkit-as3.swc" />
+			</library-path>
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</mxmlc>
+	</target>
+
+	<target name="asdocs" description="Generates asdocs from the StyleKit-as3 source">
+		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
+		<asdoc output="${report.asdocs.loc}"
+			main-title="StyleKit-as3" window-title="StyleKit-as3"
+			failonerror="true" fork="true" keep-xml="true" skip-xsl="false">
+			<doc-sources path-element="${main.src.loc}" />
+			<compiler.source-path path-element="${main.src.loc}" />
+			<package-description-file>pkg-descriptions.xml</package-description-file>
+			<!-- <templates-path path-element="${tools.loc}/templates/asdocs" /> -->
+		</asdoc>
+	</target>
+	
+	<target name="build">
+		<antcall target="clean" />
+		<antcall target="compile" />
+		<antcall target="test-only" />
+		<antcall target="example" />
+		<antcall target="asdocs" />
+		<antcall target="report" />
+	</target>
+	
+	<target name="test" depends="compile,test-only,report" description="Builds and runs the test specs and generates reports" />
+	
+	<target name="package" description="Package the StyleKit-as3 build into a distributable zip">
+		<copy file="${bin.loc}/stylekit-as3.swc" todir="${dist.loc}" />
+		<copy file="${bin.loc}/stylekit-as3-specs.swf" todir="${dist.loc}" />
+		<copy file="${bin.loc}/stylekit-as3-example.swf" todir="${dist.loc}" />
+		<copy file="${basedir}/README.markdown" todir="${dist.loc}" />
+		<copy todir="${dist.loc}/asdocs">
+			<fileset dir="${report.loc}/asdocs" />
+		</copy>
+		
+		<zip destfile="${output.loc}/${ant.project.name}.zip">
+			<fileset dir="${dist.loc}" />
+		</zip>
+	</target>
+	
+	<target name="test-only" depends="test-compile">
+		<flexunit swf="${bin.loc}/stylekit-as3-specs.swf" toDir="${report.unit.loc}"
+				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless}" />
+	</target>
+	
+	<target name="report" description="Generates HTML reports for the last ran test specs">
+		<junitreport todir="${report.unit.loc}">
+			<fileset dir="${report.unit.loc}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${report.unit.loc}/html" />
+		</junitreport>
+	</target>
+</project>

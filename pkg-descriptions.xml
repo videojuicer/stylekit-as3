@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<overviews>
+	<all-packages>
+		<description>
+		<![CDATA[
+			Documentation for all the packages that are included in the SMILKit engine.
+		]]>
+		</description>
+	</all-packages>
+	<all-classes>
+		<description>
+		<![CDATA[
+			Documentation for all the classes that are included in the SMILKit engine, includes syntax, usage information and some code samples for the various methods, properties and events inside the SMILKit API.
+		]]>
+		</description>
+	</all-classes>
+	<packages>
+		<!--
+			<package name="">
+				<shortDescription></shortDescription>
+				<description></description>
+				<propertiesDescription></propertiesDescription>
+				<functionsDescription></functionsDescription>
+			</package>
+		-->
+	</packages>
+</overviews>

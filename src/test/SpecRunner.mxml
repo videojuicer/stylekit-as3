@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:adobe="http://www.adobe.com/2009/flexUnitUIRunner" width="100%" height="100%" creationComplete="this.onCreationComplete()" xmlns:flexui="flexunit.flexui.*" >	
+	<mx:Script>
+		<![CDATA[
+			import org.flexunit.listeners.CIListener;
+			import org.flexunit.runner.FlexUnitCore;
+			import org.flexunit.runner.Request;
+			
+			import org.stylekit.spec.StyleKitSuite;
+			
+			protected var _core:FlexUnitCore;
+			
+			private function onCreationComplete():void
+			{
+				this._core = new FlexUnitCore();
+				this._core.addListener(new CIListener());
+				this._core.run(org.stylekit.spec.StyleKitSuite);
+			}
+	]]>
+	</mx:Script>
+</mx:Application>
