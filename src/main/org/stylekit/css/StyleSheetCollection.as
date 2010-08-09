@@ -46,9 +46,22 @@ package org.stylekit.css {
 			return true;
 		}
 		
-		public function removeStyleSheet(s:StyleSheet):void
+		/** Removes a <code>StyleSheet</code> instance from the collection.
+		* @return A boolean, true if the <code>StyleSheet</code> was removed and false if it was not present in the collection.
+		*/
+		public function removeStyleSheet(s:StyleSheet):Boolean
 		{
-			
+			if(this.hasStyleSheet(s))
+			{
+				this._styleSheets.splice(this._styleSheets.indexOf(s), 1);
+				return true;
+			}
+			return false;
+		}
+		
+		public function get length():uint
+		{
+			return this._styleSheets.length;
 		}
 		
 	}

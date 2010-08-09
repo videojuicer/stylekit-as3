@@ -3,6 +3,9 @@
   <includeClasses>
     <classEntry path="org.stylekit.css.StyleSheetCollection"/>
     <classEntry path="org.stylekit.css.StyleSheet"/>
+    <classEntry path="org.stylekit.css.style.Style"/>
+    <classEntry path="org.stylekit.css.parse.StyleSheetParser"/>
+    
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

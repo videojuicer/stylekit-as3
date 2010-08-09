@@ -45,5 +45,31 @@ package org.stylekit.spec.tests.css
 			}
 		}
 		
+		[Test(description="Ensure that removal of stylesheets from the collection works cleanly and returns the correct boolean value")]
+		public function sheetsMayBeRemovedFromCollection():void
+		{
+			for(var i:uint=0; i<this._styleSheets.length; i++)
+			{
+				var s:StyleSheet = this._styleSheets[i];				
+				Assert.assertTrue(this._styleSheetCollection.addStyleSheet(s));
+			}
+			for(var j:uint=0; j<this._styleSheets.length; j++)
+			{
+				var s1:StyleSheet = this._styleSheets[j];				
+				Assert.assertTrue(this._styleSheetCollection.hasStyleSheet(s1));
+				Assert.assertTrue(this._styleSheetCollection.removeStyleSheet(s1));
+				Assert.assertFalse(this._styleSheetCollection.hasStyleSheet(s1));
+			}
+			for(var k:uint=0; k<this._styleSheets.length; k++)
+			{
+				var s2:StyleSheet = this._styleSheets[k];
+				Assert.assertFalse(this._styleSheetCollection.removeStyleSheet(s2));
+			}
+		}
+		
+		// TODO: Bubbles a STYLE_MUTATION event from any constituent stylesheets
+		// TODO: Emits a STYLE_MUTATION event on adding a stylesheet
+		// TODO: Emits a STYLE_MUTATION event on removing a stylesheet
+		
 	}
 }
