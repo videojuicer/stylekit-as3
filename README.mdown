@@ -1,0 +1,39 @@
+Stylekit - Skinnable UI for Flash using CSS3
+============================================
+
+**WORK IN PROGRESS: CURRENTLY NOT FUNCTIONAL**
+
+Stylekit is a CSS3 parser intended for use in Actionscript 3 applications that provide a customisable user interface design.
+
+The stated design goals of Stylekit are:
+
+1. Provide parsing and support for a broad range of CSS3 properties including transitions and animations
+2. Provide an unopinionated tree-like structure for UI elements that may be queried using CSS3 selectors
+3. Provide basic UI elements that may be composed to produce bespoke UI elements with more advanced functionality.
+4. Avoid non-standard CSS declarations. CSS written for Stylekit should work just as well in the browser.
+
+The Magic Glue
+==============
+
+Since Flash's DisplayObjects provide no semantic structure, Stylekit applies styles by providing a UIElement class for your UI elements to extend. Each UIElement subclass that you write may *classify as* one or more CSS classes, allowing UIElements to be matched by CSS selectors. Each UIElement instance may also have a single parent and one or more children, providing the tree structure that allows complex CSS selectors to function.
+
+Using Stylekit
+==============
+
+    package org.myapplication
+    {
+        public class MyUI()
+        {
+          
+            public function MyUI()
+            {
+              
+            }
+          
+        }
+    }
+  
+TODO:
+1. How to write a UI element
+2. UI atoms - boxes, labels, images
+3. 
