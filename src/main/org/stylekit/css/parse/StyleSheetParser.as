@@ -471,7 +471,35 @@ package org.stylekit.css.parse
 			return this._currentMediaScope;
 		}
 		
-//		protected function get currentPropertyTarget():
+		/**
+		* Called during the property/value parser cycle. The current property recipient is determined from the parser's stateStack
+		* and is the lowest-hanging Style, AnimationKeyFrame, or FontFace object.
+		*/
+		protected function get addPropertyToCurrentPropertyRecipient(property:String, value:String):void
+		{
+			// Loop backwards over state stack
+			for(var i:int=this._stateStack.length-1; i>=0; i--)
+			{
+				var state:uint = this._stateStack[i];
+				if(state == StyleSheetParser.KEYFRAME)
+				{
+					
+				}
+				else if(state == StyleSheetParser.FONTFACE)
+				{
+					
+				}
+				else if(state == StyleSheetParser.SELECTOR)
+				{
+					
+				}
+			}
+		}
+		
+		protected function get currentStyle():Style
+		{
+			return this._styleStack[this._styleStack.length-1];
+		}
 		
 		protected function get currentAnimation():Animation
 		{
