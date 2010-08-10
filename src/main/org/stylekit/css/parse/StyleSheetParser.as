@@ -471,7 +471,7 @@ package org.stylekit.css.parse
 			return this._currentMediaScope;
 		}
 		
-		protected function get currentPropertyTarget():
+//		protected function get currentPropertyTarget():
 		
 		protected function get currentAnimation():Animation
 		{
