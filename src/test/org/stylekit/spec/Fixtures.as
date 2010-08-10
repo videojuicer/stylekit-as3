@@ -30,11 +30,24 @@ package org.stylekit.spec {
 	    "@import url(\"later.css\");"+
 	   	"@keyframes keyframes {"+
 	      "0% {"+
-	        "foo: bar;"+
+	        "foo: bar1;"+
 	      "}"+
 	      "100% {"+
-	        "foo: bar;"+
+	        "foo: bar2;"+
 	      "}"+
+	    "}"+
+		"third selector {"+
+	     	"property-foo: bar;"+
+	    	"property-bar: baz;"+
+			"property-important: srsbsns !important;"+
+	    "}"+
+		"@media print, screen {"+
+			"media selector for print and screen {"+
+		     	"property-foo: bar;"+
+		    "}"+
+		"}"+
+		"non-media selector {"+
+	     	"property-foo: bar;"+
 	    "}";
 	}
 	
