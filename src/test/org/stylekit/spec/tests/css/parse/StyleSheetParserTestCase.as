@@ -1,4 +1,4 @@
-package org.stylekit.spec.tests.css
+package org.stylekit.spec.tests.css.parse
 {
 	
 	import flexunit.framework.Assert;
@@ -24,6 +24,13 @@ package org.stylekit.spec.tests.css
 		public function tearDown():void
 		{
 			this._parser = null;
+		}
+		
+		[Test(description="Test parsing of the CSS_MIXED fixture and ensure that the resulting StyleSheet's content matches expectations")]
+		public function mixedCSSParsesCorrectly():void
+		{
+			this._parser.parse(Fixtures.CSS_MIXED);
+			Assert.assertEquals("", this._parser.logs.join("\n\r"));
 		}
 		
 		

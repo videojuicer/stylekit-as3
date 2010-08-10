@@ -9,7 +9,7 @@ package org.stylekit.css.style
 	/**
 	 * Dispatched when any of the Style's attributes are modified.
 	 *
-	 * @eventType org.smilkit.events.ViewportEvent.MUTATION
+	 * @eventType org.stylekit.events.StyleEvent.MUTATION
 	 */
 	[Event(name="styleMutation", type="org.stylekit.events.StyleEvent")]
 	
