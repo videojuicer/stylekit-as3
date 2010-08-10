@@ -1,0 +1,3 @@
+[submodule "libs/utilkit-as3"]
+	path = libs/utilkit-as3
+	url = git://github.com/videojuicer/utilkit-as3.git

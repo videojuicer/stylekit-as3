@@ -7,6 +7,8 @@
 	<property name="example.src.loc" location="${basedir}/src/example" />
 	
 	<property name="lib.loc" location="${basedir}/libs" />
+	<property name="util.loc" location="${lib.loc}/utilkit-as3" />
+	<property name="util.src.loc" location="${lib.loc}/utilkit-as3/src/main" />
 	<property name="output.loc" location="${basedir}/target" />
 	
 	<property name="bin.loc" location="${output.loc}/bin" />
@@ -56,6 +58,7 @@
 		<compc output="${bin.loc}/stylekit-as3.swc" fork="false">
 			<source-path path-element="${main.src.loc}" />
 			<include-sources dir="${main.src.loc}" includes="*" />
+			<include-sources dir="${util.src.loc}" includes="*" />
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
 			<compiler.headless-server>true</compiler.headless-server>
 		</compc>
@@ -65,6 +68,7 @@
 		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/stylekit-as3-specs.swf">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
+			<source-path dir="${util.src.loc}" />
 			<library-path dir="${lib.loc}" append="true">
 				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
 				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />

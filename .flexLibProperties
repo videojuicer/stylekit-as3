@@ -8,7 +8,6 @@
     <classEntry path="org.stylekit.css.style.FontFace"/>
     <classEntry path="org.stylekit.css.style.Import"/>
     <classEntry path="org.stylekit.css.parse.StyleSheetParser"/>
-    
     <classEntry path="org.stylekit.events.StyleEvent"/>
     <classEntry path="org.stylekit.events.AnimationEvent"/>
     <classEntry path="org.stylekit.events.FontFaceEvent"/>
