@@ -79,6 +79,22 @@ package org.stylekit.css.parse
 		*/	
 		protected var _stringStateExitChar:String;
 		
+		/**
+		* Maintains the property name for the corresponding value, while the value is being parsed.
+		*/
+		protected var _currentProperty:String;
+		
+		/**
+		* Populated by an @media declaration setting the media scope for any containing styles.
+		*/
+		protected var _currentMediaScope:Vector.<String>;
+		
+		/**
+		* Stores the default media scope for newly-created styles. Returned by <code>.currentMediaScope</code> when no
+		* @media block is currently active.
+		*/
+		protected var _defaultMediaScope:Vector.<String>;
+		
 		// Option flags
 		// --------------------------------------------------------------
 		
@@ -96,6 +112,22 @@ package org.stylekit.css.parse
 		* Begins parsing a chunk of CSS code. In the event an external stylesheet being parsed, an optional second argument <code>url</code> may be given.
 		* The <code>url</code> argument should be set to the URL from which the CSS was loaded and will be used for resolving relative paths for any external
 		* assets mentioned in the CSS code.
+		*
+		* The parser treats the CSS code as a series of nested states. In each case a scope is responsible for detecting child scopes and for affecting a return
+		* to the parent state. As a special case, when any state throws the parser into the property/value pair detection cycle, the property state is responsible
+		* for detecting a closing brace and exiting to the parent state.
+		*
+		* In most cases the parser iterates over the "root" level of the CSS file in the "selector" state, accumulating raw text to use as a selector and watching
+		* for an opening brace to throw it into the property/value cycle. Again, when the property/value cycle detects a closing brace the property scope is exited
+		* and the parser is returned to its previous state - this works nicely for syntax blocks with nested closing brackets.
+		* 
+		* There is a special rule for @font-face declarations. As these contain no identifying information in the "selector" portion of the code (which simply reads
+		* "@font-face" before the opening brace), when the property/value cycle detects a closing brace the parser state will be returned to at-font-face rather
+		* than being correctly nulled. To cope with this behaviour the font-face state delegates to the property/value state loop on encountering an open brace,
+		* and exits when encountering any other character within its own state. Additionally the loop is rewound to allow the null state loop to use the found
+		* character when determining the next state.
+		*
+		* Likewise if the selector state encounters a closing bracket, a decision is given to the parent scope to determine how to handle the exception.
 		*/
 		public function parse(css:String, url:String=""):void
 		{
@@ -149,6 +181,86 @@ package org.stylekit.css.parse
 						}
 						this._token += char;
 						break;
+					// During a selector state
+					case StyleSheetParser.SELECTOR:
+						// SELECTOR is something of a default state for the parser, so this case mainly contains exit criteria for going to other states.
+						if(char == "{")
+						{
+							// Entering the property block
+							this.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
+							this._token = "";
+							this.enterState(StyleSheetParser.PROPERTY);
+						}
+						else if(char == "@")
+						{
+							// Entering a special selector. Exit the state and rewind the loop.
+							this._token = "";
+							this.debug("Selector state encountered an at-selector, rewinding loop and entering special case", this);
+							this.exitState();
+							i--;
+						}
+						else if(char == "}")
+						{
+							this._token = "";
+							this.debug("Selector state found closing brace, exiting to parent", this);
+							i--;
+							this.exitState();
+						}
+						else
+						{
+							// Continuing the selector block
+							this._token += char;
+						}
+						break;
+					// During a property state
+					case StyleSheetParser.PROPERTY:
+						// Properties can belong to a number of objects - we must use the state stack to determine
+						// which property-inheritable state has been entered more recently.
+						// Properties are supported on selectors, font-faces, and keyframe descriptors.
+						if(char == ":")
+						{
+							// On encountering a colon, we've reached the end of the property key and can start parsing the value.
+							this.debug("Found property '"+this._token+"'. about to enter value state to parse property value", this);
+							this._token = "";
+							this.enterState(StyleSheetParser.VALUE);
+						}
+						else if(char == "}")
+						{
+							// When exiting from a value state, we may encounter the end of this block.
+							this.debug("Found closing brace, about to exit property state", this);
+							this._token = "";
+							this.exitState();
+						}
+						else
+						{
+							this._token += char;
+						}
+						break;
+					// During a value state
+					case StyleSheetParser.VALUE:
+						if(char == ";" || char == "}") // We allow a closing brace to end the value statement
+						{
+							this.debug("Found property value. about to exit value state", this);
+							this._token = "";
+							this.exitState();
+							if(char == "}")
+							{
+								// However if the exit character was a closing brace then we exit twice to get back to the selector state.
+								this.exitState();
+							}
+						}
+						else if(css.substr(i, 10) == "!important")
+						{
+							// Special value exit - the !important flag is registered but not appended to the value token.
+							this.debug("Found !important property value '"+this._token+"'. about to exit value state", this);
+							this._token = "";
+							this.exitState();
+						}
+						else
+						{
+							this._token += char;
+						}
+						break;
 					// During an import statement
 					case StyleSheetParser.IMPORT:
 						// In an import statement, we let the token build until the statement is terminated with a semicolon.
@@ -179,89 +291,29 @@ package org.stylekit.css.parse
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
-						else if(char == "}")
+						else if(char != " ")
 						{
 							// Exiting property descriptor block for the @font-face
+							// This is a special case - see method description for details.
 							this.debug("Found closing brace for at-font-face block, about to exit state", this);
 							this._token = "";
+							i--;
 							this.exitState();
 						}
 						break;
 					// During an @media rule
 					case StyleSheetParser.MEDIA:
-						break;
-					// During a selector state
-					case StyleSheetParser.SELECTOR:
-						// SELECTOR is something of a default state for the parser, so this case mainly contains exit criteria for going to other states.
 						if(char == "{")
 						{
-							// Entering the property block
-							this.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
+							this.debug("Entering at-media rule for '"+this._token+"'", this);
+							// Parse the list into the current
+							
 							this._token = "";
-							this.enterState(StyleSheetParser.PROPERTY);
+							this.enterState(StyleSheetParser.SELECTOR);
 						}
 						else if(char == "}")
 						{
-							// Exiting a block associated with this selector
-							this._token = "";
-							this.debug("Reached end of selector block, exiting selector state", this);
-							this.exitState();
-						}
-						else if(char == "@")
-						{
-							// Entering a special selector. Exit the state and rewind the loop.
-							this._token = "";
-							this.debug("Selector state encountered an at-selector, rewinding loop and entering special case", this);
-							this.exitState();
-							i--;
-						}
-						else
-						{
-							// Continuing the selector block
-							this._token += char;
-						}
-						break;
-					// During a property state
-					case StyleSheetParser.PROPERTY:
-						// Properties can belong to a number of objects - we must use the state stack to determine
-						// which property-inheritable state has been entered more recently.
-						// Properties are supported on selectors, font-faces, and keyframe descriptors.
-						if(char == ":")
-						{
-							// On encountering a colon, we've reached the end of the property key and can start parsing the value.
-							this.debug("Found property '"+this._token+"'. about to enter value state to parse property value", this);
-							this._token = "";
-							this.enterState(StyleSheetParser.VALUE);
-						}
-						else if(char == "}")
-						{
-							// When exiting from a value state, we may encounter the end of this block.
-							this.debug("Found closing brace, about to exit property state to search for a new selector", this);
-							this._token = "";
-							this.nullifyState();
-						}
-						else
-						{
-							this._token += char;
-						}
-						break;
-					// During a value state
-					case StyleSheetParser.VALUE:
-						if(char == ";" || char == "}") // We allow a closing brace to end the value statement
-						{
-							this.debug("Found property value. about to exit value state", this);
-							this._token = "";
-							this.exitState();
-							if(char == "}")
-							{
-								// However if the exit character was a closing brace then we exit twice to get back to the selector state.
-								this.exitState();
-							}
-						}
-						else if(css.substr(i, 10) == "!important")
-						{
-							// Special value exit - the !important flag is registered but not appended to the value token.
-							this.debug("Found !important property value '"+this._token+"'. about to exit value state", this);
+							this.debug("Exiting at-media rule", this);
 							this._token = "";
 							this.exitState();
 						}
@@ -298,11 +350,15 @@ package org.stylekit.css.parse
 						{
 							// Finished collecting a keyframe descriptor
 							this.debug("Found individual keyframe descriptor '"+this._token+"', about to look for properties", this);
+							this._token = "";
+							this.enterState(StyleSheetParser.PROPERTY);
 						}
 						else if(char == "}")
 						{
 							// finished a keyframe descriptor block
-							this.debug("Found exit brace for keyframe descriptor.", this);
+							this.debug("Found exit brace for at-keyframes block.", this);
+							this.exitState(); // Exit the keyframe
+							this.exitState(); // Exit the @keyframes block
 						}
 						else
 						{
@@ -361,6 +417,8 @@ package org.stylekit.css.parse
 		protected function resetState():void
 		{
 			this.debug("Resetting parser state for new parse operation", this);
+			this._currentMediaScope = new Vector.<String>;
+			this._defaultMediaScope = new Vector.<String>("screen");
 			this._styleSheet = new StyleSheet();			
 			this._stateStack = new Vector.<uint>();
 			this._styleStack = new Vector.<Style>();
@@ -380,15 +438,8 @@ package org.stylekit.css.parse
 		
 		protected function exitState():void
 		{
+			this.debug("About to exit state, state stack before exit is "+this._stateStack.join(", "), this);
 			this._stateStack.pop();
-		}
-		
-		/**
-		* Rather than exiting a single state, resets the state stack entirely to exit ALL states.
-		*/
-		protected function nullifyState():void
-		{
-			this._stateStack = new Vector.<uint>();
 		}
 		
 		protected function get currentState():uint
@@ -410,6 +461,17 @@ package org.stylekit.css.parse
 		{
 			return (this._stateStack.indexOf(state) > -1);
 		}
+		
+		protected function get currentMediaScope():Vector.<String>
+		{
+			if(this._currentMediaScope.length < 1)
+			{
+				return this._defaultMediaScope;
+			}
+			return this._currentMediaScope;
+		}
+		
+		protected function get currentPropertyTarget():
 		
 		protected function get currentAnimation():Animation
 		{
