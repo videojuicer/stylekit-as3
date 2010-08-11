@@ -8,7 +8,7 @@ package org.stylekit.css {
 	import flash.events.EventDispatcher;
 	
 	import org.stylekit.css.style.Style;
-	import org.stylekit.events.StyleEvent;
+	import org.stylekit.events.PropertyContainerEvent;
 	
 	public class StyleSheet extends EventDispatcher
 	{
@@ -32,7 +32,9 @@ package org.stylekit.css {
 				return false;
 			}
 			this._styles.splice(atIndex, 0, s);
-			s.addEventListener(StyleEvent.MUTATION, this.onStyleMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onStyleMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onStyleMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onStyleMutation);
 			return true;
 		}
 		
@@ -45,7 +47,9 @@ package org.stylekit.css {
 			if(this.hasStyle(s))
 			{
 				this._styles.splice(this._styles.indexOf(s), 1);
-				s.removeEventListener(StyleEvent.MUTATION, this.onStyleMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onStyleMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onStyleMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onStyleMutation);
 				return true;
 			}
 			return false;
@@ -56,7 +60,7 @@ package org.stylekit.css {
 			return this._styles;
 		}
 		
-		protected function onStyleMutation(e:StyleEvent):void
+		protected function onStyleMutation(e:PropertyContainerEvent):void
 		{
 			
 		}

@@ -3,15 +3,16 @@ package org.stylekit.css.parse
 	
 	/**
 	* This is the class responsible for lexical parsing of CSS code. After a successful parsing operation,
-	* a vector of <code>StyleSheet</code> objects is made available on the parser.
-	*
-	* CSS Parsing is an asynchronous operation.
+	* a <code>StyleSheet</code> is returned by the parser.
 	*/
 	import flash.events.EventDispatcher;
 	
 	import org.stylekit.css.StyleSheet;
+	
+	import org.stylekit.css.style.property.PropertyContainer;	
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
+	import org.stylekit.css.style.AnimationKeyFrame;
 	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Import;
 	
@@ -26,7 +27,7 @@ package org.stylekit.css.parse
 		protected static var MEDIA:uint 		= 6; // Parsing an @media statement
 		protected static var IMPORT:uint 		= 7; // Parsing an @import statement
 		protected static var FONTFACE:uint 		= 8; // Parsing an @font-face statement
-		protected static var KEYFRAMES:uint 	= 9; // Parsing an @keyframes block
+		protected static var ANIMATION:uint 	= 9; // Parsing an @keyframes block
 		protected static var KEYFRAME:uint 		= 10; // Parsing a keyframe description within an @keyframes block
 		
 		// Parser state
@@ -61,7 +62,7 @@ package org.stylekit.css.parse
 		* Maintains a list of parsed Animation objects.
 		*/
 		protected var _animationStack:Vector.<Animation>;
-		
+				
 		/**
 		* Maintains a list of parsed FontFace objects.
 		*/
@@ -134,7 +135,7 @@ package org.stylekit.css.parse
 		*
 		* Likewise if the selector state encounters a closing bracket, a decision is given to the parent scope to determine how to handle the exception.
 		*/
-		public function parse(css:String, url:String=""):void
+		public function parse(css:String, url:String=""):StyleSheet
 		{
 			this.resetState();
 			
@@ -163,6 +164,10 @@ package org.stylekit.css.parse
 					}
 				}
 				
+				// Token collectors
+				var currentSelector:String = "";
+				var currentProperty:String = "";
+				var currentPropertyValue:String = "";
 				
 				switch(this.currentState)
 				{
@@ -194,6 +199,10 @@ package org.stylekit.css.parse
 						{
 							// Entering the property block
 							this.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
+							
+							// Let's actually create the Style object ready to have properties injected
+							
+							
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
@@ -337,7 +346,7 @@ package org.stylekit.css.parse
 						}
 						break;
 					// During an @keyframes state
-					case StyleSheetParser.KEYFRAMES:
+					case StyleSheetParser.ANIMATION:
 						// Accumulate the keyframeset name, then expect an opening brace. Then expect a keyframe name followed by another opening brace.
 						if(char == "{")
 						{
@@ -396,7 +405,7 @@ package org.stylekit.css.parse
 							if(css.substr(i, 10) == "@keyframes")
 							{
 								this.debug("Encountered at-keyframes statement, entering keyframes state", this);
-								this.enterState(StyleSheetParser.KEYFRAMES);
+								this.enterState(StyleSheetParser.ANIMATION);
 								this._lexerIndex += 10;
 								continue;
 							}
@@ -435,6 +444,7 @@ package org.stylekit.css.parse
 						break;
 				}
 			}
+			return this._styleSheet;
 		}
 		
 		protected function resetState():void
@@ -516,7 +526,7 @@ package org.stylekit.css.parse
 		* Called during the property/value parser cycle. The current property recipient is determined from the parser's stateStack
 		* and is the lowest-hanging Style, AnimationKeyFrame, or FontFace object.
 		*/
-		protected function addPropertyToCurrentPropertyRecipient(property:String, value:String):void
+		protected function get currentPropertyRecipient():PropertyContainer
 		{
 			// Loop backwards over state stack
 			for(var i:int=this._stateStack.length-1; i>=0; i--)
@@ -524,17 +534,18 @@ package org.stylekit.css.parse
 				var state:uint = this._stateStack[i];
 				if(state == StyleSheetParser.KEYFRAME)
 				{
-					
+					return this.currentAnimationKeyFrame;
 				}
 				else if(state == StyleSheetParser.FONTFACE)
 				{
-					
+					return this.currentFontFace;
 				}
 				else if(state == StyleSheetParser.SELECTOR)
 				{
-					
+					return this.currentStyle;
 				}
 			}
+			return null;
 		}
 		
 		protected function get currentStyle():Style
@@ -545,6 +556,12 @@ package org.stylekit.css.parse
 		protected function get currentAnimation():Animation
 		{
 			return this._animationStack[this._animationStack.length-1];
+		}
+		
+		protected function get currentAnimationKeyFrame():AnimationKeyFrame
+		{
+			return new AnimationKeyFrame(this._styleSheet);
+			//return this._animationKeyFrameStack[this._animationKeyFrameStack.length-1];
 		}
 		
 		protected function get currentFontFace():FontFace

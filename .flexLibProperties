@@ -3,14 +3,20 @@
   <includeClasses>
     <classEntry path="org.stylekit.css.StyleSheetCollection"/>
     <classEntry path="org.stylekit.css.StyleSheet"/>
+
+    <classEntry path="org.stylekit.css.parse.StyleSheetParser"/>
+    <classEntry path="org.stylekit.css.parse.ElementSelectorParser"/>
+    
+    <classEntry path="org.stylekit.css.style.property.PropertyContainer" />
+    
+    <classEntry path="org.stylekit.css.style.selector.ElementSelectorChain" />
+    <classEntry path="org.stylekit.css.style.selector.ElementSelector" />
+    
     <classEntry path="org.stylekit.css.style.Style"/>
     <classEntry path="org.stylekit.css.style.Animation"/>
+    <classEntry path="org.stylekit.css.style.AnimationKeyFrame"/>
     <classEntry path="org.stylekit.css.style.FontFace"/>
     <classEntry path="org.stylekit.css.style.Import"/>
-    <classEntry path="org.stylekit.css.parse.StyleSheetParser"/>
-    <classEntry path="org.stylekit.events.StyleEvent"/>
-    <classEntry path="org.stylekit.events.AnimationEvent"/>
-    <classEntry path="org.stylekit.events.FontFaceEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

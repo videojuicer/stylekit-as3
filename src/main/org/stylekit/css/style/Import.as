@@ -1,9 +1,8 @@
 package org.stylekit.css.style
 {
-	import flash.events.EventDispatcher;
-	
+	import flash.events.EventDispatcher;	
 	import org.stylekit.css.StyleSheet;
-	
+		
 	/**
 	* An Import encapsulates a single @import statement within an owning StyleSheet object.
 	*/
