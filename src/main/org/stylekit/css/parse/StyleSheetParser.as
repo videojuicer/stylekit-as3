@@ -94,6 +94,12 @@ package org.stylekit.css.parse
 		*/
 		protected var _defaultMediaScope:Vector.<String>;
 		
+		/**
+		* A flag used to indicate whether or not we are in a statement that includes nested braces - e.g. an @media or @keyframes block.
+		* When zero, we are not nested. When > 0, we are nested at N tiers.
+		*/
+		protected var _nesting:uint;
+		
 		// Option flags
 		// --------------------------------------------------------------
 		
@@ -201,7 +207,7 @@ package org.stylekit.css.parse
 						else if(char == "}")
 						{
 							this._token = "";
-							this.debug("Selector state found closing brace, delegating character to parent", this);
+							this.debug("Selector state found closing brace, delegating to parent", this);
 							this.delegateToParentState();
 						}
 						else
@@ -225,9 +231,9 @@ package org.stylekit.css.parse
 						else if(char == "}")
 						{
 							// When exiting from a value state, we may encounter the end of this block.
-							this.debug("Found closing brace, about to exit property state", this);
+							this.debug("Found closing brace, about to exit property state and return control to parent state", this);
 							this._token = "";
-							this.exitState();
+							this.delegateToParentState();
 						}
 						else
 						{
@@ -289,13 +295,13 @@ package org.stylekit.css.parse
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
-						else if(char != " ")
+						else if(char == "}")
 						{
 							// Exiting property descriptor block for the @font-face
 							// This is a special case - see method description for details.
 							this.debug("Found closing brace for at-font-face block, about to exit state", this);
 							this._token = "";
-							this.delegateToParentState();
+							this.exitState();
 						}
 						break;
 					// During an @media rule
@@ -306,13 +312,24 @@ package org.stylekit.css.parse
 							// Parse the list into the current
 							
 							this._token = "";
+							this._nesting += 2;
 							this.enterState(StyleSheetParser.SELECTOR);
 						}
 						else if(char == "}")
 						{
-							this.debug("Exiting at-media rule", this);
-							this._token = "";
-							this.exitState();
+							this._nesting--;
+							if(this.isNested)
+							{
+								this.debug("at-media rule finished internal selector, now re-entering selector state", this);
+								this.enterState(StyleSheetParser.SELECTOR);
+							}
+							else
+							{
+								this.debug("Exiting at-media rule", this);
+								this._token = "";
+								this._lexerIndex++;
+								this.exitState();
+							}
 						}
 						else
 						{
@@ -327,14 +344,24 @@ package org.stylekit.css.parse
 							// Found the keyframes block name
 							this.debug("Found at-keyframe set '"+this._token+"'. About to look for keyframe descriptors.", this);
 							this._token = "";
+							this._nesting += 2;
 							this.enterState(StyleSheetParser.KEYFRAME);
 						}
 						else if(char == "}")
 						{
-							// End the keyframes block
-							this.debug("Found closing brace for at-keyframe set, about to exit state", this);
-							this._token = "";
-							this.exitState();
+							this._nesting--;
+							if(this.isNested)
+							{
+								this.debug("at-keyframes block finished internal keyframe, now re-entering keyframe state", this);
+								this.enterState(StyleSheetParser.KEYFRAME);
+							}
+							else
+							{
+								this.debug("Exiting at-keyframes block", this);
+								this._token = "";
+								this._lexerIndex++;
+								this.exitState();
+							}
 						}
 						else
 						{
@@ -353,9 +380,8 @@ package org.stylekit.css.parse
 						else if(char == "}")
 						{
 							// finished a keyframe descriptor block
-							this.debug("Found exit brace for at-keyframes block.", this);
-							this.exitState(); // Exit the keyframe
-							this.exitState(); // Exit the @keyframes block
+							this.debug("Found exit brace for keyframe descriptor.", this);
+							this.delegateToParentState(); // Exit the keyframe
 						}
 						else
 						{
@@ -371,7 +397,7 @@ package org.stylekit.css.parse
 							{
 								this.debug("Encountered at-keyframes statement, entering keyframes state", this);
 								this.enterState(StyleSheetParser.KEYFRAMES);
-								i = i+10;
+								this._lexerIndex += 10;
 								continue;
 							}
 							// Entering an @media rule
@@ -379,7 +405,7 @@ package org.stylekit.css.parse
 							{
 								this.debug("Encountered at-media statement, entering at-media state", this);
 								this.enterState(StyleSheetParser.MEDIA);
-								i = i+6;
+								this._lexerIndex += 6;
 								continue;
 							}
 							// Entering an @import statement
@@ -387,7 +413,7 @@ package org.stylekit.css.parse
 							{
 								this.debug("Encountered at-import statement, entering at-import state", this);
 								this.enterState(StyleSheetParser.IMPORT);
-								i = i+7;
+								this._lexerIndex += 7;
 								continue;
 							}
 							// Entering a font-face statement
@@ -395,7 +421,7 @@ package org.stylekit.css.parse
 							{
 								this.debug("Encountered at-font-face statement, entering at-font-face state", this);
 								this.enterState(StyleSheetParser.FONTFACE);
-								i = i+10;
+								this._lexerIndex += 10;
 								continue;
 							}
 							// Default of defaults: Look for a selector!
@@ -421,6 +447,7 @@ package org.stylekit.css.parse
 			this._styleStack = new Vector.<Style>();
 			this._animationStack = new Vector.<Animation>();
 			this._fontFaceStack = new Vector.<FontFace>();
+			this._nesting = 0;
 			this._token = "";
 		}
 		
@@ -435,7 +462,7 @@ package org.stylekit.css.parse
 		
 		protected function exitState():void
 		{
-			this.debug("About to exit state, state stack before exit is "+this._stateStack.join(", "), this);
+			//this.debug("About to exit state, state stack before exit is "+this._stateStack.join(", "), this);
 			this._stateStack.pop();
 		}
 		
@@ -466,6 +493,14 @@ package org.stylekit.css.parse
 		protected function inState(state:uint):Boolean
 		{
 			return (this._stateStack.indexOf(state) > -1);
+		}
+		
+		/**
+		* examines the _nesting variable to determine if we are nested at 1 tier or higher.
+		*/
+		protected function get isNested():Boolean
+		{
+			return (this._nesting >= 1);
 		}
 		
 		protected function get currentMediaScope():Vector.<String>

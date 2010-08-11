@@ -45,6 +45,9 @@ package org.stylekit.spec {
 			"media selector for print and screen {"+
 		     	"property-foo: bar;"+
 		    "}"+
+			"another media selector {"+
+		     	"property-foo: bar;"+
+		    "}"+
 		"}"+
 		"non-media selector {"+
 	     	"property-foo: bar;"+
