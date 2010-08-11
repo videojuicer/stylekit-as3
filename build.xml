@@ -68,7 +68,7 @@
 		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/stylekit-as3-specs.swf">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
-			<source-path dir="${util.src.loc}" />
+			<source-path path-element="${util.src.loc}" />
 			<library-path dir="${lib.loc}" append="true">
 				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
 				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
