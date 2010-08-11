@@ -81,7 +81,7 @@
 	
 	<target name="update" description="Updates the StyleKit local repo and the submodules contained within">
 		<exec executable="git" spawn="false" dir="${basedir}">
-			<arg line="pull origin master" />
+			<arg line="pull --rebase" />
 		</exec>
 		<exec executable="git" spawn="false">
 			<arg line="submodule init" />
