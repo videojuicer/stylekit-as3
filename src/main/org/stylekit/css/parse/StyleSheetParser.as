@@ -38,10 +38,9 @@ package org.stylekit.css.parse
 		protected var _styleSheet:StyleSheet;
 		
 		/**
-		* The Style instance currently being built by the parser.
+		* The current lexer index, held during parsing
 		*/
-		
-		protected var _currentStyle:Style;
+		protected var _lexerIndex:uint;
 		
 		/**
 		* The token currently being collected by the parser
@@ -134,7 +133,8 @@ package org.stylekit.css.parse
 			this.resetState();
 			
 			// Start a character-by-character loop over the given CSS.
-			for(var i:uint=0; i < css.length; i++) {
+			for(var this._lexerIndex=0; this._lexerIndex < css.length; this._lexerIndex++) {
+				var i:uint = this._lexerIndex;
 				var char:String = css.charAt(i);
 				
 				if(this.currentState != StyleSheetParser.COMMENT && this.currentState != StyleSheetParser.STRING)
@@ -196,15 +196,13 @@ package org.stylekit.css.parse
 							// Entering a special selector. Exit the state and rewind the loop.
 							this._token = "";
 							this.debug("Selector state encountered an at-selector, rewinding loop and entering special case", this);
-							this.exitState();
-							i--;
+							this.delegateToParentState();
 						}
 						else if(char == "}")
 						{
 							this._token = "";
-							this.debug("Selector state found closing brace, exiting to parent", this);
-							i--;
-							this.exitState();
+							this.debug("Selector state found closing brace, delegating character to parent", this);
+							this.delegateToParentState();
 						}
 						else
 						{
@@ -297,8 +295,7 @@ package org.stylekit.css.parse
 							// This is a special case - see method description for details.
 							this.debug("Found closing brace for at-font-face block, about to exit state", this);
 							this._token = "";
-							i--;
-							this.exitState();
+							this.delegateToParentState();
 						}
 						break;
 					// During an @media rule
@@ -442,6 +439,15 @@ package org.stylekit.css.parse
 			this._stateStack.pop();
 		}
 		
+		/**
+		* Exits the current parser state and also rewinds by one character to allow the parent state to lex the current character
+		*/
+		protected function delegateToParentState():void
+		{
+			this._lexerIndex--;
+			this.exitState();
+		}
+		
 		protected function get currentState():uint
 		{
 			if(this._stateStack.length < 1) return 0;
@@ -475,7 +481,7 @@ package org.stylekit.css.parse
 		* Called during the property/value parser cycle. The current property recipient is determined from the parser's stateStack
 		* and is the lowest-hanging Style, AnimationKeyFrame, or FontFace object.
 		*/
-		protected function get addPropertyToCurrentPropertyRecipient(property:String, value:String):void
+		protected function addPropertyToCurrentPropertyRecipient(property:String, value:String):void
 		{
 			// Loop backwards over state stack
 			for(var i:int=this._stateStack.length-1; i>=0; i--)
