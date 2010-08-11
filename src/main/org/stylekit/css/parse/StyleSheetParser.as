@@ -133,7 +133,7 @@ package org.stylekit.css.parse
 			this.resetState();
 			
 			// Start a character-by-character loop over the given CSS.
-			for(var this._lexerIndex=0; this._lexerIndex < css.length; this._lexerIndex++) {
+			for(this._lexerIndex=0; this._lexerIndex < css.length; this._lexerIndex++) {
 				var i:uint = this._lexerIndex;
 				var char:String = css.charAt(i);
 				
