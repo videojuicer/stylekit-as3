@@ -7,6 +7,8 @@ package org.stylekit.css.parse
 	*/
 	import flash.events.EventDispatcher;
 	
+	import org.utilkit.logger.Logger;
+	
 	import org.stylekit.css.StyleSheet;
 	
 	import org.stylekit.css.style.property.PropertyContainer;	
@@ -149,7 +151,7 @@ package org.stylekit.css.parse
 					// Entering a comment state
 					if(css.substr(i, 2) == "/*") {
 						i++; // We don't need to scan the next character so let's just skip it
-						this.debug("Encountered comment start, entering comment state", this);
+						Logger.debug("Encountered comment start, entering comment state", this);
 						this.enterState(StyleSheetParser.COMMENT);
 						continue;
 					}
@@ -159,7 +161,7 @@ package org.stylekit.css.parse
 						this.enterState(StyleSheetParser.STRING);
 						this._stringStateExitChar = (char == "(")? ")" : char;
 						this._token += char;
-						this.debug("Encountered string start, entering string state", this);
+						Logger.debug("Encountered string start, entering string state", this);
 						continue;
 					}
 				}
@@ -177,7 +179,7 @@ package org.stylekit.css.parse
 						if(css.substr(i,2) == "*/")
 						{
 							i++; // We don't need to scan the next character so let's just skip it
-							this.debug("Encountered comment end", this);
+							Logger.debug("Encountered comment end", this);
 							this.exitState();
 						}
 						break;
@@ -187,7 +189,7 @@ package org.stylekit.css.parse
 						// If we meet the current _stringStateExitChar, then the string block state is exited.
 						if(char == this._stringStateExitChar)
 						{
-							this.debug("Encountered string end character during string state", this);
+							Logger.debug("Encountered string end character during string state", this);
 							this.exitState();							
 						}
 						this._token += char;
@@ -198,7 +200,7 @@ package org.stylekit.css.parse
 						if(char == "{")
 						{
 							// Entering the property block
-							this.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
+							Logger.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
 							
 							// Let's actually create the Style object ready to have properties injected
 							
@@ -210,13 +212,13 @@ package org.stylekit.css.parse
 						{
 							// Entering a special selector. Exit the state and rewind the loop.
 							this._token = "";
-							this.debug("Selector state encountered an at-selector, rewinding loop and entering special case", this);
+							Logger.debug("Selector state encountered an at-selector, rewinding loop and entering special case", this);
 							this.delegateToParentState();
 						}
 						else if(char == "}")
 						{
 							this._token = "";
-							this.debug("Selector state found closing brace, delegating to parent", this);
+							Logger.debug("Selector state found closing brace, delegating to parent", this);
 							this.delegateToParentState();
 						}
 						else
@@ -233,14 +235,14 @@ package org.stylekit.css.parse
 						if(char == ":")
 						{
 							// On encountering a colon, we've reached the end of the property key and can start parsing the value.
-							this.debug("Found property '"+this._token+"'. about to enter value state to parse property value", this);
+							Logger.debug("Found property '"+this._token+"'. about to enter value state to parse property value", this);
 							this._token = "";
 							this.enterState(StyleSheetParser.VALUE);
 						}
 						else if(char == "}")
 						{
 							// When exiting from a value state, we may encounter the end of this block.
-							this.debug("Found closing brace, about to exit property state and return control to parent state", this);
+							Logger.debug("Found closing brace, about to exit property state and return control to parent state", this);
 							this._token = "";
 							this.delegateToParentState();
 						}
@@ -253,7 +255,7 @@ package org.stylekit.css.parse
 					case StyleSheetParser.VALUE:
 						if(char == ";" || char == "}") // We allow a closing brace to end the value statement
 						{
-							this.debug("Found property value. about to exit value state", this);
+							Logger.debug("Found property value. about to exit value state", this);
 							this._token = "";
 							this.exitState();
 							if(char == "}")
@@ -265,7 +267,7 @@ package org.stylekit.css.parse
 						else if(css.substr(i, 10) == "!important")
 						{
 							// Special value exit - the !important flag is registered but not appended to the value token.
-							this.debug("Found !important property value '"+this._token+"'. about to exit value state", this);
+							Logger.debug("Found !important property value '"+this._token+"'. about to exit value state", this);
 							this._token = "";
 							this.exitState();
 						}
@@ -282,7 +284,7 @@ package org.stylekit.css.parse
 							// Ending the import statement. 
 							// TODO Throw the token into an Import object at the current style index.
 							// Kill the token and exit the state
-							this.debug("Ending import state, about to clear token", this);
+							Logger.debug("Ending import state, about to clear token", this);
 							this._token = "";
 							this.exitState();
 						}
@@ -300,7 +302,7 @@ package org.stylekit.css.parse
 						if(char == "{")
 						{
 							// Entering the property descriptor block, switch to property state
-							this.debug("Found entering brace for at-font-face block, about to enter property state", this);
+							Logger.debug("Found entering brace for at-font-face block, about to enter property state", this);
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
@@ -308,7 +310,7 @@ package org.stylekit.css.parse
 						{
 							// Exiting property descriptor block for the @font-face
 							// This is a special case - see method description for details.
-							this.debug("Found closing brace for at-font-face block, about to exit state", this);
+							Logger.debug("Found closing brace for at-font-face block, about to exit state", this);
 							this._token = "";
 							this.exitState();
 						}
@@ -317,7 +319,7 @@ package org.stylekit.css.parse
 					case StyleSheetParser.MEDIA:
 						if(char == "{")
 						{
-							this.debug("Entering at-media rule for '"+this._token+"'", this);
+							Logger.debug("Entering at-media rule for '"+this._token+"'", this);
 							// Parse the list into the current
 							
 							this._token = "";
@@ -329,12 +331,12 @@ package org.stylekit.css.parse
 							this._nesting--;
 							if(this.isNested)
 							{
-								this.debug("at-media rule finished internal selector, now re-entering selector state", this);
+								Logger.debug("at-media rule finished internal selector, now re-entering selector state", this);
 								this.enterState(StyleSheetParser.SELECTOR);
 							}
 							else
 							{
-								this.debug("Exiting at-media rule", this);
+								Logger.debug("Exiting at-media rule", this);
 								this._token = "";
 								this._lexerIndex++;
 								this.exitState();
@@ -351,7 +353,7 @@ package org.stylekit.css.parse
 						if(char == "{")
 						{
 							// Found the keyframes block name
-							this.debug("Found at-keyframe set '"+this._token+"'. About to look for keyframe descriptors.", this);
+							Logger.debug("Found at-keyframe set '"+this._token+"'. About to look for keyframe descriptors.", this);
 							this._token = "";
 							this._nesting += 2;
 							this.enterState(StyleSheetParser.KEYFRAME);
@@ -361,12 +363,12 @@ package org.stylekit.css.parse
 							this._nesting--;
 							if(this.isNested)
 							{
-								this.debug("at-keyframes block finished internal keyframe, now re-entering keyframe state", this);
+								Logger.debug("at-keyframes block finished internal keyframe, now re-entering keyframe state", this);
 								this.enterState(StyleSheetParser.KEYFRAME);
 							}
 							else
 							{
-								this.debug("Exiting at-keyframes block", this);
+								Logger.debug("Exiting at-keyframes block", this);
 								this._token = "";
 								this._lexerIndex++;
 								this.exitState();
@@ -382,14 +384,14 @@ package org.stylekit.css.parse
 						if(char == "{")
 						{
 							// Finished collecting a keyframe descriptor
-							this.debug("Found individual keyframe descriptor '"+this._token+"', about to look for properties", this);
+							Logger.debug("Found individual keyframe descriptor '"+this._token+"', about to look for properties", this);
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
 						else if(char == "}")
 						{
 							// finished a keyframe descriptor block
-							this.debug("Found exit brace for keyframe descriptor.", this);
+							Logger.debug("Found exit brace for keyframe descriptor.", this);
 							this.delegateToParentState(); // Exit the keyframe
 						}
 						else
@@ -404,7 +406,7 @@ package org.stylekit.css.parse
 							// Entering an @keyframes block
 							if(css.substr(i, 10) == "@keyframes")
 							{
-								this.debug("Encountered at-keyframes statement, entering keyframes state", this);
+								Logger.debug("Encountered at-keyframes statement, entering keyframes state", this);
 								this.enterState(StyleSheetParser.ANIMATION);
 								this._lexerIndex += 10;
 								continue;
@@ -412,7 +414,7 @@ package org.stylekit.css.parse
 							// Entering an @media rule
 							else if(css.substr(i, 6) == "@media")
 							{
-								this.debug("Encountered at-media statement, entering at-media state", this);
+								Logger.debug("Encountered at-media statement, entering at-media state", this);
 								this.enterState(StyleSheetParser.MEDIA);
 								this._lexerIndex += 6;
 								continue;
@@ -420,7 +422,7 @@ package org.stylekit.css.parse
 							// Entering an @import statement
 							else if(css.substr(i, 7) == "@import")
 							{
-								this.debug("Encountered at-import statement, entering at-import state", this);
+								Logger.debug("Encountered at-import statement, entering at-import state", this);
 								this.enterState(StyleSheetParser.IMPORT);
 								this._lexerIndex += 7;
 								continue;
@@ -428,7 +430,7 @@ package org.stylekit.css.parse
 							// Entering a font-face statement
 							else if(css.substr(i, 10) == "@font-face")
 							{
-								this.debug("Encountered at-font-face statement, entering at-font-face state", this);
+								Logger.debug("Encountered at-font-face statement, entering at-font-face state", this);
 								this.enterState(StyleSheetParser.FONTFACE);
 								this._lexerIndex += 10;
 								continue;
@@ -449,7 +451,7 @@ package org.stylekit.css.parse
 		
 		protected function resetState():void
 		{
-			this.debug("Resetting parser state for new parse operation", this);
+			Logger.debug("Resetting parser state for new parse operation", this);
 			this._currentMediaScope = new Vector.<String>;
 			this._defaultMediaScope = new Vector.<String>("screen");
 			this._styleSheet = new StyleSheet();			
@@ -472,7 +474,7 @@ package org.stylekit.css.parse
 		
 		protected function exitState():void
 		{
-			//this.debug("About to exit state, state stack before exit is "+this._stateStack.join(", "), this);
+			//Logger.debug("About to exit state, state stack before exit is "+this._stateStack.join(", "), this);
 			this._stateStack.pop();
 		}
 		
