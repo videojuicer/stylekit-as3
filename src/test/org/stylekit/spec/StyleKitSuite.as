@@ -5,6 +5,7 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.StyleSheetTestCase;
 	import org.stylekit.spec.tests.css.parse.StyleSheetParserTestCase;
 	import org.stylekit.spec.tests.css.parse.ElementSelectorParserTestCase;
+	import org.stylekit.spec.tests.css.style.selector.ElementSelectorTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -14,5 +15,6 @@ package org.stylekit.spec
 		public var styleSheetTest:StyleSheetTestCase;
 		public var styleSheetParserTest:StyleSheetParserTestCase;
 		public var elementSelectorParserTest:ElementSelectorParserTestCase;
+		public var elementSelectorTest:ElementSelectorTestCase;
 	}
 }

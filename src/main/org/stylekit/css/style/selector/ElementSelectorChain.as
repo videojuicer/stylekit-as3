@@ -21,6 +21,16 @@ package org.stylekit.css.style.selector
 			this._elementSelectors = new Vector.<ElementSelector>();
 		}
 		
+		public function addElementSelector(e:ElementSelector, atIndex:int=-1):void
+		{
+			this._elementSelectors.splice(((atIndex > -1)? atIndex : this.elementSelectors.length ), 0, e);
+		}
+		
+		public function get elementSelectors():Vector.<ElementSelector>
+		{
+			return this._elementSelectors;
+		}
+		
 	}
 	
 }
