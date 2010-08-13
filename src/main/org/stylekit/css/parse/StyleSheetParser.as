@@ -11,6 +11,9 @@ package org.stylekit.css.parse
 	
 	import org.stylekit.css.StyleSheet;
 	
+	import org.stylekit.css.parse.ElementSelectorParser;
+	import org.stylekit.css.parse.ValueParser;
+	
 	import org.stylekit.css.style.property.PropertyContainer;	
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
@@ -31,6 +34,11 @@ package org.stylekit.css.parse
 		protected static var FONTFACE:uint 		= 8; // Parsing an @font-face statement
 		protected static var ANIMATION:uint 	= 9; // Parsing an @keyframes block
 		protected static var KEYFRAME:uint 		= 10; // Parsing a keyframe description within an @keyframes block
+		
+		// Subparsers
+		
+		protected var _elementSelectorParser:ElementSelectorParser;
+		protected var _valueParser:ValueParser;
 		
 		// Parser state
 		// --------------------------------------------------------------
@@ -114,6 +122,8 @@ package org.stylekit.css.parse
 		*/
 		public function StyleSheetParser()
 		{
+			this._elementSelectorParser = new ElementSelectorParser();
+			this._valueParser = new ValueParser();
 		}
 		
 		/**
@@ -167,7 +177,6 @@ package org.stylekit.css.parse
 				}
 				
 				// Token collectors
-				var currentSelector:String = "";
 				var currentProperty:String = "";
 				var currentPropertyValue:String = "";
 				
@@ -203,7 +212,7 @@ package org.stylekit.css.parse
 							Logger.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
 							
 							// Let's actually create the Style object ready to have properties injected
-							
+							this._styleStack.push(new Style(this._styleSheet));
 							
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
@@ -236,6 +245,7 @@ package org.stylekit.css.parse
 						{
 							// On encountering a colon, we've reached the end of the property key and can start parsing the value.
 							Logger.debug("Found property '"+this._token+"'. about to enter value state to parse property value", this);
+							currentProperty = this._token;
 							this._token = "";
 							this.enterState(StyleSheetParser.VALUE);
 						}
@@ -243,6 +253,7 @@ package org.stylekit.css.parse
 						{
 							// When exiting from a value state, we may encounter the end of this block.
 							Logger.debug("Found closing brace, about to exit property state and return control to parent state", this);
+							currentProperty = "";
 							this._token = "";
 							this.delegateToParentState();
 						}
@@ -255,7 +266,12 @@ package org.stylekit.css.parse
 					case StyleSheetParser.VALUE:
 						if(char == ";" || char == "}") // We allow a closing brace to end the value statement
 						{
-							Logger.debug("Found property value. about to exit value state", this);
+							Logger.debug("Found property value for property '"+currentProperty+"'. Setting on property target and exiting value state", this);
+
+							// Grab the property key and route it to the current property target
+							this.currentPropertyTarget.setProperty(currentProperty, this._token);
+							currentProperty = "";
+
 							this._token = "";
 							this.exitState();
 							if(char == "}")
@@ -282,9 +298,15 @@ package org.stylekit.css.parse
 						if(char == ";")
 						{
 							// Ending the import statement. 
-							// TODO Throw the token into an Import object at the current style index.
 							// Kill the token and exit the state
 							Logger.debug("Ending import state, about to clear token", this);
+							
+							//public function Import(ownerStyleSheet:StyleSheet, styleInsertionIndex:uint=0, animationInsertionIndex:uint=0, fontFaceInsertionIndex:uint=0) 
+							
+							var extImport:Import = new Import(this._styleSheet, this._styleStack.length, this._animationStack.length, this._fontFaceStack.length);
+							// TODO parse the import token statement
+							this._importStack.push(extImport);
+							
 							this._token = "";
 							this.exitState();
 						}
@@ -303,6 +325,9 @@ package org.stylekit.css.parse
 						{
 							// Entering the property descriptor block, switch to property state
 							Logger.debug("Found entering brace for at-font-face block, about to enter property state", this);
+							
+							this._fontFaceStack.push(new FontFace(this._styleSheet));
+							
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
@@ -354,6 +379,11 @@ package org.stylekit.css.parse
 						{
 							// Found the keyframes block name
 							Logger.debug("Found at-keyframe set '"+this._token+"'. About to look for keyframe descriptors.", this);
+							
+							var anim:Animation = new Animation(this._styleSheet);
+								anim.animationName = this._token;
+							this._animationStack.push(anim);
+							
 							this._token = "";
 							this._nesting += 2;
 							this.enterState(StyleSheetParser.KEYFRAME);
@@ -385,6 +415,11 @@ package org.stylekit.css.parse
 						{
 							// Finished collecting a keyframe descriptor
 							Logger.debug("Found individual keyframe descriptor '"+this._token+"', about to look for properties", this);
+							
+							var keyFrame:AnimationKeyFrame = new AnimationKeyFrame(this._styleSheet);
+								keyFrame.timeSelector = this._token;
+							this.currentAnimation.addKeyFrame(keyFrame);
+							
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
 						}
@@ -446,6 +481,33 @@ package org.stylekit.css.parse
 						break;
 				}
 			}
+			
+			// Append all the collected values to the stylesheet
+			var a:uint = 0;			
+			for(a=0; a < this._styleStack.length; a++)
+			{
+				
+			}
+			Logger.debug("StyleSheet build: Found "+this._styleStack.length+" styles", this);
+			
+			for(a=0; a < this._importStack.length; a++)
+			{
+				
+			}
+			Logger.debug("StyleSheet build: Found "+this._importStack.length+" @import statements", this);
+			
+			for(a=0; a < this._animationStack.length; a++)
+			{
+				
+			}
+			Logger.debug("StyleSheet build: Found "+this._animationStack.length+" @keyframe blocks", this);
+			
+			for(a=0; a < this._fontFaceStack.length; a++)
+			{
+				
+			}
+			Logger.debug("StyleSheet build: Found "+this._fontFaceStack.length+" @font-face declarations", this);
+			
 			return this._styleSheet;
 		}
 		
@@ -457,6 +519,7 @@ package org.stylekit.css.parse
 			this._styleSheet = new StyleSheet();			
 			this._stateStack = new Vector.<uint>();
 			this._styleStack = new Vector.<Style>();
+			this._importStack = new Vector.<Import>();
 			this._animationStack = new Vector.<Animation>();
 			this._fontFaceStack = new Vector.<FontFace>();
 			this._nesting = 0;
@@ -528,7 +591,7 @@ package org.stylekit.css.parse
 		* Called during the property/value parser cycle. The current property recipient is determined from the parser's stateStack
 		* and is the lowest-hanging Style, AnimationKeyFrame, or FontFace object.
 		*/
-		protected function get currentPropertyRecipient():PropertyContainer
+		protected function get currentPropertyTarget():PropertyContainer
 		{
 			// Loop backwards over state stack
 			for(var i:int=this._stateStack.length-1; i>=0; i--)
@@ -562,8 +625,7 @@ package org.stylekit.css.parse
 		
 		protected function get currentAnimationKeyFrame():AnimationKeyFrame
 		{
-			return new AnimationKeyFrame(this._styleSheet);
-			//return this._animationKeyFrameStack[this._animationKeyFrameStack.length-1];
+			return this.currentAnimation.keyFrames[this.currentAnimation.keyFrames.length-1];
 		}
 		
 		protected function get currentFontFace():FontFace
