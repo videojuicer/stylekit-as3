@@ -6,6 +6,7 @@
 
     <classEntry path="org.stylekit.css.parse.StyleSheetParser"/>
     <classEntry path="org.stylekit.css.parse.ElementSelectorParser"/>
+    <classEntry path="org.stylekit.css.parse.ValueParser"/>
     
     <classEntry path="org.stylekit.css.style.property.PropertyContainer" />
     
