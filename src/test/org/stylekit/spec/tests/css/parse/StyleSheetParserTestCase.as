@@ -9,6 +9,8 @@ package org.stylekit.spec.tests.css.parse
 	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.parse.StyleSheetParser;
+	import org.stylekit.css.style.Style;
+	import org.stylekit.css.style.Animation;
 	
 	public class StyleSheetParserTestCase
 	{
@@ -34,19 +36,41 @@ package org.stylekit.spec.tests.css.parse
 			
 			// Correct number of styles
 			Assert.assertEquals(6, this._parserResult.styles.length);
-				// Correct properties on styles
-				for(var i:uint=0; i < this._parserResult.styles.length; i++)
-				{
-					
-				}
 			// Correct number of font faces
-			
-			
-				// Correct properties on fontfaces
+			Assert.assertEquals(1, this._parserResult.fontFaces.length);		
 			// Correct number of imports
+			Assert.assertEquals(2, this._parserResult.imports.length);
+			
 			// Media block - correct number of styles marked with media restriction
-			// Correct number of animations
-				// Correct number of keyframes
+			var printStyles:uint = 0;
+			for(var prn:uint=0; prn<this._parserResult.styles.length; prn++)
+			{
+				var s:Style = this._parserResult.styles[prn];
+				if(s.mediaSelector != null)
+				{
+					if(s.mediaSelector.hasMedia("print"))
+					{
+						printStyles++;
+					}
+				}
+			}
+			Assert.assertEquals(2, printStyles);
+			
+			// Media block - correct number of styles with no restriction
+			var allMediaStyles:uint = 0;
+			for(var allMediaI:uint=0; allMediaI<this._parserResult.styles.length; allMediaI++)
+			{
+				var t:Style = this._parserResult.styles[allMediaI];
+				if(t.mediaSelector == null)
+				{
+					allMediaStyles++;
+				}
+			}
+			Assert.assertEquals(4, allMediaStyles);
+			
+			// Correct number of animations and keyframes
+			Assert.assertEquals(1, this._parserResult.animations.length);
+			Assert.assertEquals(2, (this._parserResult.animations[0] as Animation).keyFrames.length);
 		}
 		
 		

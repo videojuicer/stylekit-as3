@@ -39,18 +39,13 @@ package org.stylekit.spec.tests.css
 			for(var i:uint=0; i < this._styles.length; i++)
 			{
 				var s:Style = this._styles[i];
-				
-				Assert.assertFalse(s.hasEventListener(PropertyContainerEvent.PROPERTY_ADDED));
-				Assert.assertFalse(s.hasEventListener(PropertyContainerEvent.PROPERTY_MODIFIED));
-				Assert.assertFalse(s.hasEventListener(PropertyContainerEvent.PROPERTY_REMOVED));
+			
 				
 				Assert.assertFalse(this._styleSheet.hasStyle(s));
 				Assert.assertTrue(this._styleSheet.addStyle(s));
 				Assert.assertTrue(this._styleSheet.hasStyle(s));
 				
-				Assert.assertTrue(s.hasEventListener(PropertyContainerEvent.PROPERTY_ADDED));
-				Assert.assertTrue(s.hasEventListener(PropertyContainerEvent.PROPERTY_MODIFIED));
-				Assert.assertTrue(s.hasEventListener(PropertyContainerEvent.PROPERTY_REMOVED));
+
 
 			}
 		}
@@ -65,17 +60,11 @@ package org.stylekit.spec.tests.css
 				Assert.assertFalse(this._styleSheet.removeStyle(s));
 				Assert.assertTrue(this._styleSheet.addStyle(s));
 				Assert.assertTrue(this._styleSheet.hasStyle(s));
-				
-				Assert.assertTrue(s.hasEventListener(PropertyContainerEvent.PROPERTY_ADDED));
-				Assert.assertTrue(s.hasEventListener(PropertyContainerEvent.PROPERTY_MODIFIED));
-				Assert.assertTrue(s.hasEventListener(PropertyContainerEvent.PROPERTY_REMOVED));
+
 				
 				Assert.assertTrue(this._styleSheet.removeStyle(s));
 				Assert.assertFalse(this._styleSheet.hasStyle(s));				
-				
-				Assert.assertFalse(s.hasEventListener(PropertyContainerEvent.PROPERTY_ADDED));
-				Assert.assertFalse(s.hasEventListener(PropertyContainerEvent.PROPERTY_MODIFIED));
-				Assert.assertFalse(s.hasEventListener(PropertyContainerEvent.PROPERTY_REMOVED));
+
 			}
 		}
 		

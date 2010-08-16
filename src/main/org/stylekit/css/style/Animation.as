@@ -3,6 +3,7 @@ package org.stylekit.css.style
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.style.property.PropertyContainer;
 	import org.stylekit.css.style.AnimationKeyFrame;
+	import org.stylekit.css.style.selector.MediaSelector;
 	
 	/**
 	* An animation encapsulates a single @keyframes block within an owning StyleSheet object.
@@ -19,6 +20,12 @@ package org.stylekit.css.style
 		* A list of all keyframes defined by the Animation
 		*/
 		protected var _keyFrames:Vector.<AnimationKeyFrame>;
+		
+		/**
+		* A reference to a <code>MediaSelector</code> object used to restrict this instance to a specific set of media types.
+		*/ 
+		protected var _mediaSelector:MediaSelector;
+		
 		
 		/**
 		* Instiates a new Animation object within an owning <code>StyleSheet</code> instance.
@@ -44,6 +51,16 @@ package org.stylekit.css.style
 		public function get keyFrames():Vector.<AnimationKeyFrame>
 		{
 			return this._keyFrames;
+		}
+		
+		public function set mediaSelector(ms:MediaSelector):void
+		{
+			this._mediaSelector = ms;
+		}
+		
+		public function get mediaSelector():MediaSelector
+		{
+			return this._mediaSelector;
 		}
 		
 		public function addKeyFrame(kf:AnimationKeyFrame):Boolean

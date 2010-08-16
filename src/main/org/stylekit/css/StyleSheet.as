@@ -62,9 +62,6 @@ package org.stylekit.css {
 				return false;
 			}
 			this._styles.splice(atIndex, 0, s);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onStyleMutation);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onStyleMutation);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onStyleMutation);
 			return true;
 		}
 		
@@ -77,9 +74,6 @@ package org.stylekit.css {
 			if(this.hasStyle(s))
 			{
 				this._styles.splice(this._styles.indexOf(s), 1);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onStyleMutation);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onStyleMutation);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onStyleMutation);
 				return true;
 			}
 			return false;
@@ -97,9 +91,6 @@ package org.stylekit.css {
 				return false;
 			}
 			this._fontFaces.splice(atIndex, 0, s);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onFontFaceMutation);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onFontFaceMutation);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onFontFaceMutation);
 			return true;
 		}
 
@@ -112,9 +103,6 @@ package org.stylekit.css {
 			if(this.hasFontFace(s))
 			{
 				this._fontFaces.splice(this._fontFaces.indexOf(s), 1);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onFontFaceMutation);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onFontFaceMutation);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onFontFaceMutation);
 				return true;
 			}
 			return false;
@@ -132,9 +120,6 @@ package org.stylekit.css {
 				return false;
 			}
 			this._animations.splice(atIndex, 0, s);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onAnimationMutation);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onAnimationMutation);
-			s.addEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onAnimationMutation);
 			return true;
 		}
 
@@ -147,9 +132,6 @@ package org.stylekit.css {
 			if(this.hasAnimation(s))
 			{
 				this._animations.splice(this._animations.indexOf(s), 1);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onAnimationMutation);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onAnimationMutation);
-				s.removeEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onAnimationMutation);
 				return true;
 			}
 			return false;
@@ -184,20 +166,6 @@ package org.stylekit.css {
 			return false;
 		}
 		
-		protected function onStyleMutation(e:PropertyContainerEvent):void
-		{
-			
-		}
-		
-		protected function onFontFaceMutation(e:PropertyContainerEvent):void
-		{
-			
-		}
-		
-		protected function onAnimationMutation(e:PropertyContainerEvent):void
-		{
-			
-		}
 	}
 	
 }

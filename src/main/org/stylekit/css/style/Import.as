@@ -2,6 +2,7 @@ package org.stylekit.css.style
 {
 	import flash.events.EventDispatcher;	
 	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.style.selector.MediaSelector;
 		
 	/**
 	* An Import encapsulates a single @import statement within an owning StyleSheet object.
@@ -12,6 +13,11 @@ package org.stylekit.css.style
 		protected var _styleInsertionIndex:uint;
 		protected var _animationInsertionIndex:uint;
 		protected var _fontFaceInsertionIndex:uint;
+		
+		/**
+		* A reference to a <code>MediaSelector</code> object used to restrict this instance to a specific set of media types.
+		*/ 
+		protected var _mediaSelector:MediaSelector;
 		
 		/**
 		* Instiates a new Import object within an owning <code>StyleSheet</code> instance.
@@ -25,6 +31,16 @@ package org.stylekit.css.style
 			this._styleInsertionIndex = styleInsertionIndex;
 			this._animationInsertionIndex = animationInsertionIndex;
 			this._fontFaceInsertionIndex = fontFaceInsertionIndex;
+		}
+		
+		public function set mediaSelector(ms:MediaSelector):void
+		{
+			this._mediaSelector = ms;
+		}
+		
+		public function get mediaSelector():MediaSelector
+		{
+			return this._mediaSelector;
 		}
 	}
 }

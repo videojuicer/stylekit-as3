@@ -101,11 +101,6 @@ package org.stylekit.css.parse
 		protected var _mediaSelectorStack:Vector.<MediaSelector>;
 		
 		/**
-		* Stores the default media scope for newly-created styles. 
-		*/
-		protected var _defaultMediaSelector:MediaSelector;
-		
-		/**
 		* A flag used to indicate whether or not we are in a statement that includes nested braces - e.g. an @media or @keyframes block.
 		* When zero, we are not nested. When > 0, we are nested at N tiers.
 		*/
@@ -124,8 +119,6 @@ package org.stylekit.css.parse
 		{
 			this._elementSelectorParser = new ElementSelectorParser();
 			this._valueParser = new ValueParser();
-			this._defaultMediaSelector = new MediaSelector();
-				this._defaultMediaSelector.addMedia("screen");
 		}
 		
 		/**
@@ -214,7 +207,9 @@ package org.stylekit.css.parse
 							Logger.debug("Found selector '"+this._token+"'. Entering selector's property array, switching to property state. ", this);
 							
 							// Let's actually create the Style object ready to have properties injected
-							this._styleStack.push(new Style(this._styleSheet));
+							var style:Style = new Style(this._styleSheet);
+								style.mediaSelector = this.currentMediaSelector;
+							this._styleStack.push(style);
 							
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
@@ -328,7 +323,10 @@ package org.stylekit.css.parse
 							// Entering the property descriptor block, switch to property state
 							Logger.debug("Found entering brace for at-font-face block, about to enter property state", this);
 							
-							this._fontFaceStack.push(new FontFace(this._styleSheet));
+							var fontFace:FontFace = new FontFace(this._styleSheet);
+								fontFace.mediaSelector = this.currentMediaSelector;
+							
+							this._fontFaceStack.push(fontFace);
 							
 							this._token = "";
 							this.enterState(StyleSheetParser.PROPERTY);
@@ -395,6 +393,7 @@ package org.stylekit.css.parse
 							
 							var anim:Animation = new Animation(this._styleSheet);
 								anim.animationName = this._token;
+								anim.mediaSelector = this.currentMediaSelector;
 							this._animationStack.push(anim);
 							
 							this._token = "";
@@ -594,7 +593,7 @@ package org.stylekit.css.parse
 		{
 			if(this._mediaSelectorStack.length < 1)
 			{
-				return this._defaultMediaSelector;
+				return null;
 			}
 			return this._mediaSelectorStack[this._mediaSelectorStack.length - 1];
 		}
