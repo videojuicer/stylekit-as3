@@ -5,6 +5,7 @@ package org.stylekit.ui.element
 	import flash.errors.IllegalOperationError;
 	
 	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.style.Style;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
 	
@@ -25,11 +26,10 @@ package org.stylekit.ui.element
 		protected var _effectiveHeight:int;
 		protected var _contentWidth:int;
 		protected var _contentHeight:int;
-		
-		protected var _styleSheetCollection:StyleSheetCollection;
-		
+
 		protected var _parentElement:UIElement;
 		protected var _baseUI:BaseUI;
+		protected var _localStyle:Style;
 		
 		public function UIElement()
 		{
@@ -48,9 +48,9 @@ package org.stylekit.ui.element
 			return this._baseUI;
 		}
 		
-		public function get styleSheetCollection():StyleSheetCollection
+		public function get localStyle():Style
 		{
-			return this._styleSheetCollection;
+			return this._localStyle;
 		}
 		
 		public function get styleEligible():Boolean
