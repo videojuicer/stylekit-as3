@@ -36,5 +36,41 @@ package org.stylekit.spec.tests.css.parse
 			}
 		}
 		
+		[Test(description="Ensures that a space-delimited CSS string can be parsed, ignoring bracketed or quoted values.")]
+		public function spaceDelimStringParsesCorrectly():void
+		{
+			var result:Vector.<String> = this._parser.parseSpaceDelimitedString("one two url(three three three) url(\"four four four\") 'five five five'");
+			Assert.assertEquals(5, result.length);
+			
+			var expected:Array = ["one", "two", "url(three three three)", "url(\"four four four\")", "'five five five'"];
+			for(var i:uint = 0; i<expected.length; i++)
+			{
+				Assert.assertEquals(expected[i], result[i]);
+			}
+		}
+		
+		[Test(description="Ensures that the parsing of a CSS url-type string works correctly")]
+		public function urlTokenParsesCorrectly():void
+		{
+			var tokens:Vector.<String> = new Vector.<String>();
+				tokens.push("url(\"foo.css\") some other stuff");
+				tokens.push("url('foo.css') blah blah");
+				tokens.push("\"foo.css\"     ");
+				tokens.push("url(foo.css)     ");
+				
+			var tokenLengths:Vector.<uint> = new Vector.<uint>();
+				tokenLengths.push(14);
+				tokenLengths.push(14);
+				tokenLengths.push(9);
+				tokenLengths.push(12);
+			
+			for(var i:uint=0; i < tokens.length; i++)
+			{
+				var result:Array = this._parser.parseURLToken(tokens[i]);
+				Assert.assertEquals("foo.css", result[0]);
+				Assert.assertEquals(tokenLengths[i], result[1]);
+			}
+		}
+		
 	}
 }
