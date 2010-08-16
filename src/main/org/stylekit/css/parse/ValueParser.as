@@ -1,7 +1,7 @@
 package org.stylekit.css.parse
 {
 	
-	//import org.utilkit.util.StringUtil;
+	import org.utilkit.util.StringUtil;
 	
 	/**
 	* The <code>ValueParser</code> class provides utility methods for parsing CSS property values of various types.
@@ -33,10 +33,21 @@ package org.stylekit.css.parse
 		
 		/**
 		* Parses a comma-delimited string into a vector of strings, trimming the whitespace from each.
+		* e.g. "foo,bar, car, baz,, faz,,  bat, " > vector containing foo,bar,car,baz,faz,bat
 		*/
-		public function parseCommaDelimitedString(str:String):void
+		public function parseCommaDelimitedString(str:String):Vector.<String>
 		{
-			
+			var spl:Array = str.split(",");
+			var vec:Vector.<String> = new Vector.<String>();
+			for(var i:uint=0; i<spl.length; i++)
+			{
+				var strp:String = StringUtil.trim(spl[i]);
+				if(strp.length > 0)
+				{
+					vec.push(strp);
+				}
+			}
+			return vec;
 		}
 		
 	}

@@ -11,6 +11,7 @@ package org.stylekit.spec
 	
 	import org.stylekit.spec.tests.css.style.AnimationTestCase;
 	import org.stylekit.spec.tests.css.style.selector.ElementSelectorTestCase;
+	import org.stylekit.spec.tests.css.style.selector.MediaSelectorTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -25,6 +26,7 @@ package org.stylekit.spec
 		
 		public var elementSelectorTest:ElementSelectorTestCase;
 		public var uiElementTest:UIElementTestCase;
+		public var mediaSelectorTest:MediaSelectorTestCase;
 		public var animationTest:AnimationTestCase;
 	}
 }

@@ -31,7 +31,22 @@ package org.stylekit.spec.tests.css.parse
 		public function mixedCSSParsesCorrectly():void
 		{
 			this._parserResult = this._parser.parse(Fixtures.CSS_MIXED);
-			//Assert.assertEquals("", this._parser.logs.join("\n\r"));
+			
+			// Correct number of styles
+			Assert.assertEquals(6, this._parserResult.styles.length);
+				// Correct properties on styles
+				for(var i:uint=0; i < this._parserResult.styles.length; i++)
+				{
+					
+				}
+			// Correct number of font faces
+			
+			
+				// Correct properties on fontfaces
+			// Correct number of imports
+			// Media block - correct number of styles marked with media restriction
+			// Correct number of animations
+				// Correct number of keyframes
 		}
 		
 		

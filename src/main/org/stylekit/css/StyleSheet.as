@@ -8,16 +8,46 @@ package org.stylekit.css {
 	import flash.events.EventDispatcher;
 	
 	import org.stylekit.css.style.Style;
+	import org.stylekit.css.style.FontFace;
+	import org.stylekit.css.style.Animation;
+	import org.stylekit.css.style.Import;
+	
 	import org.stylekit.events.PropertyContainerEvent;
 	
 	public class StyleSheet extends EventDispatcher
 	{
 		
 		protected var _styles:Vector.<Style>;
+		protected var _fontFaces:Vector.<FontFace>;
+		protected var _animations:Vector.<Animation>;
+		protected var _imports:Vector.<Import>;
 		
 		public function StyleSheet()
 		{
-			this._styles = new Vector.<Style>;
+			this._styles = new Vector.<Style>();
+			this._fontFaces = new Vector.<FontFace>();
+			this._animations = new Vector.<Animation>();
+			this._imports = new Vector.<Import>();
+		}
+		
+		public function get styles():Vector.<Style>
+		{
+			return this._styles;
+		}
+		
+		public function get fontFaces():Vector.<FontFace>
+		{
+			return this._fontFaces;
+		}
+		
+		public function get animations():Vector.<Animation>
+		{
+			return this._animations;
+		}
+		
+		public function get imports():Vector.<Import>
+		{
+			return this._imports;
 		}
 		
 		public function hasStyle(s:Style):Boolean
@@ -55,9 +85,103 @@ package org.stylekit.css {
 			return false;
 		}
 		
-		public function get styles():Vector.<Style>
+		public function hasFontFace(s:FontFace):Boolean
 		{
-			return this._styles;
+			return (this._fontFaces.indexOf(s) > -1);
+		}
+
+		public function addFontFace(s:FontFace, atIndex:int=-1):Boolean
+		{
+			if(this.hasFontFace(s))
+			{
+				return false;
+			}
+			this._fontFaces.splice(atIndex, 0, s);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onFontFaceMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onFontFaceMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onFontFaceMutation);
+			return true;
+		}
+
+		/**
+		* Removes a <code>FontFace</code> object from the StyleSheet.
+		* @return A boolean, true if the <code>FontFace</code> object was removed and false if it was not present.
+		*/
+		public function removeFontFace(s:FontFace):Boolean
+		{
+			if(this.hasFontFace(s))
+			{
+				this._fontFaces.splice(this._fontFaces.indexOf(s), 1);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onFontFaceMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onFontFaceMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onFontFaceMutation);
+				return true;
+			}
+			return false;
+		}
+		
+		public function hasAnimation(s:Animation):Boolean
+		{
+			return (this._animations.indexOf(s) > -1);
+		}
+
+		public function addAnimation(s:Animation, atIndex:int=-1):Boolean
+		{
+			if(this.hasAnimation(s))
+			{
+				return false;
+			}
+			this._animations.splice(atIndex, 0, s);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onAnimationMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onAnimationMutation);
+			s.addEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onAnimationMutation);
+			return true;
+		}
+
+		/**
+		* Removes a <code>Animation</code> object from the StyleSheet.
+		* @return A boolean, true if the <code>Animation</code> object was removed and false if it was not present.
+		*/
+		public function removeAnimation(s:Animation):Boolean
+		{
+			if(this.hasAnimation(s))
+			{
+				this._animations.splice(this._animations.indexOf(s), 1);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_ADDED, this.onAnimationMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onAnimationMutation);
+				s.removeEventListener(PropertyContainerEvent.PROPERTY_REMOVED, this.onAnimationMutation);
+				return true;
+			}
+			return false;
+		}
+		
+		public function hasImport(s:Import):Boolean
+		{
+			return (this._imports.indexOf(s) > -1);
+		}
+
+		public function addImport(s:Import, atIndex:int=-1):Boolean
+		{
+			if(this.hasImport(s))
+			{
+				return false;
+			}
+			this._imports.splice(atIndex, 0, s);
+			return true;
+		}
+
+		/**
+		* Removes a <code>Import</code> object from the StyleSheet.
+		* @return A boolean, true if the <code>Import</code> object was removed and false if it was not present.
+		*/
+		public function removeImport(s:Import):Boolean
+		{
+			if(this.hasImport(s))
+			{
+				this._imports.splice(this._imports.indexOf(s), 1);
+				return true;
+			}
+			return false;
 		}
 		
 		protected function onStyleMutation(e:PropertyContainerEvent):void
@@ -65,6 +189,15 @@ package org.stylekit.css {
 			
 		}
 		
+		protected function onFontFaceMutation(e:PropertyContainerEvent):void
+		{
+			
+		}
+		
+		protected function onAnimationMutation(e:PropertyContainerEvent):void
+		{
+			
+		}
 	}
 	
 }

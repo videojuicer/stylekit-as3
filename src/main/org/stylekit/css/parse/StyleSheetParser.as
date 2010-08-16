@@ -14,6 +14,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.parse.ValueParser;
 	
+	import org.stylekit.css.style.selector.MediaSelector;
 	import org.stylekit.css.style.property.PropertyContainer;	
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
@@ -97,13 +98,12 @@ package org.stylekit.css.parse
 		/**
 		* Populated by an @media declaration setting the media scope for any containing styles.
 		*/
-		protected var _currentMediaScope:Vector.<String>;
+		protected var _mediaSelectorStack:Vector.<MediaSelector>;
 		
 		/**
-		* Stores the default media scope for newly-created styles. Returned by <code>.currentMediaScope</code> when no
-		* @media block is currently active.
+		* Stores the default media scope for newly-created styles. 
 		*/
-		protected var _defaultMediaScope:Vector.<String>;
+		protected var _defaultMediaSelector:MediaSelector;
 		
 		/**
 		* A flag used to indicate whether or not we are in a statement that includes nested braces - e.g. an @media or @keyframes block.
@@ -124,6 +124,8 @@ package org.stylekit.css.parse
 		{
 			this._elementSelectorParser = new ElementSelectorParser();
 			this._valueParser = new ValueParser();
+			this._defaultMediaSelector = new MediaSelector();
+				this._defaultMediaSelector.addMedia("screen");
 		}
 		
 		/**
@@ -344,8 +346,16 @@ package org.stylekit.css.parse
 					case StyleSheetParser.MEDIA:
 						if(char == "{")
 						{
-							Logger.debug("Entering at-media rule for '"+this._token+"'", this);
-							// Parse the list into the current
+							Logger.debug("Entering at-media rule for '"+this._token+"', parsing token and appending new MediaSelector to stack", this);
+							
+							// Parse the list into the MediaSelector stack
+							var mSel:MediaSelector = new MediaSelector();
+							var mediaTypes:Vector.<String> = this._valueParser.parseCommaDelimitedString(this._token);
+							for(var m:uint = 0; m < mediaTypes.length; m++)
+							{
+								mSel.addMedia(mediaTypes[m]);
+							}
+							this._mediaSelectorStack.push(mSel);
 							
 							this._token = "";
 							this._nesting += 2;
@@ -361,7 +371,10 @@ package org.stylekit.css.parse
 							}
 							else
 							{
-								Logger.debug("Exiting at-media rule", this);
+								Logger.debug("Exiting at-media rule, popping MediaSelector stack", this);
+								
+								this._mediaSelectorStack.pop();
+								
 								this._token = "";
 								this._lexerIndex++;
 								this.exitState();
@@ -486,25 +499,25 @@ package org.stylekit.css.parse
 			var a:uint = 0;			
 			for(a=0; a < this._styleStack.length; a++)
 			{
-				
+				this._styleSheet.addStyle(this._styleStack[a]);
 			}
 			Logger.debug("StyleSheet build: Found "+this._styleStack.length+" styles", this);
 			
 			for(a=0; a < this._importStack.length; a++)
 			{
-				
+				this._styleSheet.addImport(this._importStack[a]);
 			}
 			Logger.debug("StyleSheet build: Found "+this._importStack.length+" @import statements", this);
 			
 			for(a=0; a < this._animationStack.length; a++)
 			{
-				
+				this._styleSheet.addAnimation(this._animationStack[a]);
 			}
 			Logger.debug("StyleSheet build: Found "+this._animationStack.length+" @keyframe blocks", this);
 			
 			for(a=0; a < this._fontFaceStack.length; a++)
 			{
-				
+				this._styleSheet.addFontFace(this._fontFaceStack[a]);
 			}
 			Logger.debug("StyleSheet build: Found "+this._fontFaceStack.length+" @font-face declarations", this);
 			
@@ -514,8 +527,7 @@ package org.stylekit.css.parse
 		protected function resetState():void
 		{
 			Logger.debug("Resetting parser state for new parse operation", this);
-			this._currentMediaScope = new Vector.<String>;
-			this._defaultMediaScope = new Vector.<String>("screen");
+			this._mediaSelectorStack = new Vector.<MediaSelector>();
 			this._styleSheet = new StyleSheet();			
 			this._stateStack = new Vector.<uint>();
 			this._styleStack = new Vector.<Style>();
@@ -578,13 +590,13 @@ package org.stylekit.css.parse
 			return (this._nesting >= 1);
 		}
 		
-		protected function get currentMediaScope():Vector.<String>
+		protected function get currentMediaSelector():MediaSelector
 		{
-			if(this._currentMediaScope.length < 1)
+			if(this._mediaSelectorStack.length < 1)
 			{
-				return this._defaultMediaScope;
+				return this._defaultMediaSelector;
 			}
-			return this._currentMediaScope;
+			return this._mediaSelectorStack[this._mediaSelectorStack.length - 1];
 		}
 		
 		/**
