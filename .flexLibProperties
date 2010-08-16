@@ -6,13 +6,10 @@
     <classEntry path="org.stylekit.css.parse.StyleSheetParser"/>
     <classEntry path="org.stylekit.css.parse.ElementSelectorParser"/>
     <classEntry path="org.stylekit.css.parse.ValueParser"/>
-
-    <classEntry path="org.stylekit.css.style.property.PropertyContainer"/>
-    
-    <classEntry path="org.stylekit.css.style.selector.ElementSelectorChain"/>
-    <classEntry path="org.stylekit.css.style.selector.ElementSelector"/>
-    <classEntry path="org.stylekit.css.style.selector.MediaSelector" />
-    
+    <classEntry path="org.stylekit.css.property.PropertyContainer"/>
+    <classEntry path="org.stylekit.css.selector.ElementSelectorChain"/>
+    <classEntry path="org.stylekit.css.selector.ElementSelector"/>
+    <classEntry path="org.stylekit.css.selector.MediaSelector"/>
     <classEntry path="org.stylekit.css.style.Style"/>
     <classEntry path="org.stylekit.css.style.Animation"/>
     <classEntry path="org.stylekit.css.style.AnimationKeyFrame"/>

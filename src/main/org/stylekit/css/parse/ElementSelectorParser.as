@@ -3,8 +3,8 @@ package org.stylekit.css.parse
 	import org.utilkit.util.StringUtil;
 	import org.utilkit.logger.Logger;
 	
-	import org.stylekit.css.style.selector.ElementSelectorChain;
-	import org.stylekit.css.style.selector.ElementSelector;
+	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.selector.ElementSelector;
 	
 	/**
 	* The <code>ElementSelectorParser</code> is responsible for parsing an individual CSS selector statement such as

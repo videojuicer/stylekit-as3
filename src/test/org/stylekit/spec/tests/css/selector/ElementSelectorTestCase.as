@@ -1,11 +1,11 @@
-package org.stylekit.spec.tests.css.style.selector
+package org.stylekit.spec.tests.css.selector
 {
 
 	import flexunit.framework.Assert;
 	import flexunit.framework.AsyncTestHelper;
 	import org.flexunit.async.Async;
 
-	import org.stylekit.css.style.selector.ElementSelector;
+	import org.stylekit.css.selector.ElementSelector;
 
 	public class ElementSelectorTestCase {
 		

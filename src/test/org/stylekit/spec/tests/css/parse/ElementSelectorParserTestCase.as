@@ -8,8 +8,8 @@ package org.stylekit.spec.tests.css.parse
 	import org.stylekit.spec.Fixtures;
 	
 	import org.stylekit.css.parse.ElementSelectorParser;
-	import org.stylekit.css.style.selector.ElementSelectorChain;
-	import org.stylekit.css.style.selector.ElementSelector;
+	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.selector.ElementSelector;
 	
 	public class ElementSelectorParserTestCase
 	{

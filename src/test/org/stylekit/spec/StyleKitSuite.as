@@ -10,8 +10,8 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.parse.ValueParserTestCase;
 	
 	import org.stylekit.spec.tests.css.style.AnimationTestCase;
-	import org.stylekit.spec.tests.css.style.selector.ElementSelectorTestCase;
-	import org.stylekit.spec.tests.css.style.selector.MediaSelectorTestCase;
+	import org.stylekit.spec.tests.css.selector.ElementSelectorTestCase;
+	import org.stylekit.spec.tests.css.selector.MediaSelectorTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]

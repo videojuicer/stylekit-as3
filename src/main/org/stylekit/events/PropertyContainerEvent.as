@@ -2,7 +2,7 @@ package org.stylekit.events
 {
 	
 	import flash.events.Event;
-	import org.stylekit.css.style.property.PropertyContainer;
+	import org.stylekit.css.property.PropertyContainer;
 	
 	public class PropertyContainerEvent extends Event
 	{

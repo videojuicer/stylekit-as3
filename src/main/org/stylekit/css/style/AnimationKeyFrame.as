@@ -2,7 +2,7 @@ package org.stylekit.css.style
 {
 	
 	import org.stylekit.css.StyleSheet;
-	import org.stylekit.css.style.property.PropertyContainer;
+	import org.stylekit.css.property.PropertyContainer;
 	
 	public class AnimationKeyFrame extends PropertyContainer
 	{

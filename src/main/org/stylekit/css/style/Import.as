@@ -2,7 +2,7 @@ package org.stylekit.css.style
 {
 	import flash.events.EventDispatcher;	
 	import org.stylekit.css.StyleSheet;
-	import org.stylekit.css.style.selector.MediaSelector;
+	import org.stylekit.css.selector.MediaSelector;
 		
 	/**
 	* An Import encapsulates a single @import statement within an owning StyleSheet object.

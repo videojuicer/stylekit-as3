@@ -1,4 +1,4 @@
-package org.stylekit.css.style.property
+package org.stylekit.css.property
 {
 	import flash.events.EventDispatcher;
 	

@@ -14,8 +14,8 @@ package org.stylekit.css.parse
 	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.parse.ValueParser;
 	
-	import org.stylekit.css.style.selector.MediaSelector;
-	import org.stylekit.css.style.property.PropertyContainer;	
+	import org.stylekit.css.selector.MediaSelector;
+	import org.stylekit.css.property.PropertyContainer;	
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
 	import org.stylekit.css.style.AnimationKeyFrame;

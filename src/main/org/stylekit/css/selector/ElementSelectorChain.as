@@ -1,7 +1,7 @@
-package org.stylekit.css.style.selector
+package org.stylekit.css.selector
 {
 	
-	import org.stylekit.css.style.selector.ElementSelector;
+	import org.stylekit.css.selector.ElementSelector;
 	
 	/**
 	* An <code>ElementSelectorChain</code> is, as the name suggests, an ordered chain of <code>ElementSelector</code> instances.

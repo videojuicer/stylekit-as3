@@ -1,4 +1,4 @@
-package org.stylekit.css.style.selector
+package org.stylekit.css.selector
 {
 	/**
 	* A <code>MediaSelector</code> object may be applied to a StyleSheet or 

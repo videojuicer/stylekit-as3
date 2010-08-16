@@ -1,8 +1,8 @@
 package org.stylekit.css.style
 {
 	import org.stylekit.css.StyleSheet;
-	import org.stylekit.css.style.property.PropertyContainer;
-	import org.stylekit.css.style.selector.MediaSelector;	
+	import org.stylekit.css.property.PropertyContainer;
+	import org.stylekit.css.selector.MediaSelector;	
 	
 	/**
 	* A Style is a single declarative block within a given owning StyleSheet.

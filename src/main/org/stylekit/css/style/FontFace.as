@@ -1,8 +1,8 @@
 package org.stylekit.css.style
 {
 	import org.stylekit.css.StyleSheet;
-	import org.stylekit.css.style.property.PropertyContainer;
-	import org.stylekit.css.style.selector.MediaSelector;
+	import org.stylekit.css.property.PropertyContainer;
+	import org.stylekit.css.selector.MediaSelector;
 	
 	/**
 	* An FontFace encapsulates a single @font-face block within an owning StyleSheet object.

@@ -1,4 +1,4 @@
-package org.stylekit.css.style.selector
+package org.stylekit.css.selector
 {
 	
 	public class ElementSelector

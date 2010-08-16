@@ -1,9 +1,9 @@
 package org.stylekit.css.style
 {
 	import org.stylekit.css.StyleSheet;
-	import org.stylekit.css.style.property.PropertyContainer;
+	import org.stylekit.css.property.PropertyContainer;
 	import org.stylekit.css.style.AnimationKeyFrame;
-	import org.stylekit.css.style.selector.MediaSelector;
+	import org.stylekit.css.selector.MediaSelector;
 	
 	/**
 	* An animation encapsulates a single @keyframes block within an owning StyleSheet object.
