@@ -83,11 +83,20 @@
 		<exec executable="git" spawn="false" dir="${basedir}">
 			<arg line="pull --rebase" />
 		</exec>
+		<exec executable="git" spawn="false" dir="${util.loc}">
+			<arg line="pull origin master" />
+		</exec>
+	</target>
+	
+	<target name="setup" description="Sets up the StyleKit local repo and the submodules contained within">
+		<exec executable="git" spawn="false" dir="${basedir}">
+			<arg line="pull --rebase" />
+		</exec>
 		<exec executable="git" spawn="false">
 			<arg line="submodule init" />
 		</exec>
-		<exec executable="git" spawn="false" dir="${util.loc}">
-			<arg line="pull origin master" />
+		<exec executable="git" spawn="false">
+			<arg line="submodule update" />
 		</exec>
 	</target>
 	
