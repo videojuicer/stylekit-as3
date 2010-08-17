@@ -17,6 +17,11 @@ package org.stylekit.ui
 			return this;
 		}
 		
+		public override function get styleEligible():Boolean
+		{
+			return true;
+		}
+		
 		public function get styleSheetCollection():StyleSheetCollection
 		{
 			return this._styleSheetCollection;

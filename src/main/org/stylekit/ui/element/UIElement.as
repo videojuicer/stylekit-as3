@@ -27,15 +27,26 @@ package org.stylekit.ui.element
 		protected var _contentWidth:int;
 		protected var _contentHeight:int;
 
+		protected var _parentIndex:uint = 0;
 		protected var _parentElement:UIElement;
+		
 		protected var _baseUI:BaseUI;
 		protected var _localStyle:Style;
+		
+		protected var _elementName:String;
+		protected var _elementId:String;
+		
+		protected var _elementClassNames:Vector.<String>;
+		protected var _elementPseudoClasses:Vector.<String>;
 		
 		public function UIElement()
 		{
 			super();
 			
 			this._children = new Vector.<UIElement>();
+			
+			this._elementClassNames = new Vector.<String>();
+			this._elementPseudoClasses = new Vector.<String>();
 		}
 		
 		public function get parentElement():UIElement
@@ -108,6 +119,119 @@ package org.stylekit.ui.element
 			return null;
 		}
 		
+		public function get styleParent():UIElement
+		{
+			if (this.parentElement.styleEligible)
+			{
+				return this.parentElement;
+			}
+			
+			return this.parentElement.styleParent;
+		}
+		
+		public function get elementName():String
+		{
+			return this._elementName;
+		}
+		
+		public function set elementName(elementName:String):void
+		{
+			this._elementName = elementName;
+			
+			this.updateStyle();
+		}
+		
+		public function get elementId():String
+		{
+			return this._elementId;
+		}
+		
+		public function get isFirstChild():Boolean
+		{
+			return (this.parentIndex == 0);
+		}
+		
+		public function get isLastChild():Boolean
+		{
+			return (this.parentIndex == this.parent.numChildren);
+		}
+		
+		public function get parentIndex():uint
+		{
+			return this._parentIndex;
+		}
+		
+		public function hasElementClassName(className:String):Boolean
+		{
+			return (this._elementClassNames.indexOf(className) > -1);
+		}
+		
+		public function addElementClassName(className:String):Boolean
+		{
+			if (this.hasElementClassName(className))
+			{
+				return false;
+			}
+			
+			this._elementClassNames.push(className);
+			
+			this.updateStyle();
+			
+			return true;
+		}
+		
+		public function removeElementClassName(className:String):Boolean
+		{
+			if (this.hasElementClassName(className))
+			{
+				this._elementClassNames.splice(this._elementClassNames.indexOf(className), 1);
+				
+				this.updateStyle();
+				
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public function hasElementPseudoClass(pseudoClass:String):Boolean
+		{
+			return (this._elementPseudoClasses.indexOf(pseudoClass) > -1);
+		}
+		
+		public function addElementPseudoClass(pseudoClass:String):Boolean
+		{
+			if (this.hasElementPseudoClass(pseudoClass))
+			{
+				return false;
+			}
+			
+			this._elementPseudoClasses.push(pseudoClass);
+			
+			this.updateStyle();
+			
+			return true;
+		}
+		
+		public function removeElementPseudoClass(pseudoClass:String):Boolean
+		{
+			if (this.hasElementPseudoClass(pseudoClass))
+			{
+				this._elementPseudoClasses.splice(this._elementClassNames.indexOf(pseudoClass), 1);
+				
+				this.updateStyle();
+				
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public function updateStyle():void
+		{
+			
+		}
+		
 		public function layoutChildren():void
 		{
 			
@@ -116,6 +240,34 @@ package org.stylekit.ui.element
 		public function redraw():void
 		{
 			
+		}
+		
+		protected function updateParentIndex():void
+		{
+			var i:uint = 0;
+			
+			for (; i < this.parentElement.numChildren; i++)
+			{
+				if (this.parentElement.children[i] == this)
+				{
+					break;
+				}
+			}
+			
+			this._parentIndex = i;
+			
+			this.updateStyle();
+		}
+		
+		protected function updateChildrenIndex():void
+		{
+			if (this.parentElement != null)
+			{
+				for (var i:int = 0; i < this.parentElement.numChildren; i++)
+				{
+					this.parentElement.children[i].updateParentIndex();
+				}
+			}
 		}
 		
 		public function addElement(child:UIElement):UIElement
@@ -144,6 +296,8 @@ package org.stylekit.ui.element
 				this._children.push(child);
 			}
 			
+			this.updateChildrenIndex();
+			
 			return child;
 		}
 		
@@ -169,6 +323,8 @@ package org.stylekit.ui.element
 			child._baseUI = null;
 			
 			this._children.splice(index, 1);
+			
+			this.updateChildrenIndex();
 			
 			return child;
 		}
