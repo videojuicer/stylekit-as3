@@ -54,6 +54,34 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(child3, parent.lastChild);
 		}
 		
+		[Test(description="Tests that a UIElement can have pseduo classes attached and removed")]
+		public function canHasPseudoClass():void
+		{
+			var element:UIElement = new UIElement();
+			
+			element.addElementPseudoClass("hover");
+			
+			Assert.assertTrue(element.hasElementPseudoClass("hover"));
+				
+			element.removeElementPseudoClass("hover");
+			
+			Assert.assertFalse(element.hasElementPseudoClass("hover"));
+		}
+		
+		[Test(description="Tests that a UIElement can have class names attached and removed")]
+		public function canHasClassNames():void
+		{
+			var element:UIElement = new UIElement();
+			
+			element.addElementClassName("test");
+			
+			Assert.assertTrue(element.hasElementClassName("test"));
+			
+			element.removeElementClassName("test");
+			
+			Assert.assertFalse(element.hasElementClassName("test"));
+		}
+			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]
 		public function parentElementCanListen():void
 		{
