@@ -7,6 +7,7 @@ package org.stylekit.css.parse
 	*/
 	import flash.events.EventDispatcher;
 	
+	import org.utilkit.util.StringUtil;
 	import org.utilkit.logger.Logger;
 	
 	import org.stylekit.css.StyleSheet;
@@ -15,6 +16,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.parse.ValueParser;
 	
 	import org.stylekit.css.selector.MediaSelector;
+	import org.stylekit.css.property.Property;
 	import org.stylekit.css.property.PropertyContainer;	
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
@@ -266,7 +268,7 @@ package org.stylekit.css.parse
 							Logger.debug("Found property value for property '"+currentProperty+"'. Setting on property target and exiting value state", this);
 
 							// Grab the property key and route it to the current property target
-							this.currentPropertyTarget.setProperty(currentProperty, this._token);
+							this.appendPropertyValue(currentProperty, this._token);
 							currentProperty = "";
 
 							this._token = "";
@@ -538,6 +540,37 @@ package org.stylekit.css.parse
 			this._fontFaceStack = new Vector.<FontFace>();
 			this._nesting = 0;
 			this._token = "";
+		}
+		
+		protected function appendPropertyValue(propertyName:String, unparsedPropertyValue:String):void
+		{
+			var propN:String = StringUtil.trim(propertyName.toLowerCase());
+			var property:Property = new Property(propN);
+			
+			switch(propN)
+			{
+				// Complex Compound values
+				case "background":
+					break;
+				case "border":
+					break;
+				case "list-style":
+					break;
+				case "overflow":
+					break;
+				default:
+					if(propN == "padding" || propN == "margin" || propN == "border-width" || propN == "border-radius")
+					{
+						// Simple compound dimensional values
+					}
+					else if(propN == "border-top" || propN == "border-left" || propN == "border-right" || propN == "border-bottom")
+					{
+						// Compound background values that don't macro to each side
+					}
+					break;
+			}
+			
+			this.currentPropertyTarget.addProperty(property);
 		}
 		
 		protected function enterState(state:uint):void

@@ -4,6 +4,9 @@ package org.stylekit.css.parse
 	import org.utilkit.util.StringUtil;
 	import org.stylekit.css.selector.MediaSelector;
 	
+	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.EdgeCompoundValue;
+	
 	/**
 	* The <code>ValueParser</code> class provides utility methods for parsing CSS property values of various types.
 	*/
@@ -13,6 +16,66 @@ package org.stylekit.css.parse
 		public function ValueParser()
 		{
 			
+		}
+		
+		/**
+		* Parses a four-way sizing value such as may be used for padding, margin etc. and returns an EdgeCompoundValue.
+		*/
+		public function parseEdgeSizeCompoundValue(str:String):EdgeCompoundValue
+		{
+			var sizeStrings:Vector.<String> = this.parseSpaceDelimitedString(str);
+			var cVal:EdgeCompoundValue = new EdgeCompoundValue();
+			
+			var sizeValues:Vector.<SizeValue> = new Vector.<SizeValue>();
+			for(var i:uint = 0; i < sizeStrings.length; i++)
+			{
+				sizeValues.push(this.parseSizeValue(sizeStrings[i]));
+			}
+			
+			switch(sizeValues.length)
+			{
+				case 1:
+					// all
+					cVal.leftValue = cVal.rightValue = cVal.topValue = cVal.bottomValue = sizeValues[0];
+					break;
+				case 2:
+					// top+bottom, left+right
+					cVal.topValue = cVal.bottomValue = sizeValues[0];
+					cVal.leftValue = cVal.rightValue = sizeValues[1];
+					break;
+				case 3: 
+					// top, left+right, bottom
+					cVal.topValue = sizeValues[0];
+					cVal.leftValue = cVal.rightValue = sizeValues[1];
+					cVal.bottomValue = sizeValues[2];
+					break;
+				case 4:
+					// top, right, bottom, left
+					cVal.topValue = sizeValues[0];
+					cVal.rightValue = sizeValues[1];
+					cVal.bottomValue = sizeValues[2];
+					cVal.leftValue = sizeValues[3];
+					break;
+			}
+			
+			return cVal;
+		}
+		
+		public function parseSizeValue(str:String):SizeValue
+		{
+			str = StringUtil.trim(str.toLowerCase());
+			var sVal:SizeValue = new SizeValue();
+			var unitPattern:RegExp = new RegExp("[%a-zA-Z]+");
+			var unitIndex:int = str.search(unitPattern);
+
+			sVal.value = parseFloat(str);
+			
+			if(unitIndex >= 0)
+			{
+				sVal.units = str.substring(unitIndex);
+			}
+			
+			return sVal;
 		}
 		
 		/**
@@ -122,6 +185,7 @@ package org.stylekit.css.parse
 		*/
 		public function parseSpaceDelimitedString(str:String):Vector.<String>
 		{
+			str = StringUtil.trim(str);
 			var result:Vector.<String> = new Vector.<String>();
 			var tokenOpened:Boolean = false;
 			var token:String = "";

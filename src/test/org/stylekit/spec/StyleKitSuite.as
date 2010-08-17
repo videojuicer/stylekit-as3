@@ -10,8 +10,11 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.parse.ValueParserTestCase;
 	
 	import org.stylekit.spec.tests.css.style.AnimationTestCase;
+	
 	import org.stylekit.spec.tests.css.selector.ElementSelectorTestCase;
 	import org.stylekit.spec.tests.css.selector.MediaSelectorTestCase;
+	
+	import org.stylekit.spec.tests.css.value.SizeValueTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -28,5 +31,7 @@ package org.stylekit.spec
 		public var uiElementTest:UIElementTestCase;
 		public var mediaSelectorTest:MediaSelectorTestCase;
 		public var animationTest:AnimationTestCase;
+		
+		public var sizeValueTest:SizeValueTestCase;
 	}
 }

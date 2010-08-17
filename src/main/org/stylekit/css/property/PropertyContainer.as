@@ -3,6 +3,7 @@ package org.stylekit.css.property
 	import flash.events.EventDispatcher;
 	
 	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.property.Property;
 	import org.stylekit.events.PropertyContainerEvent;
 	
 	/**
@@ -41,11 +42,12 @@ package org.stylekit.css.property
 	{
 		
 		protected var _styleSheet:StyleSheet;
-		protected var _properties:Object;
+		protected var _properties:Vector.<Property>;
 		
 		public function PropertyContainer(ownerStyleSheet:StyleSheet)
 		{
 			this._styleSheet = ownerStyleSheet;
+			this._properties = new Vector.<Property>();
 		}
 		
 		public function get styleSheet():StyleSheet
@@ -53,20 +55,20 @@ package org.stylekit.css.property
 			return this._styleSheet;
 		}
 		
-		public function setProperty(propertyName:String, stringValue:String):void
+		public function get properties():Vector.<Property>
 		{
-			
+			return this._properties;
 		}
 		
-		public function getProperty(propertyName:String):void
+		public function addProperty(property:Property):void
 		{
-			
+			this._properties.push(property);
 		}
 		
-		public function rmProperty(propertyName:String):void
+		public function removeProperty(property:Property):void
 		{
-			
+			this._properties.splice(this._properties.indexOf(property), 1);
 		}
-		
+				
 	}
 }
