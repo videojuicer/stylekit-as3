@@ -27,7 +27,7 @@ package org.stylekit.spec {
 	        'url("type/filename.otf") format("opentype"),'+
 	        'url("type/filename.svg#filename") format("svg");'+
 	    "}"+
-	    "@import url(\"later.css\");"+
+	    "@import url(\"later.css\") mediaA, mediaB;"+
 	   	"@keyframes keyframes {"+
 	      "0% {"+
 	        "foo: bar1;"+

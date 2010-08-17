@@ -2,6 +2,7 @@ package org.stylekit.css.parse
 {
 	
 	import org.utilkit.util.StringUtil;
+	import org.stylekit.css.selector.MediaSelector;
 	
 	/**
 	* The <code>ValueParser</code> class provides utility methods for parsing CSS property values of various types.
@@ -16,11 +17,35 @@ package org.stylekit.css.parse
 		
 		/**
 		* Accepts an argument string from a CSS @import statement and parses it into an array containing a
-		* URLValue object and a vector of media types.
+		* URLValue object and a MediaSelector.
 		*/ 
-		public function parseImportArguments(importArgs:String):void
+		public function parseImportArguments(importArgs:String):Array
 		{
+			var result:Array = [];
+			var urlParserResult:Array = this.parseURLToken(importArgs);
+			var mediaSelectorParserResult:MediaSelector = this.parseMediaSelector(importArgs.slice(urlParserResult[1]));
 			
+			return [urlParserResult[0], mediaSelectorParserResult];
+		}
+		
+		/**
+		* Accepts a comma-delimited set of media types and produces a matching MediaSelector object.
+		*/
+		public function parseMediaSelector(str:String):MediaSelector
+		{
+			var mSel:MediaSelector = new MediaSelector();
+			var mediaTypes:Vector.<String> = this.parseCommaDelimitedString(str);
+
+			if(mediaTypes.length == 0)
+			{
+				return null;
+			}
+			
+			for(var m:uint = 0; m < mediaTypes.length; m++)
+			{
+				mSel.addMedia(mediaTypes[m]);
+			}
+			return mSel;
 		}
 		
 		/**

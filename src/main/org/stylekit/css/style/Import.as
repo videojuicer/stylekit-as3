@@ -20,6 +20,11 @@ package org.stylekit.css.style
 		protected var _mediaSelector:MediaSelector;
 		
 		/**
+		* A the URL specified in the @import statement.
+		*/
+		protected var _url:String;
+		
+		/**
 		* Instiates a new Import object within an owning <code>StyleSheet</code> instance.
 		* @param styleInsertionIndex A <code>uint</code> indicating the index at which loaded styles should be injected into the parent StyleSheet.
 		* @param animationInsertionIndex A <code>uint</code> indicating the index at which loaded @keyframe blocks should be injected into the parent StyleSheet.
@@ -31,6 +36,16 @@ package org.stylekit.css.style
 			this._styleInsertionIndex = styleInsertionIndex;
 			this._animationInsertionIndex = animationInsertionIndex;
 			this._fontFaceInsertionIndex = fontFaceInsertionIndex;
+		}
+		
+		public function get url():String
+		{
+			return this._url;
+		}
+		
+		public function set url(u:String):void
+		{
+			this._url = u;
 		}
 		
 		public function set mediaSelector(ms:MediaSelector):void

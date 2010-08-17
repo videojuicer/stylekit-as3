@@ -13,6 +13,11 @@ package org.stylekit.css.selector
 			this._media = new Vector.<String>();
 		}
 		
+		public function get media():Vector.<String>
+		{
+			return this._media;
+		}
+		
 		public function matches(mediaVec:Vector.<String>):Boolean
 		{
 			for(var i:uint=0; i < mediaVec.length; i++)

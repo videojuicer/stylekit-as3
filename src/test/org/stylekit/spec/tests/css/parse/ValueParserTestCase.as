@@ -4,8 +4,11 @@ package org.stylekit.spec.tests.css.parse
 	import flexunit.framework.Assert;
 	import flexunit.framework.AsyncTestHelper;
 	import org.flexunit.async.Async;
+
+	import org.stylekit.css.selector.MediaSelector;
 		
 	import org.stylekit.css.parse.ValueParser;
+
 		
 	public class ValueParserTestCase
 	{
@@ -21,6 +24,26 @@ package org.stylekit.spec.tests.css.parse
 		public function tearDown():void
 		{
 			this._parser = null;
+		}
+	
+		[Test(description="Ensures that the arguments for an @import selector can be properly parsed")]
+		public function importArgsParseCorrectly():void
+		{
+			var result:Array;
+			
+			result = this._parser.parseImportArguments("url('foo.css') media1, media2");
+			Assert.assertEquals("foo.css", result[0]);
+			Assert.assertTrue((result[1] as MediaSelector).hasMedia("media1"));
+			Assert.assertTrue((result[1] as MediaSelector).hasMedia("media2"));
+			
+			result = this._parser.parseImportArguments("url('foo.css')");
+			Assert.assertEquals("foo.css", result[0]);
+			Assert.assertEquals(null, result[1]);
+			
+			result = this._parser.parseImportArguments("\"foo.css\" media1, media2");
+			Assert.assertEquals("foo.css", result[0]);
+			Assert.assertTrue((result[1] as MediaSelector).hasMedia("media1"));
+			Assert.assertTrue((result[1] as MediaSelector).hasMedia("media2"));
 		}
 	
 		[Test(description="Ensures that the parsing of a comma-delimited string works correctly")]

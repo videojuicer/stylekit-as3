@@ -11,6 +11,8 @@ package org.stylekit.spec.tests.css.parse
 	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
+	import org.stylekit.css.style.Import;
+	import org.stylekit.css.style.FontFace;
 	
 	public class StyleSheetParserTestCase
 	{
@@ -40,6 +42,17 @@ package org.stylekit.spec.tests.css.parse
 			Assert.assertEquals(1, this._parserResult.fontFaces.length);		
 			// Correct number of imports
 			Assert.assertEquals(2, this._parserResult.imports.length);
+			
+			// Correct media selectors on imports
+			var imp1:Import = this._parserResult.imports[0];
+				Assert.assertEquals("external.css", imp1.url);
+				Assert.assertEquals(null, imp1.mediaSelector);
+				
+			var imp2:Import = this._parserResult.imports[1];
+				Assert.assertEquals("later.css", imp2.url);
+				Assert.assertTrue(imp2.mediaSelector.hasMedia("mediaA"));
+				Assert.assertTrue(imp2.mediaSelector.hasMedia("mediaB"));
+				Assert.assertFalse(imp2.mediaSelector.hasMedia("mediaC"));
 			
 			// Media block - correct number of styles marked with media restriction
 			var printStyles:uint = 0;

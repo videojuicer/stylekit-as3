@@ -297,11 +297,20 @@ package org.stylekit.css.parse
 							// Ending the import statement. 
 							// Kill the token and exit the state
 							Logger.debug("Ending import state, about to clear token", this);
-							
-							//public function Import(ownerStyleSheet:StyleSheet, styleInsertionIndex:uint=0, animationInsertionIndex:uint=0, fontFaceInsertionIndex:uint=0) 
-							
+														
 							var extImport:Import = new Import(this._styleSheet, this._styleStack.length, this._animationStack.length, this._fontFaceStack.length);
-							// TODO parse the import token statement
+							var argParserResult:Array = this._valueParser.parseImportArguments(this._token);
+							
+							var importURL:String = (argParserResult[0] as String);
+							extImport.url = importURL;
+							
+							var mSel:MediaSelector;
+							if(argParserResult[1] != null)
+							{
+								mSel = (argParserResult[1] as MediaSelector);
+							}
+							extImport.mediaSelector = mSel;
+							
 							this._importStack.push(extImport);
 							
 							this._token = "";
@@ -346,14 +355,8 @@ package org.stylekit.css.parse
 						{
 							Logger.debug("Entering at-media rule for '"+this._token+"', parsing token and appending new MediaSelector to stack", this);
 							
-							// Parse the list into the MediaSelector stack
-							var mSel:MediaSelector = new MediaSelector();
-							var mediaTypes:Vector.<String> = this._valueParser.parseCommaDelimitedString(this._token);
-							for(var m:uint = 0; m < mediaTypes.length; m++)
-							{
-								mSel.addMedia(mediaTypes[m]);
-							}
-							this._mediaSelectorStack.push(mSel);
+							// Parse the list into the MediaSelector stack							
+							this._mediaSelectorStack.push(this._valueParser.parseMediaSelector(this._token));
 							
 							this._token = "";
 							this._nesting += 2;

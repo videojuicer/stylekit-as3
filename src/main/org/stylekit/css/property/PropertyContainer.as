@@ -30,6 +30,9 @@ package org.stylekit.css.property
 	* <code>PropertyContainer</code> is an abstract class describing any CSS object that holds individual
 	* properties. It manages storage and lookup of properties as well as dispatch of modification events
 	* on those properties.
+	*
+	* It is important to note that when PropertyContainer objects are created by the StyleSheetParser,
+	* properties are added to the container in lexical order.
 	* 
 	* A <code>PropertyContainer</code> instance is created on an owning <code>StyleSheet</code> object.
 	*/

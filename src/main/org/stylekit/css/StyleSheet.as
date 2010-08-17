@@ -142,13 +142,13 @@ package org.stylekit.css {
 			return (this._imports.indexOf(s) > -1);
 		}
 
-		public function addImport(s:Import, atIndex:int=-1):Boolean
+		public function addImport(s:Import):Boolean
 		{
 			if(this.hasImport(s))
 			{
 				return false;
 			}
-			this._imports.splice(atIndex, 0, s);
+			this._imports.push(s);
 			return true;
 		}
 
@@ -166,6 +166,7 @@ package org.stylekit.css {
 			return false;
 		}
 		
+
 	}
 	
 }
