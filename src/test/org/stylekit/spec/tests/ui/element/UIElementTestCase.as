@@ -81,6 +81,29 @@ package org.stylekit.spec.tests.ui.element
 			
 			Assert.assertFalse(element.hasElementClassName("test"));
 		}
+		
+		[Test(description="Tests that a child UIElement contains the correct parent index")]
+		public function parentIndexCalculatedCorrectly():void
+		{
+			var parent:UIElement = new UIElement();
+			
+			var child1:UIElement = new UIElement();
+			var child2:UIElement = new UIElement();
+			var child3:UIElement = new UIElement();
+			
+			parent.addElement(child1);
+			parent.addElement(child2);
+			parent.addElement(child3);
+			
+			Assert.assertEquals(0, child1.parentIndex);
+			Assert.assertEquals(1, child2.parentIndex);
+			Assert.assertEquals(2, child3.parentIndex);
+			
+			parent.removeElement(child2);
+			
+			Assert.assertEquals(0, child1.parentIndex);
+			Assert.assertEquals(1, child3.parentIndex);
+		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]
 		public function parentElementCanListen():void

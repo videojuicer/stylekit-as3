@@ -242,31 +242,18 @@ package org.stylekit.ui.element
 			
 		}
 		
-		protected function updateParentIndex():void
+		protected function updateParentIndex(index:uint):void
 		{
-			var i:uint = 0;
-			
-			for (; i < this.parentElement.numChildren; i++)
-			{
-				if (this.parentElement.children[i] == this)
-				{
-					break;
-				}
-			}
-			
-			this._parentIndex = i;
+			this._parentIndex = index;
 			
 			this.updateStyle();
 		}
 		
 		protected function updateChildrenIndex():void
 		{
-			if (this.parentElement != null)
+			for (var i:int = 0; i < this.numChildren; i++)
 			{
-				for (var i:int = 0; i < this.parentElement.numChildren; i++)
-				{
-					this.parentElement.children[i].updateParentIndex();
-				}
+				this.children[i].updateParentIndex(i);
 			}
 		}
 		
