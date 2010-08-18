@@ -10,6 +10,7 @@
     <classEntry path="org.stylekit.css.property.PropertyContainer"/>
 
     <classEntry path="org.stylekit.css.value.Value" />
+    <classEntry path="org.stylekit.css.value.ColorValue" />
     <classEntry path="org.stylekit.css.value.SizeValue" />
     <classEntry path="org.stylekit.css.value.EdgeCompoundValue" />
 

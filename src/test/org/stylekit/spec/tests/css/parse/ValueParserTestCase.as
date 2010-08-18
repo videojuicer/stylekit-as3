@@ -9,6 +9,7 @@ package org.stylekit.spec.tests.css.parse
 		
 	import org.stylekit.css.parse.ValueParser;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 		
 	public class ValueParserTestCase
@@ -71,6 +72,25 @@ package org.stylekit.spec.tests.css.parse
 			Assert.assertEquals("px", (result.bottomValue as SizeValue).units);
 			Assert.assertEquals(4, (result.leftValue as SizeValue).value);
 			Assert.assertEquals("px", (result.leftValue as SizeValue).units);
+		}
+		
+		[Test(description="Ensures that basic color values using both hex and CSS color words parse correctly.")]
+		public function colorValuesParseCorrectly():void
+		{
+			var testColors:Array = ["FF0000", "0xFF0000", "#FF0000", "red"];
+			var cVal:ColorValue;
+			for(var i:uint=0; i<testColors.length; i++)
+			{
+				cVal = this._parser.parseColorValue(testColors[i]);
+				Assert.assertEquals("Failing on test color string: "+testColors[i], 0xFF0000, cVal.hexValue);
+			}
+			
+			testColors = ["008000", "0x008000", "#008000", "green"];
+			for(i=0; i<testColors.length; i++)
+			{
+				cVal = this._parser.parseColorValue(testColors[i]);
+				Assert.assertEquals("Failing on test color string: "+testColors[i], 0x008000, cVal.hexValue);
+			}
 		}
 		
 		[Test(description="Ensures that basic size values may be parsed correctly")]

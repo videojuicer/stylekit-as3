@@ -14,7 +14,7 @@ package org.stylekit.css.value
 		public static var UNIT_PERCENTAGE:String = "%";
 		
 		protected var _units:String = "px";
-		protected var _value:Number;
+		protected var _value:Number = 0;
 		
 		public function SizeValue()
 		{

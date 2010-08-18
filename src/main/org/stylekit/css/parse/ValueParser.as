@@ -5,6 +5,8 @@ package org.stylekit.css.parse
 	import org.stylekit.css.selector.MediaSelector;
 	
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.ColorValue;
+	
 	import org.stylekit.css.value.EdgeCompoundValue;
 	
 	/**
@@ -58,6 +60,41 @@ package org.stylekit.css.parse
 					break;
 			}
 			
+			return cVal;
+		}
+		
+		/**
+		* Accepts a string such as "#FF0000", "0xFF0000", "FF0000", or even "red" and returns a ColorValue to match your string.
+		*/
+		public function parseColorValue(str:String):ColorValue
+		{
+			str = StringUtil.trim(str);
+			var cVal:ColorValue = new ColorValue();
+			var wVal:uint = ColorValue.COLORS[str.toLowerCase()];
+			
+			if(wVal)
+			{
+				// Word value.
+				cVal.hexValue = wVal;
+			}
+			else
+			{
+				// Attempt to parse into hex number
+				var mInd:int = -1;
+				mInd = str.indexOf("0x");
+				if(mInd > -1)
+				{
+					str = str.substr(mInd+2, 6);
+				}
+				
+				mInd = str.indexOf("#");
+				if(mInd > -1)
+				{
+					str = str.substr(mInd+1, 6);
+				}
+				
+				cVal.hexValue = parseInt(str, 16);
+			}
 			return cVal;
 		}
 		
