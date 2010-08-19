@@ -53,12 +53,6 @@ package org.stylekit.css.selector
 		*/
 		protected var _lastLetterOnly:Boolean = false;
 		
-		/**
-		* A flag that, when set to <code>false</code>, allows the selector to match elements of any name. This may be achieved through using the "*" wildcard in a selector,
-		* or by specifying a selector that omits the element name such as ":hover" or ".okbutton"
-		*/
-		protected var _elementNameMatchRequired:Boolean = true;
-		
 		public function ElementSelector()
 		{
 			this._elementClassNames = new Vector.<String>();
@@ -152,12 +146,7 @@ package org.stylekit.css.selector
 		
 		public function get elementNameMatchRequired():Boolean
 		{
-			return this._elementNameMatchRequired;
-		}
-		
-		public function set elementNameMatchRequired(b:Boolean):void
-		{
-			this._elementNameMatchRequired = b;
+			return (this.elementName != null && this._elementName != "*");
 		}
 		
 		public function hasElementClassName(className:String):Boolean

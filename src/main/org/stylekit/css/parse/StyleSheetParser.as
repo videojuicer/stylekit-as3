@@ -24,6 +24,8 @@ package org.stylekit.css.parse
 	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Import;
 	
+	import org.stylekit.css.value.URLValue;
+	
 	public class StyleSheetParser extends EventDispatcher
 	{
 		// All possible states for the parser as it works through the CSS string.
@@ -303,8 +305,8 @@ package org.stylekit.css.parse
 							var extImport:Import = new Import(this._styleSheet, this._styleStack.length, this._animationStack.length, this._fontFaceStack.length);
 							var argParserResult:Array = this._valueParser.parseImportArguments(this._token);
 							
-							var importURL:String = (argParserResult[0] as String);
-							extImport.url = importURL;
+							var uVal:URLValue = (argParserResult[0] as URLValue);
+							extImport.urlValue = uVal;
 							
 							var mSel:MediaSelector;
 							if(argParserResult[1] != null)

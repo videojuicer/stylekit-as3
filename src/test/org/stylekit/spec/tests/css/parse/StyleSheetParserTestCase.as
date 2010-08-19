@@ -45,11 +45,11 @@ package org.stylekit.spec.tests.css.parse
 			
 			// Correct media selectors on imports
 			var imp1:Import = this._parserResult.imports[0];
-				Assert.assertEquals("external.css", imp1.url);
+				Assert.assertEquals("external.css", imp1.urlValue.url);
 				Assert.assertEquals(null, imp1.mediaSelector);
 				
 			var imp2:Import = this._parserResult.imports[1];
-				Assert.assertEquals("later.css", imp2.url);
+				Assert.assertEquals("later.css", imp2.urlValue.url);
 				Assert.assertTrue(imp2.mediaSelector.hasMedia("mediaA"));
 				Assert.assertTrue(imp2.mediaSelector.hasMedia("mediaB"));
 				Assert.assertFalse(imp2.mediaSelector.hasMedia("mediaC"));

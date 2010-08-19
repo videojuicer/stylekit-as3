@@ -1,6 +1,9 @@
 package org.stylekit.css.value 
 {
-	public class ColorValue
+	
+	import org.stylekit.css.value.Value;
+	
+	public class ColorValue extends Value
 	{
 		
 		public static var COLORS:Object = {
@@ -150,7 +153,7 @@ package org.stylekit.css.value
 		
 		public function ColorValue()
 		{
-			
+			super();
 		}
 		
 		public function set hexValue(n:uint):void

@@ -11,6 +11,7 @@ package org.stylekit.css.value
 		
 		public function EdgeCompoundValue()
 		{
+			super();
 		}
 		
 		public function get leftValue():Value

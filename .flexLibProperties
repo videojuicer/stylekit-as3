@@ -12,6 +12,10 @@
     <classEntry path="org.stylekit.css.value.Value" />
     <classEntry path="org.stylekit.css.value.ColorValue" />
     <classEntry path="org.stylekit.css.value.SizeValue" />
+    <classEntry path="org.stylekit.css.value.URLValue" />
+    <classEntry path="org.stylekit.css.value.AlignmentValue" />
+    <classEntry path="org.stylekit.css.value.RepeatValue" />
+    <classEntry path="org.stylekit.css.value.LineStyleValue" />
     <classEntry path="org.stylekit.css.value.EdgeCompoundValue" />
 
     <classEntry path="org.stylekit.css.selector.ElementSelectorChain"/>

@@ -18,6 +18,7 @@ package org.stylekit.css.value
 		
 		public function SizeValue()
 		{
+			super();
 		}
 		
 		public function get units():String

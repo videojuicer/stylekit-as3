@@ -180,6 +180,28 @@ package org.stylekit.spec.tests.css.parse
 			Assert.assertFalse(selector.specifiesFirstChild);
 		}
 		
+		[Test(description="Ensures that elementNameMatchRequired is correctly set on the selector")]
+		public function elementNameMatchRequiredSetCorrectly():void
+		{
+			var matchRequired:String = "p div div#id div.class div:pseudo";
+			var matchNotRequired:String = "#id .class :pseudo * *.class *:pseudo *#id";
+			
+			this._parserResult = this._parser.parseSelector(matchRequired);
+			var matchRequiredChain:ElementSelectorChain = this._parserResult[0];
+			for(var i:uint = 0; i < matchRequiredChain.elementSelectors.length; i++)
+			{
+				Assert.assertTrue(matchRequiredChain.elementSelectors[i].elementNameMatchRequired)
+			}
+			
+			this._parserResult = this._parser.parseSelector(matchNotRequired);
+			var matchNotRequiredChain:ElementSelectorChain = this._parserResult[0];
+			for(i = 0; i < matchNotRequiredChain.elementSelectors.length; i++)
+			{
+				var sel:ElementSelector = matchNotRequiredChain.elementSelectors[i];
+				Assert.assertFalse("Failing on selector: "+matchNotRequired.split(" ")[i]+" elementName: '"+sel.elementName+"'" ,sel.elementNameMatchRequired)
+			}
+		}
+		
 		[Test(description="Ensures that a selector containing only an ID followed by a pseudoclass is parsed correctly")]
 		public function idThenPseudoParsesCorrectly():void
 		{

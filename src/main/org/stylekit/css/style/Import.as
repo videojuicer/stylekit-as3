@@ -3,6 +3,8 @@ package org.stylekit.css.style
 	import flash.events.EventDispatcher;	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.selector.MediaSelector;
+	
+	import org.stylekit.css.value.URLValue;
 		
 	/**
 	* An Import encapsulates a single @import statement within an owning StyleSheet object.
@@ -20,9 +22,9 @@ package org.stylekit.css.style
 		protected var _mediaSelector:MediaSelector;
 		
 		/**
-		* A the URL specified in the @import statement.
+		* A the URLValue resulting from the parsed url('whatever.css') statement.
 		*/
-		protected var _url:String;
+		protected var _urlValue:URLValue;
 		
 		/**
 		* Instiates a new Import object within an owning <code>StyleSheet</code> instance.
@@ -38,14 +40,14 @@ package org.stylekit.css.style
 			this._fontFaceInsertionIndex = fontFaceInsertionIndex;
 		}
 		
-		public function get url():String
+		public function get urlValue():URLValue
 		{
-			return this._url;
+			return this._urlValue;
 		}
 		
-		public function set url(u:String):void
+		public function set urlValue(u:URLValue):void
 		{
-			this._url = u;
+			this._urlValue = u;
 		}
 		
 		public function set mediaSelector(ms:MediaSelector):void
