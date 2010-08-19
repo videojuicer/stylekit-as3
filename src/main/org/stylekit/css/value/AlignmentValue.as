@@ -3,6 +3,9 @@ package org.stylekit.css.value
 	
 	import org.stylekit.css.value.Value;
 	
+	import org.stylekit.css.parse.ValueParser;
+	import org.utilkit.util.StringUtil;
+	
 	/**
 	* An AlignmentValue represents any type of anchoring or alignment in a CSS statement. text-align, background-position and other such properties are good examples.
 	* An AlignmentValue may have a horizontalAlign value and a verticalAlign value.
@@ -21,6 +24,53 @@ package org.stylekit.css.value
 		public function AlignmentValue()
 		{
 			super();
+		}
+		
+		public static function parse(str:String):AlignmentValue
+		{
+			var aVal:AlignmentValue = new AlignmentValue();
+				aVal.rawValue = str;
+			var tokens:Vector.<String> = ValueParser.parseSpaceDelimitedString(str);
+			
+			for(var i:uint = 0; i < tokens.length; i++)
+			{
+				var t:String = tokens[i].toLowerCase();
+				
+				switch(t)
+				{
+					case "left":
+						aVal.horizontalAlign = AlignmentValue.ALIGN_LEFT;
+						break;
+					case "right":
+						aVal.horizontalAlign = AlignmentValue.ALIGN_RIGHT;
+						break;
+					case "top":
+						aVal.verticalAlign = AlignmentValue.ALIGN_TOP;
+						break;
+					case "bottom":
+						aVal.verticalAlign = AlignmentValue.ALIGN_BOTTOM;
+						break;
+				}
+			}
+			
+			return aVal;
+		}
+		
+		/**
+		* Identifies a string as a valid candidate AlignmentValue string. Returns true if the string appears valid.
+		*/
+		public static function identify(str:String):Boolean
+		{
+			var tokens:Vector.<String> = ValueParser.parseSpaceDelimitedString(str);
+			var valid:Array = ["left", "right", "top", "bottom"];
+			for(var i:uint = 0; i < tokens.length; i++)
+			{
+				if(valid.indexOf(tokens[i].toLowerCase()) == -1)
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 		
 		public function get horizontalAlign():uint

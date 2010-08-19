@@ -1,7 +1,10 @@
 package org.stylekit.css.value
 {
 	import org.stylekit.css.value.Value;
-	
+
+	import org.stylekit.css.parse.ValueParser;
+	import org.utilkit.util.StringUtil;
+
 	public class RepeatValue extends Value
 	{
 		
@@ -11,6 +14,39 @@ package org.stylekit.css.value
 		public function RepeatValue()
 		{
 			super();
+		}
+		
+		public static function parse(str:String):RepeatValue
+		{
+			var rVal:RepeatValue = new RepeatValue();
+				rVal.rawValue = str;
+			str = StringUtil.trim(str).toLowerCase();
+			
+			switch(str)
+			{
+				case "repeat":
+					rVal.horizontalRepeat = true;
+					rVal.verticalRepeat = true;
+					break;
+				case "repeat-x":
+					rVal.horizontalRepeat = true;
+					rVal.verticalRepeat = false;
+					break;
+				case "repeat-y":
+					rVal.horizontalRepeat = false;
+					rVal.verticalRepeat = true;
+					break;
+				default:
+					rVal.horizontalRepeat = false;
+					rVal.verticalRepeat = false;
+					break;
+			}
+			return rVal;
+		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (["repeat", "repeat-x", "repeat-y", "no-repeat"].indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
 		
 		public function get horizontalRepeat():Boolean

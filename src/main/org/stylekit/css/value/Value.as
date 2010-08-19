@@ -7,6 +7,7 @@ package org.stylekit.css.value {
 	public class Value
 	{
 		
+		protected var _rawValue:String;
 		protected var _stringValue:String;
 		
 		public function Value()
@@ -22,6 +23,11 @@ package org.stylekit.css.value {
 		public function set stringValue(s:String):void
 		{
 			this._stringValue = s;
+		}
+		
+		public function set rawValue(s:String):void
+		{
+			this._rawValue = s;
 		}
 	}
 }

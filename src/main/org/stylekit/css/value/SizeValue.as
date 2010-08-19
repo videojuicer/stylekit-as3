@@ -3,6 +3,9 @@ package org.stylekit.css.value
 	import org.stylekit.css.value.Value;
 	import org.stylekit.ui.element.UIElement;
 	
+	import org.stylekit.css.parse.ValueParser;
+	import org.utilkit.util.StringUtil;
+	
 	/**
 	* A <code>SizeValue</code> represents any unit of spatial measurement expressed in a CSS value. 
 	* 10px, 3%, 2em are among the examples of an acceptable size value.
@@ -19,6 +22,35 @@ package org.stylekit.css.value
 		public function SizeValue()
 		{
 			super();
+		}
+		
+		public static function parse(str:String):SizeValue
+		{
+			str = StringUtil.trim(str.toLowerCase());
+			var sVal:SizeValue = new SizeValue();
+				sVal.rawValue = str;
+			var unitPattern:RegExp = new RegExp("[%a-zA-Z]+");
+			var unitIndex:int = str.search(unitPattern);
+
+			sVal.value = parseFloat(str);
+			
+			if(unitIndex >= 0)
+			{
+				sVal.units = str.substring(unitIndex);
+			}
+			
+			return sVal;
+		}
+		
+		/**
+		* Identifies a string as a valid candidate AlignmentValue string. Returns true if the string appears valid.
+		*/
+		public static function identify(str:String):Boolean
+		{
+			str = StringUtil.trim(str.toLowerCase());
+			var unitPattern:RegExp = new RegExp("[0-9]+[%a-zA-Z]+");
+			var unitIndex:int = str.search(unitPattern);
+			return (unitIndex == 0);
 		}
 		
 		public function get units():String

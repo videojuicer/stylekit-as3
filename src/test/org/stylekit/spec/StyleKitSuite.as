@@ -15,6 +15,11 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.selector.MediaSelectorTestCase;
 	
 	import org.stylekit.spec.tests.css.value.SizeValueTestCase;
+	import org.stylekit.spec.tests.css.value.AlignmentValueTestCase;
+	import org.stylekit.spec.tests.css.value.URLValueTestCase;
+	import org.stylekit.spec.tests.css.value.ColorValueTestCase;
+
+	import org.stylekit.spec.tests.css.value.BackgroundCompoundValueTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -33,5 +38,10 @@ package org.stylekit.spec
 		public var animationTest:AnimationTestCase;
 		
 		public var sizeValueTest:SizeValueTestCase;
+		public var alignmentValueTest:AlignmentValueTestCase;
+		public var urlValueTest:URLValueTestCase;
+		public var colorValueTest:ColorValueTestCase;
+		
+		public var backgroundCompoundValueTest:BackgroundCompoundValueTestCase;
 	}
 }

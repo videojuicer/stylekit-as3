@@ -3,6 +3,9 @@ package org.stylekit.css.value
 	
 	import org.stylekit.css.value.Value;
 	
+	import org.stylekit.css.parse.ValueParser;
+	import org.utilkit.util.StringUtil;
+	
 	public class ColorValue extends Value
 	{
 		
@@ -154,6 +157,53 @@ package org.stylekit.css.value
 		public function ColorValue()
 		{
 			super();
+		}
+		
+		public static function parse(str:String):ColorValue
+		{
+			str = StringUtil.trim(str);
+			var cVal:ColorValue = new ColorValue();
+				cVal.rawValue = str;
+			var wVal:uint = ColorValue.COLORS[str.toLowerCase()];
+			
+			if(wVal)
+			{
+				// Word value.
+				cVal.hexValue = wVal;
+			}
+			else
+			{
+				// Attempt to parse into hex number
+				var mInd:int = -1;
+				mInd = str.indexOf("0x");
+				if(mInd > -1)
+				{
+					str = str.substr(mInd+2, 6);
+				}
+				
+				mInd = str.indexOf("#");
+				if(mInd > -1)
+				{
+					str = str.substr(mInd+1, 6);
+				}
+				
+				var hVal:uint = parseInt(str, 16);
+				if(!isNaN(hVal))
+				{
+					cVal.hexValue = parseInt(str, 16);
+				}			
+			}
+			return cVal;
+		}
+		
+		public static function identify(str:String):Boolean
+		{
+			str = StringUtil.trim(str).toLowerCase();
+			if(str.charAt(0) == "#" || str.charAt(0) == "#" || str.substr(0,2) == "0x" || ColorValue.COLORS[str] != null)
+			{
+				return true;
+			}
+			return false;
 		}
 		
 		public function set hexValue(n:uint):void
