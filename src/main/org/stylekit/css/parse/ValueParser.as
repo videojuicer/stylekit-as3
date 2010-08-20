@@ -112,6 +112,7 @@ package org.stylekit.css.parse
 			var result:Vector.<String> = new Vector.<String>();
 			var tokenOpened:Boolean = false;
 			var token:String = "";
+			var tokenIsQuoteWrapped:Boolean = false;
 			
 			var bracketDepth:uint = 0;
 			var quoteStack:Vector.<String> = new Vector.<String>();
@@ -124,12 +125,13 @@ package org.stylekit.css.parse
 				
 				
 				// Decide whether to open or close a token
-				if(char == " " || char == "END")
+				if(char == " " || char == "END" || (tokenIsQuoteWrapped && char == quoteStack[quoteStack.length-1]))
 				{
-					if(tokenOpened && bracketDepth <= 0 && quoteStack.length == 0)
+					if(tokenOpened && bracketDepth <= 0 && (quoteStack.length == 0 || (tokenIsQuoteWrapped && quoteStack.length <= 1)))
 					{
 						// Close the token
 						tokenOpened = false;
+						tokenIsQuoteWrapped = false;
 						result.push(StringUtil.trim(token));
 						token = "";
 					}
@@ -142,8 +144,16 @@ package org.stylekit.css.parse
 				}
 				else
 				{
+					if(!tokenOpened && (char == "'" || char == "\""))
+					{
+						// if opening a token with a quote, we'll strip the quotes from the token.	
+						tokenIsQuoteWrapped = true;
+					}
+					else
+					{
+						token += char;
+					}
 					tokenOpened = true;
-					token += char;
 				}
 				
 				if(char == "(")

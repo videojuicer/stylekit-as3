@@ -117,7 +117,7 @@ package org.stylekit.spec.tests.css.parse
 			var result:Vector.<String> = ValueParser.parseSpaceDelimitedString("one two url(three three three) url(\"four four four\") 'five five five'");
 			Assert.assertEquals(5, result.length);
 			
-			var expected:Array = ["one", "two", "url(three three three)", "url(\"four four four\")", "'five five five'"];
+			var expected:Array = ["one", "two", "url(three three three)", "url(\"four four four\")", "five five five"];
 			for(var i:uint = 0; i<expected.length; i++)
 			{
 				Assert.assertEquals(expected[i], result[i]);
