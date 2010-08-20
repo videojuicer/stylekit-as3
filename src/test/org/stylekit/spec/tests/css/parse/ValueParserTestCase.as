@@ -115,7 +115,7 @@ package org.stylekit.spec.tests.css.parse
 		public function spaceDelimStringParsesCorrectly():void
 		{
 			var result:Vector.<String> = ValueParser.parseSpaceDelimitedString("one two url(three three three) url(\"four four four\") 'five five five'");
-			Assert.assertEquals(5, result.length);
+			Assert.assertEquals("Got result: "+result.join(" - "), 5, result.length);
 			
 			var expected:Array = ["one", "two", "url(three three three)", "url(\"four four four\")", "five five five"];
 			for(var i:uint = 0; i<expected.length; i++)

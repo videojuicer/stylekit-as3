@@ -124,10 +124,31 @@ package org.stylekit.css.parse
 				else char = "END";
 				
 				
-				// Decide whether to open or close a token
-				if(char == " " || char == "END" || (tokenIsQuoteWrapped && char == quoteStack[quoteStack.length-1]))
+				if(char == "(")
 				{
-					if(tokenOpened && bracketDepth <= 0 && (quoteStack.length == 0 || (tokenIsQuoteWrapped && quoteStack.length <= 1)))
+					bracketDepth++;
+				}
+				else if(char == ")")
+				{
+					bracketDepth = Math.max(0, bracketDepth-1);
+				}
+				else if(char == "'" || char == "\"")
+				{
+					if(quoteStack.length > 0 && char == quoteStack[quoteStack.length-1])
+					{
+						// Found a closing quote
+						quoteStack.pop();
+					}
+					else
+					{
+						quoteStack.push(char);
+					}
+				}
+				
+				// Decide whether to open or close a token
+				if(char == " " || char == "END" || (tokenIsQuoteWrapped && quoteStack.length == 0))
+				{
+					if(tokenOpened && bracketDepth <= 0 && quoteStack.length == 0)
 					{
 						// Close the token
 						tokenOpened = false;
@@ -156,26 +177,7 @@ package org.stylekit.css.parse
 					tokenOpened = true;
 				}
 				
-				if(char == "(")
-				{
-					bracketDepth++;
-				}
-				else if(char == ")")
-				{
-					bracketDepth = Math.max(0, bracketDepth-1);
-				}
-				else if(char == "'" || char == "\"")
-				{
-					if(quoteStack.length > 0 && char == quoteStack[quoteStack.length-1])
-					{
-						// Found a closing quote
-						quoteStack.pop();
-					}
-					else
-					{
-						quoteStack.push(char);
-					}
-				}
+				
 			}
 			
 			return result;
