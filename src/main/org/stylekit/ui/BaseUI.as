@@ -22,6 +22,11 @@ package org.stylekit.ui
 			return true;
 		}
 		
+		public override function get styleParent():UIElement
+		{
+			return this;
+		}
+		
 		public function get styleSheetCollection():StyleSheetCollection
 		{
 			return this._styleSheetCollection;

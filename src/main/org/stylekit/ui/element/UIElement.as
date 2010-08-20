@@ -5,6 +5,8 @@ package org.stylekit.ui.element
 	import flash.errors.IllegalOperationError;
 	
 	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.selector.ElementSelector;
+	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
@@ -54,6 +56,11 @@ package org.stylekit.ui.element
 			return this._parentElement;
 		}
 		
+		public function set parentElement(parent:UIElement):void
+		{
+			this._parentElement = parent;
+		}
+		
 		public function get baseUI():BaseUI
 		{
 			return this._baseUI;
@@ -67,6 +74,11 @@ package org.stylekit.ui.element
 		public function get styleEligible():Boolean
 		{
 			return this._styleEligible;
+		}
+		
+		public function set styleEligible(styleEligible:Boolean):void
+		{
+			this._styleEligible = styleEligible;
 		}
 		
 		public function get effectiveWidth():int
@@ -121,6 +133,11 @@ package org.stylekit.ui.element
 		
 		public function get styleParent():UIElement
 		{
+			if(this.parentElement == null)
+			{
+				return null;
+			}
+			
 			if (this.parentElement.styleEligible)
 			{
 				return this.parentElement;
@@ -314,6 +331,71 @@ package org.stylekit.ui.element
 			this.updateChildrenIndex();
 			
 			return child;
+		}
+		
+		public function matchesElementSelector(selector:ElementSelector):Boolean
+		{
+			if (selector.elementNameMatchRequired && selector.elementName != null)
+			{
+				if (selector.elementName != this.elementName)
+				{
+					return false;
+				}
+			}
+			
+			if (selector.elementID != null)
+			{
+				if (selector.elementID != this.elementId)
+				{
+					return false;
+				}
+			}
+			
+			if (selector.elementClassNames.length > 0)
+			{
+				for (var i:int = 0; i < selector.elementClassNames.length; i++)
+				{
+					if (!this.hasElementClassName(selector.elementClassNames[i]))
+					{
+						return false;
+					}
+				}
+			}
+			
+			if (selector.elementPseudoClasses.length > 0)
+			{
+				for (var j:int = 0; j < selector.elementPseudoClasses.length; j++)
+				{
+					if (!this.hasElementPseudoClass(selector.elementPseudoClasses[j]))
+					{
+						return false;
+					}
+				}
+			}
+			
+			return true;
+		}
+		
+		public function matchesElementSelectorChain(chain:ElementSelectorChain):Boolean
+		{
+			var collection:Vector.<ElementSelector> = chain.elementSelectors.reverse();
+			var parent:UIElement = this;
+			
+			for (var i:int = 0; i < collection.length; i++)
+			{
+				var selector:ElementSelector = collection[i];
+				
+				if (parent != null && parent.matchesElementSelector(selector))
+				{
+					parent = parent.styleParent;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			return true;
 		}
 		
 		protected function onChildDimensionsChanged(e:UIElementEvent):void

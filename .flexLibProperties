@@ -8,7 +8,6 @@
     <classEntry path="org.stylekit.css.parse.ValueParser"/>
     <classEntry path="org.stylekit.css.property.Property"/>
     <classEntry path="org.stylekit.css.property.PropertyContainer"/>
-
     <classEntry path="org.stylekit.css.value.Value" />
     <classEntry path="org.stylekit.css.value.ColorValue" />
     <classEntry path="org.stylekit.css.value.SizeValue" />
@@ -17,7 +16,6 @@
     <classEntry path="org.stylekit.css.value.RepeatValue" />
     <classEntry path="org.stylekit.css.value.LineStyleValue" />
     <classEntry path="org.stylekit.css.value.EdgeCompoundValue" />
-
     <classEntry path="org.stylekit.css.selector.ElementSelectorChain"/>
     <classEntry path="org.stylekit.css.selector.ElementSelector"/>
     <classEntry path="org.stylekit.css.selector.MediaSelector"/>
@@ -29,6 +27,7 @@
     <classEntry path="org.stylekit.ui.element.UIElement"/>
     <classEntry path="org.stylekit.events.UIElementEvent"/>
     <classEntry path="org.stylekit.ui.BaseUI"/>
+    <classEntry path="org.stylekit.events.StyleSheetEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
