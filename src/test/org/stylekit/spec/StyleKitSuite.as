@@ -18,6 +18,7 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.AlignmentValueTestCase;
 	import org.stylekit.spec.tests.css.value.URLValueTestCase;
 	import org.stylekit.spec.tests.css.value.ColorValueTestCase;
+	import org.stylekit.spec.tests.css.value.LineStyleValueTestCase;
 
 	import org.stylekit.spec.tests.css.value.BackgroundCompoundValueTestCase;
 	
@@ -41,6 +42,7 @@ package org.stylekit.spec
 		public var alignmentValueTest:AlignmentValueTestCase;
 		public var urlValueTest:URLValueTestCase;
 		public var colorValueTest:ColorValueTestCase;
+		public var lineStyleValueTest:LineStyleValueTestCase;
 		
 		public var backgroundCompoundValueTest:BackgroundCompoundValueTestCase;
 	}
