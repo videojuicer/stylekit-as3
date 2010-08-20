@@ -26,7 +26,7 @@ package org.stylekit.css.value
 		public static function parse(str:String):BorderCompoundValue
 		{
 			var bVal:BorderCompoundValue = new BorderCompoundValue();
-			
+				bVal.rawValue = str;
 			var tokens:Vector.<String> = ValueParser.parseSpaceDelimitedString(str);
 			for(var i:uint=0; i < tokens.length; i++)
 			{

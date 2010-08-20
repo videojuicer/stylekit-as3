@@ -19,8 +19,13 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.URLValueTestCase;
 	import org.stylekit.spec.tests.css.value.ColorValueTestCase;
 	import org.stylekit.spec.tests.css.value.LineStyleValueTestCase;
-
+	import org.stylekit.spec.tests.css.value.FontStyleValueTestCase;
+	import org.stylekit.spec.tests.css.value.FontVariantValueTestCase;
+	import org.stylekit.spec.tests.css.value.FontWeightValueTestCase;
+		
 	import org.stylekit.spec.tests.css.value.BackgroundCompoundValueTestCase;
+	import org.stylekit.spec.tests.css.value.BorderCompoundValueTestCase;
+
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -43,7 +48,11 @@ package org.stylekit.spec
 		public var urlValueTest:URLValueTestCase;
 		public var colorValueTest:ColorValueTestCase;
 		public var lineStyleValueTest:LineStyleValueTestCase;
+		public var fontStyleValueTest:FontStyleValueTestCase;
+		public var fontVariantValueTest:FontVariantValueTestCase;
+		public var fontWeightValueTest:FontWeightValueTestCase;
 		
 		public var backgroundCompoundValueTest:BackgroundCompoundValueTestCase;
+		public var borderCompoundValueTest:BorderCompoundValueTestCase;
 	}
 }

@@ -33,6 +33,7 @@ package org.stylekit.css.value
 		{
 			str = StringUtil.trim(str).toLowerCase();
 			var lsVal:LineStyleValue = new LineStyleValue();
+				lsVal.rawValue = str;
 			lsVal.lineStyle = Math.max(1, LineStyleValue.validStrings.indexOf(str));
 			return lsVal;
 		}
