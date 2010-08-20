@@ -213,6 +213,7 @@ package org.stylekit.css.parse
 							// Let's actually create the Style object ready to have properties injected
 							var style:Style = new Style(this._styleSheet);
 								style.mediaSelector = this.currentMediaSelector;
+								style.elementSelectorChains = this._elementSelectorParser.parseSelector(this._token);
 							this._styleStack.push(style);
 							
 							this._token = "";
