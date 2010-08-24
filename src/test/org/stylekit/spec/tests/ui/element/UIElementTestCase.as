@@ -7,10 +7,15 @@ package org.stylekit.spec.tests.ui.element
 	import mx.utils.object_proxy;
 	
 	import org.flexunit.async.Async;
+	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.selector.MediaSelector;
+	import org.stylekit.css.style.Style;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.spec.Fixtures;
+	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
 	
 	public class UIElementTestCase
@@ -178,6 +183,32 @@ package org.stylekit.spec.tests.ui.element
 			element2.elementName = "div";
 			
 			Assert.assertTrue(element1.matchesElementSelectorChain(chain));
+		}
+		
+		public function elementCanCollectStyles():void
+		{
+			var collection:StyleSheetCollection = new StyleSheetCollection();
+			var styleSheet:StyleSheet = new StyleSheet();
+			var style:Style = new Style(styleSheet);
+			
+			style.mediaSelector = new MediaSelector();
+			style.mediaSelector.addMedia("div");
+			
+			styleSheet.addStyle(style);
+			
+			collection.addStyleSheet(styleSheet);
+			
+			var baseUI:BaseUI = new BaseUI(collection);
+			var uiElement:UIElement = baseUI.createUIElement();
+			uiElement.elementName = "div";
+			
+			uiElement.updateStyles();
+		
+			Assert.assertEquals(1, uiElement.styles.length);
+			
+			var newStyle:Style = uiElement.styles[0];
+			
+			Assert.assertEquals(style, newStyle);
 		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]

@@ -7,9 +7,11 @@ package org.stylekit.ui
 	{
 		protected var _styleSheetCollection:StyleSheetCollection;
 		
-		public function BaseUI()
+		public function BaseUI(styleSheetCollection:StyleSheetCollection = null)
 		{
 			super();
+			
+			this._styleSheetCollection = styleSheetCollection;
 		}
 		
 		public override function get baseUI():BaseUI
@@ -30,6 +32,11 @@ package org.stylekit.ui
 		public function get styleSheetCollection():StyleSheetCollection
 		{
 			return this._styleSheetCollection;
+		}
+		
+		public function createUIElement():UIElement
+		{
+			return new UIElement(this);
 		}
 	}
 }

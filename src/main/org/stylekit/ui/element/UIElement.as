@@ -44,9 +44,11 @@ package org.stylekit.ui.element
 		protected var _elementClassNames:Vector.<String>;
 		protected var _elementPseudoClasses:Vector.<String>;
 		
-		public function UIElement()
+		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
+			
+			this._baseUI = baseUI;
 			
 			this._children = new Vector.<UIElement>();
 			
@@ -152,6 +154,11 @@ package org.stylekit.ui.element
 			}
 			
 			return this.parentElement.styleParent;
+		}
+		
+		public function get styles():Vector.<Style>
+		{
+			return this._styles;
 		}
 		
 		public function get elementName():String
