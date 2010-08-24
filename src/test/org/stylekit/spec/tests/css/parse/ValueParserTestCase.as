@@ -101,8 +101,8 @@ package org.stylekit.spec.tests.css.parse
 		[Test(description="Ensures that the parsing of a comma-delimited string works correctly")]
 		public function commaDelimStringParsesCorrectly():void
 		{
-			var result:Vector.<String> = ValueParser.parseCommaDelimitedString("foo,bar, baz,,,,     car, ");
-			Assert.assertEquals(4, result.length);
+			var result:Vector.<String> = ValueParser.parseCommaDelimitedString("foo,bar, \"baz\",,,,     car, ");
+			Assert.assertEquals(result.join(" % "), 4, result.length);
 			
 			var expected:Array = ["foo", "bar", "baz", "car"];
 			for(var i:uint = 0; i<expected.length; i++)
@@ -115,7 +115,7 @@ package org.stylekit.spec.tests.css.parse
 		public function spaceDelimStringParsesCorrectly():void
 		{
 			var result:Vector.<String> = ValueParser.parseSpaceDelimitedString("one two url(three three three) url(\"four four four\") 'five five five'");
-			Assert.assertEquals("Got result: "+result.join(" - "), 5, result.length);
+			Assert.assertEquals(result.join(" % "), 5, result.length);
 			
 			var expected:Array = ["one", "two", "url(three three three)", "url(\"four four four\")", "five five five"];
 			for(var i:uint = 0; i<expected.length; i++)

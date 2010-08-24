@@ -20,6 +20,13 @@ package org.stylekit.css.parse
 	public class ValueParser
 	{
 		
+		public static var wrapMap:Object = {
+			"(": ")",
+			'"': '"',
+			"'": "'",
+			"{": "}"
+		};
+		
 		public function ValueParser()
 		{
 			
@@ -108,79 +115,7 @@ package org.stylekit.css.parse
 		*/
 		public static function parseSpaceDelimitedString(str:String):Vector.<String>
 		{
-			str = StringUtil.trim(str);
-			var result:Vector.<String> = new Vector.<String>();
-			var tokenOpened:Boolean = false;
-			var token:String = "";
-			var tokenIsQuoteWrapped:Boolean = false;
-			
-			var bracketDepth:uint = 0;
-			var quoteStack:Vector.<String> = new Vector.<String>();
-			
-			for(var i:uint=0; i <= str.length; i++) // loop deliberately overruns
-			{
-				var char:String;
-				if(i < str.length) char = str.charAt(i);
-				else char = "END";
-				
-				
-				if(char == "(")
-				{
-					bracketDepth++;
-				}
-				else if(char == ")")
-				{
-					bracketDepth = Math.max(0, bracketDepth-1);
-				}
-				else if(char == "'" || char == "\"")
-				{
-					if(quoteStack.length > 0 && char == quoteStack[quoteStack.length-1])
-					{
-						// Found a closing quote
-						quoteStack.pop();
-					}
-					else
-					{
-						quoteStack.push(char);
-					}
-				}
-				
-				// Decide whether to open or close a token
-				if(char == " " || char == "END" || (tokenIsQuoteWrapped && quoteStack.length == 0))
-				{
-					if(tokenOpened && bracketDepth <= 0 && quoteStack.length == 0)
-					{
-						// Close the token
-						tokenOpened = false;
-						tokenIsQuoteWrapped = false;
-						result.push(StringUtil.trim(token));
-						token = "";
-					}
-					else
-					{
-						// Consider part of the token
-						tokenOpened = true;
-						token += char;
-					}
-				}
-				else
-				{
-					if(!tokenOpened && (char == "'" || char == "\""))
-					{
-						// if opening a token with a quote, we'll strip the quotes from the token.	
-						tokenIsQuoteWrapped = true;
-					}
-					else
-					{
-						token += char;
-					}
-					tokenOpened = true;
-				}
-				
-				
-			}
-			
-			return result;
+			return ValueParser.parseDelimitedString(" ", str);
 		}
 		
 		/**
@@ -189,17 +124,104 @@ package org.stylekit.css.parse
 		*/
 		public static function  parseCommaDelimitedString(str:String):Vector.<String>
 		{
-			var spl:Array = str.split(",");
-			var vec:Vector.<String> = new Vector.<String>();
-			for(var i:uint=0; i<spl.length; i++)
+			return ValueParser.parseDelimitedString(",", str);
+		}
+		
+		public static function parseDelimitedString(delimiter:String, str:String):Vector.<String>
+		{
+			str = StringUtil.trim(str);
+			var result:Vector.<String> = new Vector.<String>();
+			var tokenOpened:Boolean = false;
+			var token:String = "";
+			var lastPoppedWrap:String = "";
+			
+			
+			
+			// Contains a stack of expected closing strings
+			var wrapStack:Vector.<String> = new Vector.<String>();
+			
+			for(var i:uint=0; i <= str.length; i++) // loop deliberately overruns
 			{
-				var strp:String = StringUtil.trim(spl[i]);
-				if(strp.length > 0)
+				var char:String;
+				if(i < str.length) char = str.charAt(i);
+				else char = "END";
+				
+				// Process the character to determine if we're deepening (or popping) either the quote depth or the bracket depth.
+				if(wrapStack.length > 0 && char == wrapStack[wrapStack.length-1])
 				{
-					vec.push(strp);
+					lastPoppedWrap = wrapStack.pop();
+				}
+				else if(ValueParser.wrapMap[char] != null)
+				{
+					// Encountered a wrap character
+					wrapStack.push(ValueParser.wrapMap[char]);
+				}
+				
+				// Decide whether to open or close a token
+				if(char == delimiter || char == "END")
+				{
+					if(tokenOpened && (wrapStack.length == 0 || char == "END"))
+					{
+						// Close the token
+						var t:String = token;
+						// Strip the last character if we're quote-wrapped and it matches the quotestack
+						if(t.length > 0)
+						{
+							result.push(ValueParser.stripWrapping(t));
+						}
+						token = "";
+						tokenOpened = false;
+					}
+					else if(tokenOpened && char != "END")
+					{
+						// If the token is opened, push the char
+						token += char;
+					}
+				}
+				else
+				{
+					tokenOpened = true;
+					token += char;
+				}
+				
+				
+			}
+			
+			return result;
+		}
+		
+		// Strips any wrapping quotes or brackets from a single string.
+		// e.g. "(foo)" => "foo"
+		public static function stripWrapping(str:String):String
+		{
+			str = StringUtil.trim(str);
+			var oWraps:Vector.<String> = new Vector.<String>();
+			var chopIndex:uint = 0;
+			
+			for(var i:uint = 0; i < str.length; i++)
+			{
+				var char:String = str.charAt(i);
+				
+				if(ValueParser.wrapMap[char] != null)
+				{
+					oWraps.push(ValueParser.wrapMap[char]);
+				}
+				else
+				{
+					break;
 				}
 			}
-			return vec;
+			
+			for(i=0; i < oWraps.length; i++)
+			{
+				var strChar:String = str.charAt(str.length-(1+i));
+				if(strChar == oWraps[i])
+				{
+					chopIndex++;
+				}
+			}
+			
+			return str.substring(chopIndex, str.length-(chopIndex));
 		}
 		
 	}
