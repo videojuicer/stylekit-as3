@@ -340,26 +340,29 @@ package org.stylekit.ui.element
 		{
 			this._styles = new Vector.<Style>();
 			
-			for (var i:int = 0; i < this.baseUI.styleSheetCollection.length; ++i)
+			if (this.baseUI != null)
 			{
-				var sheet:StyleSheet = this.baseUI.styleSheetCollection.styleSheets[i];
-				
-				for (var j:int = 0; j < sheet.styles.length; ++j)
+				for (var i:int = 0; i < this.baseUI.styleSheetCollection.length; ++i)
 				{
-					var style:Style = sheet.styles[j];
+					var sheet:StyleSheet = this.baseUI.styleSheetCollection.styleSheets[i];
 					
-					for (var k:int = 0; k < style.elementSelectorChains.length; ++k)
+					for (var j:int = 0; j < sheet.styles.length; ++j)
 					{
-						var chain:ElementSelectorChain = style.elementSelectorChains[k];
+						var style:Style = sheet.styles[j];
 						
-						if (this.matchesElementSelectorChain(chain))
+						for (var k:int = 0; k < style.elementSelectorChains.length; ++k)
 						{
-							if (this._styles.indexOf(style) == -1)
-							{
-								this._styles.push(style);
-							}
+							var chain:ElementSelectorChain = style.elementSelectorChains[k];
 							
-							break;
+							if (this.matchesElementSelectorChain(chain))
+							{
+								if (this._styles.indexOf(style) == -1)
+								{
+									this._styles.push(style);
+								}
+								
+								break;
+							}
 						}
 					}
 				}

@@ -157,12 +157,12 @@ package org.stylekit.spec.tests.ui.element
 			var element2:UIElement = new UIElement();
 			element2.elementName = "d-iv";
 			element2.addElementClassName("current");
-			element1.styleEligible = true;
+			element2.styleEligible = true;
 			
 			var element3:UIElement = new UIElement();
 			element3.elementName = "body";
 			element3.addElementPseudoClass("hover");
-			element1.styleEligible = true;
+			element3.styleEligible = true;
 			
 			element1.parentElement = element2;
 			element2.parentElement = element3;
