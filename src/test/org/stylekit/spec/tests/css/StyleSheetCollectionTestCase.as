@@ -3,10 +3,11 @@ package org.stylekit.spec.tests.css
 	
 	import flexunit.framework.Assert;
 	import flexunit.framework.AsyncTestHelper;
-	import org.flexunit.async.Async;
 	
-	import org.stylekit.css.StyleSheetCollection;
+	import org.flexunit.async.Async;
 	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.events.StyleSheetEvent;
 	
 	public class StyleSheetCollectionTestCase
 	{
@@ -67,9 +68,48 @@ package org.stylekit.spec.tests.css
 			}
 		}
 		
-		// TODO: Bubbles a STYLE_MUTATION event from any constituent stylesheets
-		// TODO: Emits a STYLE_MUTATION event on adding a stylesheet
-		// TODO: Emits a STYLE_MUTATION event on removing a stylesheet
+		[Test(async,description="Tests that the StyleSheetCollection dispatches the correct STYLESHEET_MODIFIED event when the collection is altered")]
+		public function collectionDispatchesEventsDuringAdd():void
+		{
+			var asyncFunction:Function = Async.asyncHandler(this, this.onStyleSheetAddedModified, 2000, null, this.onStyleSheetAddTimeout);
+			
+			this._styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, asyncFunction);
+			
+			this._styleSheetCollection.addStyleSheet(this._styleSheets[0]);
+		}
 		
+		protected function onStyleSheetAddedModified(e:StyleSheetEvent, passThru:Object):void
+		{
+			
+		}
+		
+		protected function onStyleSheetAddTimeout(passThru:Object):void
+		{
+			Assert.assertFalse("Timeout reached whilst waiting for STYLESHEET_MODIFIED on the StyleSheetCollection");
+		}
+		
+		[Test(async,description="Tests that the StyleSheetCollection dispatches the correct STYLESHEET_MODIFIED event when the collection is altered")]
+		public function collectionDispatchesEventsDuringReove():void
+		{
+			var asyncFunction:Function = Async.asyncHandler(this, this.onStyleSheetRemovedModified, 2000, null, this.onStyleSheetRemoveTimeout);
+			
+			this._styleSheetCollection.addStyleSheet(this._styleSheets[0]);
+			
+			this._styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, asyncFunction);
+			
+			this._styleSheetCollection.removeStyleSheet(this._styleSheets[0]);
+		}
+		
+		protected function onStyleSheetRemovedModified(e:StyleSheetEvent, passThru:Object):void
+		{
+			
+		}
+		
+		protected function onStyleSheetRemoveTimeout(passThru:Object):void
+		{
+			Assert.assertFalse("Timeout reached whilst waiting for STYLESHEET_MODIFIED on the StyleSheetCollection");
+		}
+		
+		// TODO: Bubbles a STYLE_MUTATION event from any constituent stylesheets		
 	}
 }

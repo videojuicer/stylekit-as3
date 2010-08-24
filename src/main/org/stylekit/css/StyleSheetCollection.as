@@ -7,7 +7,16 @@ package org.stylekit.css {
 	*/
 	
 	import flash.events.EventDispatcher;
+	
 	import org.stylekit.css.StyleSheet;
+	import org.stylekit.events.StyleSheetEvent;
+	
+	/**
+	 * Dispatched when the StyleSheet collection is altered in anyway.
+	 *
+	 * @eventType org.stylekit.events.StyleSheetEvent.STYLESHEET_MODIFIED
+	 */
+	[Event(name="styleSheetModified", type="org.stylekit.events.StyleSheetEvent")]
 	
 	public class StyleSheetCollection extends EventDispatcher
 	{
@@ -43,6 +52,9 @@ package org.stylekit.css {
 				return false;
 			}
 			this._styleSheets.push(s);
+			
+			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+			
 			return true;
 		}
 		
@@ -54,8 +66,11 @@ package org.stylekit.css {
 			if(this.hasStyleSheet(s))
 			{
 				this._styleSheets.splice(this._styleSheets.indexOf(s), 1);
+				this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+				
 				return true;
 			}
+			
 			return false;
 		}
 		

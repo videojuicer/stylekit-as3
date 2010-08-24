@@ -4,10 +4,12 @@ package org.stylekit.ui.element
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	
+	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
+	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
 	
@@ -21,6 +23,7 @@ package org.stylekit.ui.element
 	public class UIElement extends Sprite
 	{
 		protected var _children:Vector.<UIElement>;
+		protected var _styles:Vector.<Style>;
 		
 		protected var _styleEligible:Boolean = false;
 		
@@ -49,6 +52,11 @@ package org.stylekit.ui.element
 			
 			this._elementClassNames = new Vector.<String>();
 			this._elementPseudoClasses = new Vector.<String>();
+			
+			if (this.baseUI != null)
+			{
+				this.baseUI.styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
+			}
 		}
 		
 		public function get parentElement():UIElement
@@ -155,7 +163,7 @@ package org.stylekit.ui.element
 		{
 			this._elementName = elementName;
 			
-			this.updateStyle();
+			this.updateStyles();
 		}
 		
 		public function get elementId():String
@@ -192,7 +200,7 @@ package org.stylekit.ui.element
 			
 			this._elementClassNames.push(className);
 			
-			this.updateStyle();
+			this.updateStyles();
 			
 			return true;
 		}
@@ -203,7 +211,7 @@ package org.stylekit.ui.element
 			{
 				this._elementClassNames.splice(this._elementClassNames.indexOf(className), 1);
 				
-				this.updateStyle();
+				this.updateStyles();
 				
 				return true;
 			}
@@ -225,7 +233,7 @@ package org.stylekit.ui.element
 			
 			this._elementPseudoClasses.push(pseudoClass);
 			
-			this.updateStyle();
+			this.updateStyles();
 			
 			return true;
 		}
@@ -236,17 +244,12 @@ package org.stylekit.ui.element
 			{
 				this._elementPseudoClasses.splice(this._elementClassNames.indexOf(pseudoClass), 1);
 				
-				this.updateStyle();
+				this.updateStyles();
 				
 				return true;
 			}
 			
 			return false;
-		}
-		
-		public function updateStyle():void
-		{
-			
 		}
 		
 		public function layoutChildren():void
@@ -263,7 +266,7 @@ package org.stylekit.ui.element
 		{
 			this._parentIndex = index;
 			
-			this.updateStyle();
+			this.updateStyles();
 		}
 		
 		protected function updateChildrenIndex():void
@@ -331,6 +334,36 @@ package org.stylekit.ui.element
 			this.updateChildrenIndex();
 			
 			return child;
+		}
+		
+		public function updateStyles():void
+		{
+			this._styles = new Vector.<Style>();
+			
+			for (var i:int = 0; i < this.baseUI.styleSheetCollection.length; ++i)
+			{
+				var sheet:StyleSheet = this.baseUI.styleSheetCollection.styleSheets[i];
+				
+				for (var j:int = 0; j < sheet.styles.length; ++j)
+				{
+					var style:Style = sheet.styles[j];
+					
+					for (var k:int = 0; k < style.elementSelectorChains.length; ++k)
+					{
+						var chain:ElementSelectorChain = style.elementSelectorChains[k];
+						
+						if (this.matchesElementSelectorChain(chain))
+						{
+							if (this._styles.indexOf(style) == -1)
+							{
+								this._styles.push(style);
+							}
+							
+							break;
+						}
+					}
+				}
+			}
 		}
 		
 		public function matchesElementSelector(selector:ElementSelector):Boolean
@@ -401,6 +434,11 @@ package org.stylekit.ui.element
 		protected function onChildDimensionsChanged(e:UIElementEvent):void
 		{
 			this.layoutChildren();
+		}
+		
+		protected function onStyleSheetModified(e:StyleSheetEvent):void
+		{
+			this.updateStyles();
 		}
 		
 		/* Overrides to block the Flash methods when they called outside of this class */
