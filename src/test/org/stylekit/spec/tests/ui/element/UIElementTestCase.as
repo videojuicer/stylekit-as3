@@ -20,10 +20,30 @@ package org.stylekit.spec.tests.ui.element
 	
 	public class UIElementTestCase
 	{
+		protected var _baseUI:BaseUI;
+		protected var _element:UIElement;
+		
 		[Before]
 		public function setUp():void
 		{
+			this._baseUI = new BaseUI();
+			this._element = new UIElement(this._baseUI);
 			
+			var child1:UIElement = new UIElement(this._baseUI);
+			var child2:UIElement = new UIElement(this._baseUI);
+			var child3:UIElement = new UIElement(this._baseUI);
+			
+			child1.elementName = "div";
+			child2.elementName = "p";
+			child3.elementName = "div";
+			
+			var child4:UIElement = new UIElement(this._baseUI);
+			
+			child2.addElement(child4);
+			
+			this._element.addElement(child1);
+			this._element.addElement(child2);
+			this._element.addElement(child3);
 		}
 		
 		[Test(description="Tests that a UIElement can contain children that belong to the parent and the children can be removed")]
@@ -209,6 +229,45 @@ package org.stylekit.spec.tests.ui.element
 			var newStyle:Style = uiElement.styles[0];
 			
 			Assert.assertEquals(style, newStyle);
+		}
+		
+		public function getElementsBySelector():void
+		{
+			var selector:ElementSelector = new ElementSelector();
+			selector.elementName = "div";
+			
+			var elements:Vector.<UIElement> = this._element.getElementsBySelector(selector);
+			
+			Assert.assertNotNull(elements);
+			Assert.assertEquals(2, elements.length);
+		}
+		
+		public function getElementsBySelectorString():void
+		{			
+			var elements:Vector.<UIElement> = this._element.getElementsBySelector("div");
+			
+			Assert.assertNotNull(elements);
+			Assert.assertEquals(1, elements.length);
+		}
+		
+		public function getElementsByChainSelector():void
+		{
+			var chainSelector:ElementSelectorChain = new ElementSelectorChain();
+			
+			var selector:ElementSelector = new ElementSelector();
+			selector.elementName = "p";
+			
+			chainSelector.addElementSelector(selector);
+			
+			selector = new ElementSelector();
+			selector.elementName = "div";
+			
+			chainSelector.addElementSelector(selector);
+			
+			var elements:Vector.<UIElement> = this._element.getElementsBySelector(chainSelector);
+			
+			Assert.assertNotNull(elements);
+			Assert.assertEquals(1, elements.length);
 		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]

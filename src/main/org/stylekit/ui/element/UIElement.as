@@ -6,6 +6,7 @@ package org.stylekit.ui.element
 	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
@@ -55,7 +56,7 @@ package org.stylekit.ui.element
 			this._elementClassNames = new Vector.<String>();
 			this._elementPseudoClasses = new Vector.<String>();
 			
-			if (this.baseUI != null)
+			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
 			{
 				this.baseUI.styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
 			}
@@ -193,6 +194,53 @@ package org.stylekit.ui.element
 			return this._parentIndex;
 		}
 		
+		public function getElementsBySelector(selector:*):Vector.<UIElement>
+		{
+			var elements:Vector.<UIElement> = new Vector.<UIElement>();
+			
+			var elementSelector:ElementSelector = null;
+			var chainSelector:ElementSelectorChain = null;
+			
+			if (selector is String)
+			{
+				var parser:ElementSelectorParser = new ElementSelectorParser();
+				
+				chainSelector = parser.parseElementSelectorChain(selector);
+			}
+			else if (selector is ElementSelector)
+			{
+				elementSelector = selector as ElementSelector;
+			}
+			else if (selector is ElementSelectorChain)
+			{
+				chainSelector = selector as ElementSelectorChain;
+			}
+			else
+			{
+				throw new IllegalOperationError("Illegal selector type defined as '"+selector.toString()+"' used when calling 'getElementsBySelector'");
+			}
+			
+			for (var i:int = 0; i < this.children.length; i++)
+			{
+				if (elementSelector != null && this.children[i].matchesElementSelector(elementSelector))
+				{
+					elements.push(this.children[i]);
+				}
+				
+				if (chainSelector != null && this.children[i].matchesElementSelectorChain(chainSelector))
+				{
+					elements.push(this.children[i]);
+				}
+			}
+			
+			if (elements.length > 0)
+			{
+				return elements;
+			}
+			
+			return null;
+		}
+		
 		public function hasElementClassName(className:String):Boolean
 		{
 			return (this._elementClassNames.indexOf(className) > -1);
@@ -291,7 +339,7 @@ package org.stylekit.ui.element
 		
 		public function addElementAt(child:UIElement, index:int):UIElement
 		{
-			if (child.baseUI != null && child.baseUI != this)
+			if (child.baseUI != null && child.baseUI != this.baseUI)
 			{
 				throw new IllegalOperationError("Child belongs to a different BaseUI, cannot add to this UIElement");
 			}
@@ -347,7 +395,7 @@ package org.stylekit.ui.element
 		{
 			this._styles = new Vector.<Style>();
 			
-			if (this.baseUI != null)
+			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
 			{
 				for (var i:int = 0; i < this.baseUI.styleSheetCollection.length; ++i)
 				{
