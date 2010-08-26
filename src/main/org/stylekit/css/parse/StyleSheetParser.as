@@ -24,7 +24,18 @@ package org.stylekit.css.parse
 	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Import;
 	
+	import org.stylekit.css.value.BackgroundCompoundValue;
+	import org.stylekit.css.value.BorderCompoundValue;
+	import org.stylekit.css.value.ColorValue;
+	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.EdgeCompoundValue;
+	import org.stylekit.css.value.FontCompoundValue;
+	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.OverflowValue;
+	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
+	import org.stylekit.css.value.Value;
 	
 	public class StyleSheetParser extends EventDispatcher
 	{
@@ -554,21 +565,73 @@ package org.stylekit.css.parse
 			{
 				// Complex Compound values
 				case "background":
+					property.value = BackgroundCompoundValue.parse(unparsedPropertyValue);
 					break;
 				case "border":
+					var borderValue:BorderCompoundValue = BorderCompoundValue.parse(unparsedPropertyValue);
+					var edgeValue:EdgeCompoundValue = new EdgeCompoundValue();
+					edgeValue.topValue = edgeValue.leftValue = edgeValue.rightValue = edgeValue.bottomValue = borderValue;
+					
+					property.value = edgeValue;
+					break;
+				case "font":
+					property.value = FontCompoundValue.parse(unparsedPropertyValue);
 					break;
 				case "list-style":
+					
 					break;
-				case "overflow":
+				case "display":
+					property.value = DisplayValue.parse(unparsedPropertyValue);
 					break;
 				default:
 					if(propN == "padding" || propN == "margin" || propN == "border-width" || propN == "border-radius")
 					{
 						// Simple compound dimensional values
+						property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);
 					}
 					else if(propN == "border-top" || propN == "border-left" || propN == "border-right" || propN == "border-bottom")
 					{
 						// Compound background values that don't macro to each side
+						property.value = BorderCompoundValue.parse(unparsedPropertyValue);
+					}
+					// list-style-position, list-style-type
+					else if (propN == "list-style-position" || propN == "list-style-type")
+					{
+						
+					}
+					// list-style-image
+					else if (propN == "list-style-image")
+					{
+						property.value = URLValue.parse(unparsedPropertyValue);
+					}
+					// overflow, overflow-x, overflow-y, text-overflow
+					else if (propN.indexOf("overflow") > -1)
+					{
+						property.value = OverflowValue.parse(unparsedPropertyValue);
+					}
+					// position, list-style-position, ruby-position, text-underline-position
+					else if (propN.indexOf("position") > -1)
+					{
+						property.value = PositionValue.parse(unparsedPropertyValue);
+					}
+					// border-style, font-style, outline-style
+					else if (propN.indexOf("style") > -1)
+					{
+						property.value = LineStyleValue.parse(unparsedPropertyValue);
+					}
+					// background-color, border-color, color, outline-color, scrollbar-arrow-color
+					else if (propN.indexOf("color") > -1)
+					{
+						property.value = ColorValue.parse(unparsedPropertyValue);
+					}
+					else if (propN.indexOf("width") > -1 || propN.indexOf("height") > -1)
+					{
+						property.value = SizeValue.parse(unparsedPropertyValue);
+					}
+					else
+					{
+						property.value = new Value();
+						property.value.rawValue = (unparsedPropertyValue);
 					}
 					break;
 			}

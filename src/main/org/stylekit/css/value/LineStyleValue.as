@@ -22,7 +22,7 @@ package org.stylekit.css.value
 			"none", "hidden", "dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "outset"
 		];
 		
-		protected var _lineStyle:uint = 1;
+		protected var _lineStyle:uint = LineStyleValue.LINE_STYLE_NONE;
 		
 		public function LineStyleValue()
 		{
