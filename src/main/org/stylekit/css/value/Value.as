@@ -15,6 +15,13 @@ package org.stylekit.css.value {
 			
 		}
 		
+		public static function parse(str:String):Value
+		{
+			var val:Value = new Value();
+				val.stringValue = str;
+			return val;
+		}
+		
 		public function get stringValue():String
 		{
 			return this._stringValue;

@@ -25,6 +25,7 @@ package org.stylekit.spec
 		
 	import org.stylekit.spec.tests.css.value.BackgroundCompoundValueTestCase;
 	import org.stylekit.spec.tests.css.value.BorderCompoundValueTestCase;
+	import org.stylekit.spec.tests.css.value.FontCompoundValueTestCase;
 
 	
 	[Suite]
@@ -54,5 +55,6 @@ package org.stylekit.spec
 		
 		public var backgroundCompoundValueTest:BackgroundCompoundValueTestCase;
 		public var borderCompoundValueTest:BorderCompoundValueTestCase;
+		public var fontCompoundValueTest:FontCompoundValueTestCase;
 	}
 }
