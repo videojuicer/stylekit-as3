@@ -65,6 +65,21 @@ package org.stylekit.css.property
 			this._properties.push(property);
 		}
 		
+		public function evaluate(mergeParent:Object = null):Object
+		{
+			if (mergeParent == null)
+			{
+				mergeParent = new Object();
+			}
+			
+			for (var i:int = 0; i < this._properties.length; i++)
+			{
+				mergeParent = this._properties[i].evaluateProperty(mergeParent);
+			}
+			
+			return mergeParent;
+		}
+		
 		public function removeProperty(property:Property):void
 		{
 			this._properties.splice(this._properties.indexOf(property), 1);
