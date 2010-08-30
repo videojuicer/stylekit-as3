@@ -82,10 +82,10 @@ package org.stylekit.css.property
 				case "font":
 					var fontValue:FontCompoundValue = (this.value as FontCompoundValue);
 					
-					if (fontValue.faceValue != null) mergeParent["font-family"] = fontValue.faceValue;
-					if (fontValue.styleValue != null) mergeParent["font-style"] = fontValue.styleValue;
-					if (fontValue.variantValue != null) mergeParent["font-variant"] = fontValue.variantValue;
-					if (fontValue.weightValue != null) mergeParent["font-weight"] = fontValue.weightValue;
+					if (fontValue.fontFaceValue != null) mergeParent["font-family"] = fontValue.fontFaceValue;
+					if (fontValue.fontStyleValue != null) mergeParent["font-style"] = fontValue.fontStyleValue;
+					if (fontValue.fontVariantValue != null) mergeParent["font-variant"] = fontValue.fontVariantValue;
+					if (fontValue.fontWeightValue != null) mergeParent["font-weight"] = fontValue.fontWeightValue;
 					if (fontValue.sizeValue != null) mergeParent["font-size"] = fontValue.sizeValue;
 					
 					break;
