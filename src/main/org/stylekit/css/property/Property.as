@@ -65,54 +65,54 @@ package org.stylekit.css.property
 				case "background":
 					var backgroundValue:BackgroundCompoundValue = (this.value as BackgroundCompoundValue)
 					
-					if (backgroundValue.colorValue != null) mergeParent["background-color"] = backgroundValue.colorValue;
-					if (backgroundValue.urlValue != null) mergeParent["background-image"] = backgroundValue.urlValue;
-					if (backgroundValue.alignmentValue != null) mergeParent["background-position"] = backgroundValue.alignmentValue;
-					if (backgroundValue.repeatValue != null) mergeParent["background-repeat"] = backgroundValue.repeatValue;
+					mergeParent["background-color"] = backgroundValue.colorValue;
+					mergeParent["background-image"] = backgroundValue.urlValue;
+					mergeParent["background-position"] = backgroundValue.alignmentValue;
+					mergeParent["background-repeat"] = backgroundValue.repeatValue;
 					
 					break;
 				case "border":
 					var borderValue:BorderCompoundValue = (this.value as BorderCompoundValue);
 					
-					if (borderValue.colorValue != null) mergeParent["border-color"] = borderValue.colorValue;
-					if (borderValue.lineStyleValue != null) mergeParent["border-style"] = borderValue.lineStyleValue;
-					if (borderValue.sizeValue != null) mergeParent["border-width"] = borderValue.sizeValue;
+					mergeParent["border-color"] = borderValue.colorValue;
+					mergeParent["border-style"] = borderValue.lineStyleValue;
+					mergeParent["border-width"] = borderValue.sizeValue;
 
 					break;
 				case "font":
 					var fontValue:FontCompoundValue = (this.value as FontCompoundValue);
 					
-					if (fontValue.fontFaceValue != null) mergeParent["font-family"] = fontValue.fontFaceValue;
-					if (fontValue.fontStyleValue != null) mergeParent["font-style"] = fontValue.fontStyleValue;
-					if (fontValue.fontVariantValue != null) mergeParent["font-variant"] = fontValue.fontVariantValue;
-					if (fontValue.fontWeightValue != null) mergeParent["font-weight"] = fontValue.fontWeightValue;
-					if (fontValue.sizeValue != null) mergeParent["font-size"] = fontValue.sizeValue;
+					mergeParent["font-family"] = fontValue.fontFaceValue;
+					mergeParent["font-style"] = fontValue.fontStyleValue;
+					mergeParent["font-variant"] = fontValue.fontVariantValue;
+					mergeParent["font-weight"] = fontValue.fontWeightValue;
+					mergeParent["font-size"] = fontValue.sizeValue;
 					
 					break;
 				case "outline":
 					var outlineValue:BorderCompoundValue = (this.value as BorderCompoundValue);
 					
-					if (outlineValue.colorValue != null) mergeParent["outline-color"] = outlineValue.colorValue;
-					if (outlineValue.lineStyleValue != null) mergeParent["outline-style"] = outlineValue.lineStyleValue;
-					if (outlineValue.sizeValue != null) mergeParent["outline-width"] = outlineValue.sizeValue;
+					mergeParent["outline-color"] = outlineValue.colorValue;
+					mergeParent["outline-style"] = outlineValue.lineStyleValue;
+					mergeParent["outline-width"] = outlineValue.sizeValue;
 					
 					break;
 				case "margin":
 					var marginValue:EdgeCompoundValue = (this.value as EdgeCompoundValue);
 					
-					if (marginValue.topValue != null) mergeParent["margin-top"] = marginValue.topValue;
-					if (marginValue.rightValue != null) mergeParent["margin-right"] = marginValue.rightValue;
-					if (marginValue.bottomValue != null) mergeParent["margin-bottom"] = marginValue.bottomValue;
-					if (marginValue.leftValue != null) mergeParent["margin-left"] = marginValue.leftValue;
+					mergeParent["margin-top"] = marginValue.topValue;
+					mergeParent["margin-right"] = marginValue.rightValue;
+					mergeParent["margin-bottom"] = marginValue.bottomValue;
+					mergeParent["margin-left"] = marginValue.leftValue;
 					
 					break;
 				case "padding":
 					var paddingValue:EdgeCompoundValue = (this.value as EdgeCompoundValue);
 					
-					if (paddingValue.topValue != null) mergeParent["padding-top"] = paddingValue.topValue;
-					if (paddingValue.rightValue != null) mergeParent["padding-right"] = paddingValue.rightValue;
-					if (paddingValue.bottomValue != null) mergeParent["padding-bottom"] = paddingValue.bottomValue;
-					if (paddingValue.leftValue != null) mergeParent["padding-left"] = paddingValue.leftValue;
+					mergeParent["padding-top"] = paddingValue.topValue;
+					mergeParent["padding-right"] = paddingValue.rightValue;
+					mergeParent["padding-bottom"] = paddingValue.bottomValue;
+					mergeParent["padding-left"] = paddingValue.leftValue;
 					
 					break;
 				case "list-style":
