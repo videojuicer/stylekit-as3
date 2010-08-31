@@ -45,7 +45,7 @@ package org.stylekit.css.value
 					bVal.colorValue = ColorValue.parse(t);
 				}
 				// Try to identify as a url value
-				else if(t.indexOf("url(") > -1)
+				else if(URLValue.identify(t))
 				{
 					bVal.urlValue = URLValue.parse(t);
 				}

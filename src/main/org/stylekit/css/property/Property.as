@@ -152,10 +152,7 @@ package org.stylekit.css.property
 					
 					break;
 				default:
-					if (this.value != null)
-					{
-						mergeParent[this.name] = this.value;
-					}
+					mergeParent[this.name] = this.value;
 					break;
 			}
 			

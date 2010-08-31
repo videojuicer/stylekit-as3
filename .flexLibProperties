@@ -34,6 +34,9 @@
     <classEntry path="org.stylekit.events.UIElementEvent"/>
     <classEntry path="org.stylekit.ui.BaseUI"/>
     <classEntry path="org.stylekit.events.StyleSheetEvent"/>
+    <classEntry path="org.stylekit.css.value.ListStyleCompoundValue"/>
+    <classEntry path="org.stylekit.css.value.ListStyleTypeValue"/>
+    <classEntry path="org.stylekit.css.value.ListStylePositionValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
