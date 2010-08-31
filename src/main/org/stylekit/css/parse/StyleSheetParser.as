@@ -7,23 +7,17 @@ package org.stylekit.css.parse
 	*/
 	import flash.events.EventDispatcher;
 	
-	import org.utilkit.util.StringUtil;
-	import org.utilkit.logger.Logger;
-	
 	import org.stylekit.css.StyleSheet;
-	
 	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.parse.ValueParser;
-	
-	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.property.Property;
-	import org.stylekit.css.property.PropertyContainer;	
-	import org.stylekit.css.style.Style;
+	import org.stylekit.css.property.PropertyContainer;
+	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Animation;
 	import org.stylekit.css.style.AnimationKeyFrame;
 	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Import;
-	
+	import org.stylekit.css.style.Style;
 	import org.stylekit.css.value.BackgroundCompoundValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
@@ -31,11 +25,14 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FontCompoundValue;
 	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.OverflowValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
 	import org.stylekit.css.value.Value;
+	import org.utilkit.logger.Logger;
+	import org.utilkit.util.StringUtil;
 	
 	public class StyleSheetParser extends EventDispatcher
 	{
@@ -578,7 +575,7 @@ package org.stylekit.css.parse
 					property.value = FontCompoundValue.parse(unparsedPropertyValue);
 					break;
 				case "list-style":
-					
+					property.value = ListStyleCompoundValue.parse(unparsedPropertyValue);
 					break;
 				case "display":
 					property.value = DisplayValue.parse(unparsedPropertyValue);

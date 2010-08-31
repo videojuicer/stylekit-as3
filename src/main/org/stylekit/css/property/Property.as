@@ -7,6 +7,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FontCompoundValue;
+	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.Value;
 	
 	/**
@@ -148,7 +149,11 @@ package org.stylekit.css.property
 					
 					break;
 				case "list-style":
+					var listValue:ListStyleCompoundValue = (this.value as ListStyleCompoundValue);
 					
+					mergeParent["list-style-type"] = listValue.typeValue;
+					mergeParent["list-style-position"] = listValue.positionValue;
+					mergeParent["list-style-image"] = listValue.urlValue;
 					
 					break;
 				default:
