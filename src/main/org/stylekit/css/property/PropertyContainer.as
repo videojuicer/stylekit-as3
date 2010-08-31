@@ -2,8 +2,23 @@ package org.stylekit.css.property
 {
 	import flash.events.EventDispatcher;
 	
+	import flashx.textLayout.formats.BackgroundColor;
+	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.property.Property;
+	import org.stylekit.css.value.AlignmentValue;
+	import org.stylekit.css.value.ColorValue;
+	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.FontStyleValue;
+	import org.stylekit.css.value.FontVariantValue;
+	import org.stylekit.css.value.FontWeightValue;
+	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.OverflowValue;
+	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.RepeatValue;
+	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.Value;
+	import org.stylekit.css.value.VisibilityValue;
 	import org.stylekit.events.PropertyContainerEvent;
 	
 	/**
@@ -84,6 +99,92 @@ package org.stylekit.css.property
 		{
 			this._properties.splice(this._properties.indexOf(property), 1);
 		}
+		
+		public static function get defaultStyles():Object
+		{
+			var defaults:Object =
+			{
+				// background
+				"background-color": ColorValue.parse("transparent"),
+				"background-image": null,
+				"background-position": PositionValue.parse("0% 0%"),
+				"background-repeat": RepeatValue.parse("repeat"),
 				
+				// border-left
+				"border-left-width": SizeValue.parse("medium"),
+				"border-left-style": LineStyleValue.parse("none"),
+				"border-left-color": ColorValue.parse("transparent"),
+				
+				// border-right
+				"border-right-width": SizeValue.parse("medium"),
+				"border-right-style": LineStyleValue.parse("none"),
+				"border-right-color": ColorValue.parse("transparent"),
+				
+				// border-top
+				"border-top-width": SizeValue.parse("medium"),
+				"border-top-style": LineStyleValue.parse("none"),
+				"border-top-color": ColorValue.parse("transparent"),
+				
+				// border-bottom
+				"border-bottom-width": SizeValue.parse("medium"),
+				"border-bottom-style": LineStyleValue.parse("none"),
+				"border-bottom-color": ColorValue.parse("transparent"),
+				
+				// positions
+				"bottom": SizeValue.parse("auto"),
+				"left": SizeValue.parse("auto"),
+				"right": SizeValue.parse("auto"),
+				"top": SizeValue.parse("auto"),
+				
+				"clear": AlignmentValue.parse("none"),				
+				"float": AlignmentValue.parse("none"),
+				"position": PositionValue.parse("static"),
+				"text-align": AlignmentValue.parse("left"),
+				"vertical-align": AlignmentValue.parse("left"),
+				"overflow": OverflowValue.parse("visible"),
+				
+				// display
+				"display": DisplayValue.parse("inline"),
+				"color": ColorValue.parse("#000000"),
+				"visibility": VisibilityValue.parse("visible"),
+				
+				// font
+				"font-family": Value.parse("sans-serif"),
+				"font-size": SizeValue.parse("medium"),
+				"font-style": FontStyleValue.parse("normal"),
+				"font-variant": FontVariantValue.parse("normal"),
+				"font-weight": FontWeightValue.parse("normal"),
+				
+				// size
+				"height": SizeValue.parse("auto"),
+				"width": SizeValue.parse("auto"),
+				
+				"max-height": null,
+				"max-width": null,
+				"min-height": null,
+				"min-width": null,
+				
+				"letter-spacing": SizeValue.parse("normal"),
+				"line-height": SizeValue.parse("normal"),
+				
+				// margin
+				"margin-left": SizeValue.parse("0"),
+				"margin-right": SizeValue.parse("0"),
+				"margin-bottom": SizeValue.parse("0"),
+				"margin-top": SizeValue.parse("0"),
+				
+				"outline-color": ColorValue.parse("invert"),
+				"outline-style": LineStyleValue.parse("none"),
+				"outline-width": SizeValue.parse("medium"),
+				
+				// padding
+				"padding-left": SizeValue.parse("0"),
+				"padding-right": SizeValue.parse("0"),
+				"padding-bottom": SizeValue.parse("0"),
+				"padding-top": SizeValue.parse("0")			
+			};
+			
+			return defaults;
+		}
 	}
 }

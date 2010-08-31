@@ -37,6 +37,7 @@
     <classEntry path="org.stylekit.css.value.ListStyleCompoundValue"/>
     <classEntry path="org.stylekit.css.value.ListStyleTypeValue"/>
     <classEntry path="org.stylekit.css.value.ListStylePositionValue"/>
+    <classEntry path="org.stylekit.css.value.VisibilityValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
