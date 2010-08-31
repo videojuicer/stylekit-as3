@@ -74,10 +74,42 @@ package org.stylekit.css.property
 				case "border":
 					var borderValue:BorderCompoundValue = (this.value as BorderCompoundValue);
 					
-					mergeParent["border-color"] = borderValue.colorValue;
-					mergeParent["border-style"] = borderValue.lineStyleValue;
-					mergeParent["border-width"] = borderValue.sizeValue;
+					mergeParent["border-left-color"] = mergeParent["border-right-color"] = mergeParent["border-top-color"] = mergeParent["border-bottom-color"] = borderValue.colorValue;
+					mergeParent["border-left-style"] = mergeParent["border-right-style"] = mergeParent["border-top-style"] = mergeParent["border-bottom-style"] = borderValue.lineStyleValue;
+					mergeParent["border-left-width"] = mergeParent["border-right-width"] = mergeParent["border-top-width"] = mergeParent["border-bottom-width"] = borderValue.sizeValue;
 
+					break;
+				case "border-left":
+					var borderLeftValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					
+					mergeParent["border-left-color"] = borderLeftValue.colorValue;
+					mergeParent["border-left-style"] = borderLeftValue.lineStyleValue;
+					mergeParent["border-left-width"] = borderLeftValue.sizeValue;
+					
+					break;
+				case "border-right":
+					var borderRightValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					
+					mergeParent["border-right-color"] = borderRightValue.colorValue;
+					mergeParent["border-right-style"] = borderRightValue.lineStyleValue;
+					mergeParent["border-right-width"] = borderRightValue.sizeValue;
+					
+					break;
+				case "border-top":
+					var borderTopValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					
+					mergeParent["border-top-color"] = borderTopValue.colorValue;
+					mergeParent["border-top-style"] = borderTopValue.lineStyleValue;
+					mergeParent["border-top-width"] = borderTopValue.sizeValue;
+					
+					break;
+				case "border-bottom":
+					var borderBottomValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					
+					mergeParent["border-bottom-color"] = borderBottomValue.colorValue;
+					mergeParent["border-bottom-style"] = borderBottomValue.lineStyleValue;
+					mergeParent["border-bottom-width"] = borderBottomValue.sizeValue;
+					
 					break;
 				case "font":
 					var fontValue:FontCompoundValue = (this.value as FontCompoundValue);
