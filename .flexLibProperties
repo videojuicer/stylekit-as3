@@ -38,6 +38,10 @@
     <classEntry path="org.stylekit.css.value.ListStyleTypeValue"/>
     <classEntry path="org.stylekit.css.value.ListStylePositionValue"/>
     <classEntry path="org.stylekit.css.value.VisibilityValue"/>
+    <classEntry path="org.stylekit.css.value.TextTransformValue"/>
+    <classEntry path="org.stylekit.css.value.TextAlignValue"/>
+    <classEntry path="org.stylekit.css.value.TextDecorationValue"/>
+    <classEntry path="org.stylekit.css.value.CursorValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

@@ -17,6 +17,9 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.TextAlignValue;
+	import org.stylekit.css.value.TextDecorationValue;
+	import org.stylekit.css.value.TextTransformValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.VisibilityValue;
 	import org.stylekit.events.PropertyContainerEvent;
@@ -155,6 +158,12 @@ package org.stylekit.css.property
 				"font-variant": FontVariantValue.parse("normal"),
 				"font-weight": FontWeightValue.parse("normal"),
 				
+				// text
+				"text-align": TextAlignValue.parse("left"),
+				"text-decoration": TextDecorationValue.parse("none"),
+				"text-indent": SizeValue.parse("0"),
+				"text-transform": TextTransformValue.parse("none"),
+				
 				// size
 				"height": SizeValue.parse("auto"),
 				"width": SizeValue.parse("auto"),
@@ -181,7 +190,9 @@ package org.stylekit.css.property
 				"padding-left": SizeValue.parse("0"),
 				"padding-right": SizeValue.parse("0"),
 				"padding-bottom": SizeValue.parse("0"),
-				"padding-top": SizeValue.parse("0")			
+				"padding-top": SizeValue.parse("0"),
+				
+				"z-index": SizeValue.parse("auto")
 			};
 			
 			return defaults;
