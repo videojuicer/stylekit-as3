@@ -563,6 +563,15 @@ package org.stylekit.css.parse
 			this._token = "";
 		}
 		
+		/**
+		 * Unsupported CSS properties:
+		 * 
+		 * azimuth, clip, content, counter-increment, counter-reset, cue, cue-after, cue-before, 
+		 * direction, caption-side, elevation, empty-cells, orphans, page-break-after, page-break-before,
+		 * page-break-inside, pause-after, pause-before, pause, pitch-range, pitch, play-during, richness,
+		 * speak-header, speak-numeral, speak-punctuation, speak, speech-rate, stress, table-layout,
+		 * unicode-bidi, voice-family, volume, widows
+		 */
 		protected function appendPropertyValue(propertyName:String, unparsedPropertyValue:String):void
 		{
 			var propN:String = StringUtil.trim(propertyName.toLowerCase());
