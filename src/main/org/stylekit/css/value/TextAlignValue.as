@@ -40,5 +40,10 @@ package org.stylekit.css.value
 			
 			return fvVal;
 		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (TextAlignValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
+		}
 	}
 }

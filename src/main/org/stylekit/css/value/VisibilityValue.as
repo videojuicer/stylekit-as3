@@ -7,12 +7,11 @@ package org.stylekit.css.value
 		public static var VISIBILITY_VISIBLE:uint = 0;
 		public static var VISIBILITY_HIDDEN:uint = 1;
 		public static var VISIBILITY_COLLAPSE:uint = 2;
-		public static var VISIBILITY_INHERIT:uint = 3;
 		
 		protected var _visibility:uint = VisibilityValue.VISIBILITY_VISIBLE;
 		
 		protected static var validStrings:Array = [
-			"visible", "hidden", "collapse", "inherit"
+			"visible", "hidden", "collapse"
 		];
 		
 		public function VisibilityValue()
@@ -40,6 +39,11 @@ package org.stylekit.css.value
 			value.visibility = Math.max(0, VisibilityValue.validStrings.indexOf(str));
 			
 			return value;
+		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (VisibilityValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
 	}
 }

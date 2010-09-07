@@ -72,5 +72,10 @@ package org.stylekit.css.value
 			
 			return fvVal;
 		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (CursorValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
+		}
 	}
 }

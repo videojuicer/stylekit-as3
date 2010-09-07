@@ -22,13 +22,12 @@ package org.stylekit.css.value
 		public static var DISPLAY_ROW_GROUP:uint = 15;
 		public static var DISPLAY_COLUMN:uint = 16;
 		public static var DISPLAY_COLUMN_GROUP:uint = 17;
-		public static var DISPLAY_INHERIT:uint = 18;
 		
 		protected var _display:uint = DisplayValue.DISPLAY_INLINE;
 		
 		protected static var validStrings:Array = [
 			"inline", "none", "block", "inline-block", "list-item", "marker", "compact", "run-in", "table-header-group", "table-footer-group",
-			"table", "inline-table", "table-caption", "table-cell", "table-row", "table-row-group", "table-column", "table-column-group", "inherit"
+			"table", "inline-table", "table-caption", "table-cell", "table-row", "table-row-group", "table-column", "table-column-group"
 		];
 		
 		public function DisplayValue()
@@ -56,6 +55,11 @@ package org.stylekit.css.value
 			value.display = Math.max(0, DisplayValue.validStrings.indexOf(str));
 			
 			return value;
+		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (DisplayValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
 	}
 }

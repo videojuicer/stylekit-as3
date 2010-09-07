@@ -44,6 +44,16 @@
     <classEntry path="org.stylekit.css.value.CursorValue"/>
     <classEntry path="org.stylekit.css.value.InheritValue"/>
     <classEntry path="org.stylekit.spec.tests.css.property.PropertyTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.VisibilityValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.TextTransformValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.TextDecorationValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.TextAlignValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.PositionValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.OverflowValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.CursorValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.DisplayValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.EdgeCompoundValueTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.InheritValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

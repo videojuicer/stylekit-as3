@@ -8,12 +8,11 @@ package org.stylekit.css.value
 		public static var POSITION_RELATIVE:uint = 1;
 		public static var POSITION_ABSOLUTE:uint = 2;
 		public static var POSITION_FIXED:uint = 3;
-		public static var POSITION_INHERIT:uint = 4;
 		
 		protected var _position:uint = PositionValue.POSITION_STATIC;
 		
 		protected static var validStrings:Array = [
-			"static", "relative", "absolute", "fixed", "inherit"
+			"static", "relative", "absolute", "fixed"
 		];
 		
 		public function PositionValue()
@@ -41,6 +40,11 @@ package org.stylekit.css.value
 			value.position = Math.max(0, PositionValue.validStrings.indexOf(str));
 			
 			return value;
+		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (PositionValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
 	}
 }

@@ -8,12 +8,11 @@ package org.stylekit.css.value
 		public static var OVERFLOW_HIDDEN:uint = 1;
 		public static var OVERFLOW_SCROLL:uint = 2;
 		public static var OVERFLOW_AUTO:uint = 3;
-		public static var OVERFLOW_INHERIT:uint = 4;
 		
 		protected var _overflow:uint = OverflowValue.OVERFLOW_VISIBLE;
 		
 		protected static var validStrings:Array = [
-			"visible", "hidden", "scroll", "auto", "inherit"
+			"visible", "hidden", "scroll", "auto"
 		];
 		
 		public function OverflowValue()
@@ -41,6 +40,11 @@ package org.stylekit.css.value
 			value.overflow = Math.max(0, OverflowValue.validStrings.indexOf(str));
 			
 			return value;
+		}
+		
+		public static function identify(str:String):Boolean
+		{
+			return (OverflowValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
 	}
 }
