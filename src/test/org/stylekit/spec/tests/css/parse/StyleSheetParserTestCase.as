@@ -9,6 +9,8 @@ package org.stylekit.spec.tests.css.parse
 	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.parse.StyleSheetParser;
+	import org.stylekit.css.property.Property;
+	import org.stylekit.css.value.Value;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.style.Animation;
 	import org.stylekit.css.style.Import;
@@ -42,6 +44,28 @@ package org.stylekit.spec.tests.css.parse
 			Assert.assertEquals(1, this._parserResult.fontFaces.length);		
 			// Correct number of imports
 			Assert.assertEquals(2, this._parserResult.imports.length);
+			
+			// Property-important on the first selector has the !important flag set
+			var encounteredImportant:Boolean = false;
+			for(var i:uint = 0; i < this._parserResult.styles.length; i++)
+			{
+				var st:Style = this._parserResult.styles[i];
+				for(var j:uint = 0; j < st.properties.length; j++)
+				{
+					var p:Property = st.properties[j];
+					if(p.name == "property-important")
+					{
+						encounteredImportant = true;
+						Assert.assertTrue("Property "+p.name+" should be !important", p.value.important);
+					}
+					else
+					{
+						Assert.assertFalse("Property "+p.name+" should not be !important", p.value.important);
+					}
+				}
+			}
+			Assert.assertTrue("Should have encountered at least one property called 'property-important'", encounteredImportant);
+			
 			
 			// Correct media selectors on imports
 			var imp1:Import = this._parserResult.imports[0];
