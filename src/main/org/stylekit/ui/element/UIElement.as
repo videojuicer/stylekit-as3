@@ -7,9 +7,11 @@ package org.stylekit.ui.element
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
+	import org.stylekit.css.property.Property;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
+	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
@@ -391,8 +393,36 @@ package org.stylekit.ui.element
 			return child;
 		}
 		
+		public function hasStyleProperty(propertyName:String):Boolean
+		{
+			if (this.getStyleProperty(propertyName) != null)
+			{
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public function getStyleProperty(propertyName:String):Property
+		{
+			for (var i:int = 0; i < this.styles.length; i++)
+			{
+				for (var j:int = 0; j < this.styles[i].properties.length; j++)
+				{
+					if (this.styles[i].properties[j].name == propertyName)
+					{
+						return this.styles[i].properties[j];
+					}
+				}
+			}
+			
+			return null;
+		}
+		
 		public function updateStyles():void
 		{
+			// remove listeners
+			
 			this._styles = new Vector.<Style>();
 			
 			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
@@ -413,6 +443,8 @@ package org.stylekit.ui.element
 							{
 								if (this._styles.indexOf(style) == -1)
 								{
+									// add listener
+									
 									this._styles.push(style);
 								}
 								

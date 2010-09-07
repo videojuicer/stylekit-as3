@@ -31,10 +31,21 @@ package org.stylekit.css.value {
 		{
 			this._stringValue = s;
 		}
-		
+
 		public function set rawValue(s:String):void
 		{
 			this._rawValue = s;
+		}
+		
+		public function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (this === other)
+			{
+				return (this._rawValue == other._rawValue);
+			}
+			
+			return false;
 		}
 	}
 }

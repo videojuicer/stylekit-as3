@@ -28,6 +28,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.FontStyleValue;
 	import org.stylekit.css.value.FontVariantValue;
 	import org.stylekit.css.value.FontWeightValue;
+	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.ListStylePositionValue;
@@ -577,98 +578,107 @@ package org.stylekit.css.parse
 			var propN:String = StringUtil.trim(propertyName.toLowerCase());
 			var property:Property = new Property(propN);
 			
-			switch(propN)
+			if (InheritValue.identify(unparsedPropertyValue))
 			{
-				// Complex Compound values
-				case "background":
-					property.value = BackgroundCompoundValue.parse(unparsedPropertyValue);
-					break;
-				case "border":
-					var borderValue:BorderCompoundValue = BorderCompoundValue.parse(unparsedPropertyValue);
-					var edgeValue:EdgeCompoundValue = new EdgeCompoundValue();
-					edgeValue.topValue = edgeValue.leftValue = edgeValue.rightValue = edgeValue.bottomValue = borderValue;
-					
-					property.value = edgeValue;
-					break;
-				case "font":
-					property.value = FontCompoundValue.parse(unparsedPropertyValue);
-					break;
-				case "font-style":
-					property.value = FontStyleValue.parse(unparsedPropertyValue);
-					break;
-				case "font-variant":
-					property.value = FontVariantValue.parse(unparsedPropertyValue);
-					break;
-				case "font-weight":
-					property.value = FontWeightValue.parse(unparsedPropertyValue);
-					break;
-				case "list-style":
-					property.value = ListStyleCompoundValue.parse(unparsedPropertyValue);
-					break;
-				case "display":
-					property.value = DisplayValue.parse(unparsedPropertyValue);
-					break;
-				case "text-transform":
-					property.value = TextTransformValue.parse(unparsedPropertyValue);
-					break;
-				case "text-decoration":
-					property.value = TextDecorationValue.parse(unparsedPropertyValue);
-					break;
-				case "text-align":
-					property.value = TextAlignValue.parse(unparsedPropertyValue);
-					break;
-				case "cursor":
-					property.value = CursorValue.parse(unparsedPropertyValue);
-					break;
-				case "visibility":
-					property.value = VisibilityValue.parse(unparsedPropertyValue);
-					break;
-				case "padding": case "margin": case "border-width": case "border-radius":
-					property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);
-					break;
-				case "border-top": case "border-left": case "border-right": case "border-bottom":
-					property.value = BorderCompoundValue.parse(unparsedPropertyValue);
-					break;
-				case "list-style-position":
-					property.value = ListStylePositionValue.parse(unparsedPropertyValue);
-					break;
-				case "list-style-type":
-					property.value = ListStyleTypeValue.parse(unparsedPropertyValue);
-					break;
-				case "list-style-image":
-					property.value = URLValue.parse(unparsedPropertyValue);
-					break;
-				default:
-					// overflow, overflow-x, overflow-y, text-overflow
-					if (propN.indexOf("overflow") > -1)
-					{
-						property.value = OverflowValue.parse(unparsedPropertyValue);
-					}
-					// position, ruby-position, text-underline-position
-					else if (propN.indexOf("position") > -1)
-					{
-						property.value = PositionValue.parse(unparsedPropertyValue);
-					}
-					// border-style, outline-style
-					else if (propN.indexOf("style") > -1)
-					{
-						property.value = LineStyleValue.parse(unparsedPropertyValue);
-					}
-					// background-color, border-color, color, outline-color, scrollbar-arrow-color
-					else if (propN.indexOf("color") > -1)
-					{
-						property.value = ColorValue.parse(unparsedPropertyValue);
-					}
-					else if (propN.indexOf("width") > -1 || propN.indexOf("height") > -1)
-					{
-						property.value = SizeValue.parse(unparsedPropertyValue);
-					}
-					else
-					{
-						property.value = new Value();
-						property.value.rawValue = (unparsedPropertyValue);
-					}
-					break;
+				// we pass the property name to the inherit value so we 
+				// know what to inherit
+				property.value = new InheritValue(propN);
+			}
+			else
+			{
+				switch(propN)
+				{
+					// Complex Compound values
+					case "background":
+						property.value = BackgroundCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "border":
+						var borderValue:BorderCompoundValue = BorderCompoundValue.parse(unparsedPropertyValue);
+						var edgeValue:EdgeCompoundValue = new EdgeCompoundValue();
+						edgeValue.topValue = edgeValue.leftValue = edgeValue.rightValue = edgeValue.bottomValue = borderValue;
+						
+						property.value = edgeValue;
+						break;
+					case "font":
+						property.value = FontCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "font-style":
+						property.value = FontStyleValue.parse(unparsedPropertyValue);
+						break;
+					case "font-variant":
+						property.value = FontVariantValue.parse(unparsedPropertyValue);
+						break;
+					case "font-weight":
+						property.value = FontWeightValue.parse(unparsedPropertyValue);
+						break;
+					case "list-style":
+						property.value = ListStyleCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "display":
+						property.value = DisplayValue.parse(unparsedPropertyValue);
+						break;
+					case "text-transform":
+						property.value = TextTransformValue.parse(unparsedPropertyValue);
+						break;
+					case "text-decoration":
+						property.value = TextDecorationValue.parse(unparsedPropertyValue);
+						break;
+					case "text-align":
+						property.value = TextAlignValue.parse(unparsedPropertyValue);
+						break;
+					case "cursor":
+						property.value = CursorValue.parse(unparsedPropertyValue);
+						break;
+					case "visibility":
+						property.value = VisibilityValue.parse(unparsedPropertyValue);
+						break;
+					case "padding": case "margin": case "border-width": case "border-radius":
+						property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);
+						break;
+					case "border-top": case "border-left": case "border-right": case "border-bottom":
+						property.value = BorderCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "list-style-position":
+						property.value = ListStylePositionValue.parse(unparsedPropertyValue);
+						break;
+					case "list-style-type":
+						property.value = ListStyleTypeValue.parse(unparsedPropertyValue);
+						break;
+					case "list-style-image":
+						property.value = URLValue.parse(unparsedPropertyValue);
+						break;
+					default:
+						// overflow, overflow-x, overflow-y, text-overflow
+						if (propN.indexOf("overflow") > -1)
+						{
+							property.value = OverflowValue.parse(unparsedPropertyValue);
+						}
+						// position, ruby-position, text-underline-position
+						else if (propN.indexOf("position") > -1)
+						{
+							property.value = PositionValue.parse(unparsedPropertyValue);
+						}
+						// border-style, outline-style
+						else if (propN.indexOf("style") > -1)
+						{
+							property.value = LineStyleValue.parse(unparsedPropertyValue);
+						}
+						// background-color, border-color, color, outline-color, scrollbar-arrow-color
+						else if (propN.indexOf("color") > -1)
+						{
+							property.value = ColorValue.parse(unparsedPropertyValue);
+						}
+						else if (propN.indexOf("width") > -1 || propN.indexOf("height") > -1)
+						{
+							property.value = SizeValue.parse(unparsedPropertyValue);
+						}
+						else
+						{
+							property.value = new Value();
+							property.value.rawValue = (unparsedPropertyValue);
+						}
+						break;
+				}
 			}
 			
 			this.currentPropertyTarget.addProperty(property);

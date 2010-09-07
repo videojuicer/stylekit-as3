@@ -7,6 +7,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FontCompoundValue;
+	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.Value;
 	
@@ -61,10 +62,17 @@ package org.stylekit.css.property
 				mergeParent = new Object();
 			}
 			
+			var val:Value = this.value;
+			
+			if (val is InheritValue)
+			{
+				val = (val as InheritValue).resolveValue(null);
+			}
+
 			switch (this.name)
 			{
 				case "background":
-					var backgroundValue:BackgroundCompoundValue = (this.value as BackgroundCompoundValue)
+					var backgroundValue:BackgroundCompoundValue = (val as BackgroundCompoundValue)
 					
 					mergeParent["background-color"] = backgroundValue.colorValue;
 					mergeParent["background-image"] = backgroundValue.urlValue;
@@ -73,15 +81,15 @@ package org.stylekit.css.property
 					
 					break;
 				case "border":
-					var borderValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					var borderValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
 					mergeParent["border-left-color"] = mergeParent["border-right-color"] = mergeParent["border-top-color"] = mergeParent["border-bottom-color"] = borderValue.colorValue;
 					mergeParent["border-left-style"] = mergeParent["border-right-style"] = mergeParent["border-top-style"] = mergeParent["border-bottom-style"] = borderValue.lineStyleValue;
 					mergeParent["border-left-width"] = mergeParent["border-right-width"] = mergeParent["border-top-width"] = mergeParent["border-bottom-width"] = borderValue.sizeValue;
-
+					
 					break;
 				case "border-left":
-					var borderLeftValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					var borderLeftValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
 					mergeParent["border-left-color"] = borderLeftValue.colorValue;
 					mergeParent["border-left-style"] = borderLeftValue.lineStyleValue;
@@ -89,7 +97,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "border-right":
-					var borderRightValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					var borderRightValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
 					mergeParent["border-right-color"] = borderRightValue.colorValue;
 					mergeParent["border-right-style"] = borderRightValue.lineStyleValue;
@@ -97,7 +105,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "border-top":
-					var borderTopValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					var borderTopValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
 					mergeParent["border-top-color"] = borderTopValue.colorValue;
 					mergeParent["border-top-style"] = borderTopValue.lineStyleValue;
@@ -105,7 +113,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "border-bottom":
-					var borderBottomValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					var borderBottomValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
 					mergeParent["border-bottom-color"] = borderBottomValue.colorValue;
 					mergeParent["border-bottom-style"] = borderBottomValue.lineStyleValue;
@@ -113,7 +121,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "font":
-					var fontValue:FontCompoundValue = (this.value as FontCompoundValue);
+					var fontValue:FontCompoundValue = (val as FontCompoundValue);
 					
 					mergeParent["font-family"] = fontValue.fontFaceValue;
 					mergeParent["font-style"] = fontValue.fontStyleValue;
@@ -123,7 +131,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "outline":
-					var outlineValue:BorderCompoundValue = (this.value as BorderCompoundValue);
+					var outlineValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
 					mergeParent["outline-color"] = outlineValue.colorValue;
 					mergeParent["outline-style"] = outlineValue.lineStyleValue;
@@ -131,7 +139,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "margin":
-					var marginValue:EdgeCompoundValue = (this.value as EdgeCompoundValue);
+					var marginValue:EdgeCompoundValue = (val as EdgeCompoundValue);
 					
 					mergeParent["margin-top"] = marginValue.topValue;
 					mergeParent["margin-right"] = marginValue.rightValue;
@@ -140,7 +148,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "padding":
-					var paddingValue:EdgeCompoundValue = (this.value as EdgeCompoundValue);
+					var paddingValue:EdgeCompoundValue = (val as EdgeCompoundValue);
 					
 					mergeParent["padding-top"] = paddingValue.topValue;
 					mergeParent["padding-right"] = paddingValue.rightValue;
@@ -149,7 +157,7 @@ package org.stylekit.css.property
 					
 					break;
 				case "list-style":
-					var listValue:ListStyleCompoundValue = (this.value as ListStyleCompoundValue);
+					var listValue:ListStyleCompoundValue = (val as ListStyleCompoundValue);
 					
 					mergeParent["list-style-type"] = listValue.typeValue;
 					mergeParent["list-style-position"] = listValue.positionValue;
@@ -157,7 +165,7 @@ package org.stylekit.css.property
 					
 					break;
 				default:
-					mergeParent[this.name] = this.value;
+					mergeParent[this.name] = val;
 					break;
 			}
 			
