@@ -9,6 +9,7 @@ package org.stylekit.css.value {
 		
 		protected var _rawValue:String;
 		protected var _stringValue:String;
+		protected var _important:Boolean = false;
 		
 		public function Value()
 		{
@@ -20,6 +21,16 @@ package org.stylekit.css.value {
 			var val:Value = new Value();
 				val.stringValue = str;
 			return val;
+		}
+		
+		public function get important():Boolean
+		{
+			return this._important;
+		}
+		
+		public function set important(i:Boolean):void
+		{
+			this._important = i;
 		}
 		
 		public function get stringValue():String

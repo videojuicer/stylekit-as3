@@ -119,6 +119,11 @@ package org.stylekit.css.parse
 		protected var _currentProperty:String;
 		
 		/**
+		* Maintains the importance of the value currently being parsed.
+		*/
+		protected var _currentValueIsImportant:Boolean;
+		
+		/**
 		* Populated by an @media declaration setting the media scope for any containing styles.
 		*/
 		protected var _mediaSelectorStack:Vector.<MediaSelector>;
@@ -169,6 +174,10 @@ package org.stylekit.css.parse
 		{
 			this.resetState();
 			
+			// Token collectors
+			var currentProperty:String = "";
+			var currentPropertyValue:String = "";
+			
 			// Start a character-by-character loop over the given CSS.
 			for(this._lexerIndex=0; this._lexerIndex < css.length; this._lexerIndex++) {
 				var i:uint = this._lexerIndex;
@@ -193,10 +202,6 @@ package org.stylekit.css.parse
 						continue;
 					}
 				}
-				
-				// Token collectors
-				var currentProperty:String = "";
-				var currentPropertyValue:String = "";
 				
 				switch(this.currentState)
 				{
@@ -290,8 +295,10 @@ package org.stylekit.css.parse
 							Logger.debug("Found property value for property '"+currentProperty+"'. Setting on property target and exiting value state", this);
 
 							// Grab the property key and route it to the current property target
-							this.appendPropertyValue(currentProperty, this._token);
+							this.appendPropertyValue(currentProperty, this._token, this._currentValueIsImportant);
+							
 							currentProperty = "";
+							this._currentValueIsImportant = false;
 
 							this._token = "";
 							this.exitState();
@@ -305,8 +312,7 @@ package org.stylekit.css.parse
 						{
 							// Special value exit - the !important flag is registered but not appended to the value token.
 							Logger.debug("Found !important property value '"+this._token+"'. about to exit value state", this);
-							this._token = "";
-							this.exitState();
+							this._currentValueIsImportant = true;
 						}
 						else
 						{
@@ -560,6 +566,7 @@ package org.stylekit.css.parse
 			this._importStack = new Vector.<Import>();
 			this._animationStack = new Vector.<Animation>();
 			this._fontFaceStack = new Vector.<FontFace>();
+			this._currentValueIsImportant = false;
 			this._nesting = 0;
 			this._token = "";
 		}
@@ -573,7 +580,7 @@ package org.stylekit.css.parse
 		 * speak-header, speak-numeral, speak-punctuation, speak, speech-rate, stress, table-layout,
 		 * unicode-bidi, voice-family, volume, widows
 		 */
-		protected function appendPropertyValue(propertyName:String, unparsedPropertyValue:String):void
+		protected function appendPropertyValue(propertyName:String, unparsedPropertyValue:String, valueIsImportant:Boolean = false):void
 		{
 			var propN:String = StringUtil.trim(propertyName.toLowerCase());
 			var property:Property = new Property(propN);
@@ -679,6 +686,12 @@ package org.stylekit.css.parse
 						}
 						break;
 				}
+			}
+			
+			// Set the !important flag if it was found
+			if(valueIsImportant)
+			{
+				property.value.important = true;
 			}
 			
 			this.currentPropertyTarget.addProperty(property);
