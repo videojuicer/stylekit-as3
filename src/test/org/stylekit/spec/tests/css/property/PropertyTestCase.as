@@ -11,7 +11,7 @@ package org.stylekit.spec.tests.css.property
 	
 	public class PropertyTestCase
 	{
-		[Test(description="Tests that a property can be evaluated into a flash hash successfully")]
+		[Test(description="Tests that a property can be evaluated into a flat hash successfully")]
 		public function ableToEvaluate():void
 		{
 			// test some colours
