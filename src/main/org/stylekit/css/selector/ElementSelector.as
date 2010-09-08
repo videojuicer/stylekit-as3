@@ -253,7 +253,7 @@ package org.stylekit.css.selector
 			for(var i:uint = 0; i < this.elementPseudoClasses.length; i++)
 			{
 				var p:String = this.elementPseudoClasses[i];
-				if(p.indexOf("first") == 0 || p.indexOf("last") == 0 || p.indexOf("nth") == 0)
+				if(p.indexOf("first-l") == 0 || p.indexOf("last-l") == 0)
 				{
 					pseudoElementCount++;
 				}

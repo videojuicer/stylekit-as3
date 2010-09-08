@@ -31,6 +31,16 @@ package org.stylekit.css.selector
 			return this._elementSelectors;
 		}
 		
+		public function get specificity():uint
+		{
+			var score:uint = 0;
+			for(var i:uint=0; i < this._elementSelectors.length; i++)
+			{
+				score += this._elementSelectors[i];
+			}
+			return score;
+		}
+		
 	}
 	
 }

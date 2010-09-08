@@ -5,6 +5,7 @@ package org.stylekit.spec.tests.css.selector
 	import flexunit.framework.AsyncTestHelper;
 	import org.flexunit.async.Async;
 
+	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.selector.ElementSelector;
 
 	public class ElementSelectorTestCase {
@@ -79,6 +80,23 @@ package org.stylekit.spec.tests.css.selector
 			Assert.assertTrue(this._selector.addElementPseudoClass("last-letter"));
 			Assert.assertTrue(this._selector.lastLetterOnly);
 			
+		}
+		
+		[Test(description="Ensures that selectors may be sorted by specificity")]
+		public function specificityIsComparable():void
+		{
+			var p:ElementSelectorParser = new ElementSelectorParser();
+			
+			var a:ElementSelector = p.parseElementSelector("p");
+			var b:ElementSelector = p.parseElementSelector("p:first-letter");
+			var c:ElementSelector = p.parseElementSelector("p.class");
+			var d:ElementSelector = p.parseElementSelector("p#id");
+			var e:ElementSelector = p.parseElementSelector("p#id.class");
+			
+			Assert.assertTrue(b.specificity > a.specificity);
+			Assert.assertTrue(c.specificity > b.specificity);
+			Assert.assertTrue(d.specificity > c.specificity);
+			Assert.assertTrue(e.specificity > d.specificity);
 		}
 		
 	}
