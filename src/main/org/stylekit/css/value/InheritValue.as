@@ -48,5 +48,16 @@ package org.stylekit.css.value
 		{
 			return (str == "inherit");
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is InheritValue)
+			{
+				return (this.stringValue == other.stringValue);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

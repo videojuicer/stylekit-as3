@@ -1,8 +1,7 @@
 package org.stylekit.css.value
 {
-	import org.stylekit.css.value.Value;
-
 	import org.stylekit.css.parse.ValueParser;
+	import org.stylekit.css.value.Value;
 	import org.utilkit.util.StringUtil;
 
 	public class RepeatValue extends Value
@@ -67,6 +66,17 @@ package org.stylekit.css.value
 		public function set verticalRepeat(r:Boolean):void
 		{
 			this._verticalRepeat = r;
+		}
+
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is RepeatValue)
+			{
+				return (this.horizontalRepeat == (other as RepeatValue).horizontalRepeat) && (this.verticalRepeat == (other as RepeatValue).verticalRepeat);
+			}
+			
+			return super.isEquivalent(other);
 		}
 	}
 }

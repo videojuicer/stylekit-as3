@@ -45,5 +45,16 @@ package org.stylekit.css.value
 		{
 			return (VisibilityValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is VisibilityValue)
+			{
+				return (this.visibility == (other as VisibilityValue).visibility);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

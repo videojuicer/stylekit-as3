@@ -46,5 +46,16 @@ package org.stylekit.css.value
 		{
 			return (TextDecorationValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is TextDecorationValue)
+			{
+				return (this.textDecoration == (other as TextDecorationValue).textDecoration);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

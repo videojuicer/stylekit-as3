@@ -1,7 +1,6 @@
 package org.stylekit.css.value
 {
 	import org.stylekit.css.value.Value;
-	
 	import org.utilkit.util.StringUtil;
 	
 	public class LineStyleValue extends Value
@@ -52,6 +51,17 @@ package org.stylekit.css.value
 		public function set lineStyle(l:uint):void
 		{
 			this._lineStyle = l;
+		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is LineStyleValue)
+			{
+				return (this.lineStyle == (other as LineStyleValue).lineStyle);
+			}
+			
+			return super.isEquivalent(other);
 		}
 	}
 }

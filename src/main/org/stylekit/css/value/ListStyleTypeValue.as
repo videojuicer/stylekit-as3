@@ -59,5 +59,16 @@ package org.stylekit.css.value
 		{
 			return (ListStyleTypeValue.validStrings.indexOf(str) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is ListStyleTypeValue)
+			{
+				return (this.type == (other as ListStyleTypeValue).type);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

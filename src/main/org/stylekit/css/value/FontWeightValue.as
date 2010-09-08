@@ -84,5 +84,16 @@ package org.stylekit.css.value
 		{
 			this._fontWeight = fs;
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is FontWeightValue)
+			{
+				return (this.fontWeight == (other as FontWeightValue).fontWeight);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

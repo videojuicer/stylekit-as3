@@ -1,9 +1,8 @@
 package org.stylekit.css.value 
 {
 	
-	import org.stylekit.css.value.Value;
-	
 	import org.stylekit.css.parse.ValueParser;
+	import org.stylekit.css.value.Value;
 	import org.utilkit.util.StringUtil;
 	
 	public class ColorValue extends Value
@@ -214,6 +213,17 @@ package org.stylekit.css.value
 		public function get hexValue():uint
 		{
 			return this._hexValue;
+		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is ColorValue)
+			{
+				return (this.hexValue == (other as ColorValue).hexValue);
+			}
+			
+			return super.isEquivalent(other);
 		}
 	}
 }

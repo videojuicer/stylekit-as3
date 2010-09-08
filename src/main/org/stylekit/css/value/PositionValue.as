@@ -46,5 +46,16 @@ package org.stylekit.css.value
 		{
 			return (PositionValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is PositionValue)
+			{
+				return (this.position == (other as PositionValue).position);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

@@ -46,5 +46,16 @@ package org.stylekit.css.value
 		{
 			return (OverflowValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is OverflowValue)
+			{
+				return (this.overflow == (other as OverflowValue).overflow);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

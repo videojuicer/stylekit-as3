@@ -45,5 +45,16 @@ package org.stylekit.css.value
 		{
 			return (TextTransformValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is TextTransformValue)
+			{
+				return (this.textTransform == (other as TextTransformValue).textTransform);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

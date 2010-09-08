@@ -1,9 +1,8 @@
 package org.stylekit.css.value
 {
 	
-	import org.stylekit.css.value.Value;
-	
 	import org.stylekit.css.parse.ValueParser;
+	import org.stylekit.css.value.Value;
 	import org.utilkit.util.StringUtil;
 	
 	/**
@@ -113,6 +112,30 @@ package org.stylekit.css.value
 			return (this.verticalAlign == AlignmentValue.ALIGN_BOTTOM);
 		}
 		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is AlignmentValue)
+			{
+				var align:AlignmentValue = (other as AlignmentValue);
+				var validates:Boolean = true;
+				
+				if (this.bottomAlign != align.bottomAlign) validates = false;
+				if (this.leftAlign != align.leftAlign) validates = false;
+				if (this.rightAlign != align.rightAlign) validates = false;
+				if (this.topAlign != align.topAlign) validates = false;
+				
+				if (this.horizontalAlign != align.horizontalAlign) validates = false;
+				if (this.verticalAlign != align.verticalAlign) validates = false;
+				
+				if (validates)
+				{
+					return true;
+				}
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 	
 }

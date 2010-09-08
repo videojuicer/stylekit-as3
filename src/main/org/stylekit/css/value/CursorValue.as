@@ -77,5 +77,16 @@ package org.stylekit.css.value
 		{
 			return (CursorValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is CursorValue)
+			{
+				return (this.cursor == (other as CursorValue).cursor) && (this.cursorUrl.isEquivalent((other as CursorValue).cursorUrl));
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

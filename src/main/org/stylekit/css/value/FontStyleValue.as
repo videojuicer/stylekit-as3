@@ -47,5 +47,16 @@ package org.stylekit.css.value
 		{
 			this._fontStyle = fs;
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is FontStyleValue)
+			{
+				return (this.fontStyle == (other as FontStyleValue).fontStyle);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

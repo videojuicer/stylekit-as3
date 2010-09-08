@@ -45,5 +45,16 @@ package org.stylekit.css.value
 		{
 			return (TextAlignValue.validStrings.indexOf(StringUtil.trim(str).toLowerCase()) > -1);
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is TextAlignValue)
+			{
+				return (this.textAlign == (other as TextAlignValue).textAlign);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

@@ -1,9 +1,8 @@
 package org.stylekit.css.value
 {
 	
-	import org.stylekit.css.value.Value;
-	
 	import org.stylekit.css.parse.ValueParser;
+	import org.stylekit.css.value.Value;
 	import org.utilkit.util.StringUtil;
 	
 	/**
@@ -110,6 +109,16 @@ package org.stylekit.css.value
 			this._baseURL = b;
 		}
 		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is URLValue)
+			{
+				return (this.url == (other as URLValue).url);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 	
 }

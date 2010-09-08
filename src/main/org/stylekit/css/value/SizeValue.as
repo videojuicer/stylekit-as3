@@ -1,9 +1,8 @@
 package org.stylekit.css.value
 {
+	import org.stylekit.css.parse.ValueParser;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.ui.element.UIElement;
-	
-	import org.stylekit.css.parse.ValueParser;
 	import org.utilkit.util.StringUtil;
 	
 	/**
@@ -80,6 +79,17 @@ package org.stylekit.css.value
 		public function evaluateSize(onElement:UIElement = null):void
 		{
 			
+		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			// type matches
+			if (other is SizeValue)
+			{
+				return (this.units == (other as SizeValue).units);
+			}
+			
+			return super.isEquivalent(other);
 		}
 	}
 	
