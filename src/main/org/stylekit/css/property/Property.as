@@ -63,112 +63,140 @@ package org.stylekit.css.property
 			}
 			
 			var val:Value = this.value;
+			// Store the !important flag for this value.
+			// Stored this way because compound values that are !important should lend their importance to all their sub-values.
+			var importance:Boolean = val.important;
 			
 			if (val is InheritValue)
 			{
 				val = (val as InheritValue).resolveValue(null);
 			}
+			
+			
 
 			switch (this.name)
 			{
 				case "background":
 					var backgroundValue:BackgroundCompoundValue = (val as BackgroundCompoundValue)
 					
-					mergeParent["background-color"] = backgroundValue.colorValue;
-					mergeParent["background-image"] = backgroundValue.urlValue;
-					mergeParent["background-position"] = backgroundValue.alignmentValue;
-					mergeParent["background-repeat"] = backgroundValue.repeatValue;
-					
+					mergePropertyWithImportance(mergeParent, ["background-color"], backgroundValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["background-image"], backgroundValue.urlValue, importance);
+					mergePropertyWithImportance(mergeParent, ["background-position"], backgroundValue.alignmentValue, importance);
+					mergePropertyWithImportance(mergeParent, ["background-repeat"], backgroundValue.repeatValue, importance);
+										
 					break;
 				case "border":
 					var borderValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
-					mergeParent["border-left-color"] = mergeParent["border-right-color"] = mergeParent["border-top-color"] = mergeParent["border-bottom-color"] = borderValue.colorValue;
-					mergeParent["border-left-style"] = mergeParent["border-right-style"] = mergeParent["border-top-style"] = mergeParent["border-bottom-style"] = borderValue.lineStyleValue;
-					mergeParent["border-left-width"] = mergeParent["border-right-width"] = mergeParent["border-top-width"] = mergeParent["border-bottom-width"] = borderValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["border-left-color", "border-right-color", "border-top-color", "border-bottom-color"], 	
+												borderValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-left-style", "border-right-style", "border-top-style", "border-bottom-style"], 	
+												borderValue.lineStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-left-width", "border-right-width", "border-top-width", "border-bottom-width"], 	
+												borderValue.sizeValue, importance);
 					
 					break;
 				case "border-left":
 					var borderLeftValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
-					mergeParent["border-left-color"] = borderLeftValue.colorValue;
-					mergeParent["border-left-style"] = borderLeftValue.lineStyleValue;
-					mergeParent["border-left-width"] = borderLeftValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["border-left-color"], borderLeftValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-left-style"], borderLeftValue.lineStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-left-width"], borderLeftValue.sizeValue, importance);
 					
 					break;
 				case "border-right":
 					var borderRightValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
-					mergeParent["border-right-color"] = borderRightValue.colorValue;
-					mergeParent["border-right-style"] = borderRightValue.lineStyleValue;
-					mergeParent["border-right-width"] = borderRightValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["border-right-color"], borderRightValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-right-style"], borderRightValue.lineStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-right-width"], borderRightValue.sizeValue, importance);
 					
 					break;
 				case "border-top":
 					var borderTopValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
-					mergeParent["border-top-color"] = borderTopValue.colorValue;
-					mergeParent["border-top-style"] = borderTopValue.lineStyleValue;
-					mergeParent["border-top-width"] = borderTopValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["border-top-color"], borderTopValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-top-style"], borderTopValue.lineStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-top-width"], borderTopValue.sizeValue, importance);
 					
 					break;
 				case "border-bottom":
 					var borderBottomValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
-					mergeParent["border-bottom-color"] = borderBottomValue.colorValue;
-					mergeParent["border-bottom-style"] = borderBottomValue.lineStyleValue;
-					mergeParent["border-bottom-width"] = borderBottomValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["border-bottom-color"], borderBottomValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-bottom-style"], borderBottomValue.lineStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["border-bottom-width"], borderBottomValue.sizeValue, importance);
 					
 					break;
 				case "font":
 					var fontValue:FontCompoundValue = (val as FontCompoundValue);
 					
-					mergeParent["font-family"] = fontValue.fontFaceValue;
-					mergeParent["font-style"] = fontValue.fontStyleValue;
-					mergeParent["font-variant"] = fontValue.fontVariantValue;
-					mergeParent["font-weight"] = fontValue.fontWeightValue;
-					mergeParent["font-size"] = fontValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["font-family"], fontValue.fontFaceValue, importance);
+					mergePropertyWithImportance(mergeParent, ["font-style"], fontValue.fontStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["font-variant"], fontValue.fontVariantValue, importance);
+					mergePropertyWithImportance(mergeParent, ["font-weight"], fontValue.fontWeightValue, importance);
+					mergePropertyWithImportance(mergeParent, ["font-size"], fontValue.sizeValue, importance);
 					
 					break;
 				case "outline":
 					var outlineValue:BorderCompoundValue = (val as BorderCompoundValue);
 					
-					mergeParent["outline-color"] = outlineValue.colorValue;
-					mergeParent["outline-style"] = outlineValue.lineStyleValue;
-					mergeParent["outline-width"] = outlineValue.sizeValue;
+					mergePropertyWithImportance(mergeParent, ["outline-color"], outlineValue.colorValue, importance);
+					mergePropertyWithImportance(mergeParent, ["outline-style"], outlineValue.lineStyleValue, importance);
+					mergePropertyWithImportance(mergeParent, ["outline-width"], outlineValue.sizeValue, importance);
 					
 					break;
 				case "margin":
 					var marginValue:EdgeCompoundValue = (val as EdgeCompoundValue);
 					
-					mergeParent["margin-top"] = marginValue.topValue;
-					mergeParent["margin-right"] = marginValue.rightValue;
-					mergeParent["margin-bottom"] = marginValue.bottomValue;
-					mergeParent["margin-left"] = marginValue.leftValue;
+					mergePropertyWithImportance(mergeParent, ["margin-top"], marginValue.topValue, importance);
+					mergePropertyWithImportance(mergeParent, ["margin-right"], marginValue.rightValue, importance);
+					mergePropertyWithImportance(mergeParent, ["margin-bottom"], marginValue.bottomValue, importance);
+					mergePropertyWithImportance(mergeParent, ["margin-left"], marginValue.leftValue, importance);
 					
 					break;
 				case "padding":
 					var paddingValue:EdgeCompoundValue = (val as EdgeCompoundValue);
 					
-					mergeParent["padding-top"] = paddingValue.topValue;
-					mergeParent["padding-right"] = paddingValue.rightValue;
-					mergeParent["padding-bottom"] = paddingValue.bottomValue;
-					mergeParent["padding-left"] = paddingValue.leftValue;
+					mergePropertyWithImportance(mergeParent, ["padding-top"], paddingValue.topValue, importance);
+					mergePropertyWithImportance(mergeParent, ["padding-right"], paddingValue.rightValue, importance);
+					mergePropertyWithImportance(mergeParent, ["padding-bottom"], paddingValue.bottomValue, importance);
+					mergePropertyWithImportance(mergeParent, ["padding-left"], paddingValue.leftValue, importance);
 					
 					break;
 				case "list-style":
 					var listValue:ListStyleCompoundValue = (val as ListStyleCompoundValue);
 					
-					mergeParent["list-style-type"] = listValue.typeValue;
-					mergeParent["list-style-position"] = listValue.positionValue;
-					mergeParent["list-style-image"] = listValue.urlValue;
+					mergePropertyWithImportance(mergeParent, ["list-style-type"], listValue.typeValue, importance);
+					mergePropertyWithImportance(mergeParent, ["list-style-position"], listValue.positionValue, importance);
+					mergePropertyWithImportance(mergeParent, ["list-style-image"], listValue.urlValue, importance);
 					
 					break;
 				default:
-					mergeParent[this.name] = val;
+					mergePropertyWithImportance(mergeParent, [this.name], val, importance);
 					break;
 			}
 			
+			return mergeParent;
+		}
+		
+		// Merges a value into the mergeParent object, following the rules for !important overrides.
+		// Only performs the merge if:
+		// 1. The previous value is not set OR
+		// 2. The previous value isn't important OR
+		// 3. The new value is important
+		protected function mergePropertyWithImportance(mergeParent:Object, keys:Array, newValue:Value, newValueIsImportant:Boolean):Object
+		{
+			for(var i:uint=0; i<keys.length; i++)
+			{
+				var key:String = (keys[i] as String);
+				var prevValue:Value = mergeParent[key];
+
+				if(prevValue == null || !prevValue.important || newValueIsImportant)
+				{
+					mergeParent[key] = newValue;
+				}
+			}
 			return mergeParent;
 		}
 		
