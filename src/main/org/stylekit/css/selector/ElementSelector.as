@@ -4,6 +4,11 @@ package org.stylekit.css.selector
 	public class ElementSelector
 	{
 		
+		public static var SPECIFICITY_SCORE_ELEMENT_NAME_OR_PSEUDO_ELEMENT:uint = 1;
+		public static var SPECIFICITY_SCORE_CLASS_OR_PSEUDOCLASS:uint = 100;
+		public static var SPECIFICITY_SCORE_ELEMENT_ID:uint = 10000;
+		public static var SPECIFICITY_SCORE_LOCAL:uint = 1000000;
+		
 		/**
 		* The element name required to match this selector. In the selector string "div.clear", the elementName is "div".
 		*/ 
@@ -235,6 +240,46 @@ package org.stylekit.css.selector
 				return true;
 			}
 			return false;
+		}
+		
+		/**
+		* Calculates the specificity for this selector as a uint that may be directly compared to other 
+		* selectors for sorting purposes.
+		*/
+		public function get specificity():uint
+		{
+			// Get pseudoclasses and extract pseudoelements
+			var pseudoElementCount:uint = 0;
+			for(var i:uint = 0; i < this.elementPseudoClasses.length; i++)
+			{
+				var p:String = this.elementPseudoClasses[i];
+				if(p.indexOf("first") == 0 || p.indexOf("last") == 0 || p.indexOf("nth") == 0)
+				{
+					pseudoElementCount++;
+				}
+			}
+
+			var score:uint = 0;
+
+			// Element name
+			if(this.elementName != null)
+			{
+				score += ElementSelector.SPECIFICITY_SCORE_ELEMENT_NAME_OR_PSEUDO_ELEMENT;
+			}
+
+			// Pseudoelements
+			score += pseudoElementCount * ElementSelector.SPECIFICITY_SCORE_ELEMENT_NAME_OR_PSEUDO_ELEMENT;
+
+			if(this.elementID != null)
+			{
+				score += ElementSelector.SPECIFICITY_SCORE_ELEMENT_ID;
+			}
+
+			// Classes and pseudoclasses
+			score += this.elementClassNames.length * ElementSelector.SPECIFICITY_SCORE_CLASS_OR_PSEUDOCLASS;
+			score += (this.elementPseudoClasses.length - pseudoElementCount) * ElementSelector.SPECIFICITY_SCORE_CLASS_OR_PSEUDOCLASS;
+
+			return score;
 		}
 	}
 	
