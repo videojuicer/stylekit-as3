@@ -23,6 +23,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.VisibilityValue;
 	import org.stylekit.events.PropertyContainerEvent;
+	import org.stylekit.ui.element.UIElement;
 	
 	/**
 	 * Dispatched when any new properties are added to this container instance..
@@ -83,7 +84,7 @@ package org.stylekit.css.property
 			this._properties.push(property);
 		}
 		
-		public function evaluate(mergeParent:Object = null):Object
+		public function evaluate(mergeParent:Object, uiElement:UIElement):Object
 		{
 			if (mergeParent == null)
 			{
@@ -92,7 +93,7 @@ package org.stylekit.css.property
 			
 			for (var i:int = 0; i < this._properties.length; i++)
 			{
-				mergeParent = this._properties[i].evaluateProperty(mergeParent);
+				mergeParent = this._properties[i].evaluateProperty(mergeParent, uiElement);
 			}
 			
 			return mergeParent;

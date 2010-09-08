@@ -44,7 +44,7 @@ package org.stylekit.spec.tests.css.property
 		protected function evaluatePropertyAndValue(propertyName:String, value:Value):void
 		{
 			var property:Property = new Property(propertyName, value);
-			var mergeParent:Object = property.evaluateProperty(new Object());
+			var mergeParent:Object = property.evaluateProperty(new Object(), null);
 			
 			Assert.assertNotNull(mergeParent);
 			Assert.assertTrue(mergeParent.hasOwnProperty(propertyName));

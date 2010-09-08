@@ -10,6 +10,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.ui.element.UIElement;
 	
 	/**
 	* The Property class represents a CSS value given a property name. For instance, the padding property 
@@ -55,7 +56,7 @@ package org.stylekit.css.property
 		* However, some properties evaluate into more complex arrangements:
 		* <code>Property(name="padding", value=EdgeCompoundValue(...)).evaluateStyle() => {"padding-top": SizeValue(...), "padding-right": SizeValue(...), "padding-bottom": SizeValue(...), "padding-left": SizeValue(...)}</code>
 		*/ 
-		public function evaluateProperty(mergeParent:Object = null):Object
+		public function evaluateProperty(mergeParent:Object, uiElement:UIElement):Object
 		{
 			if (mergeParent == null)
 			{
@@ -69,7 +70,7 @@ package org.stylekit.css.property
 			
 			if (val is InheritValue)
 			{
-				val = (val as InheritValue).resolveValue(null);
+				val = (val as InheritValue).resolveValue(uiElement);
 			}
 			
 			
