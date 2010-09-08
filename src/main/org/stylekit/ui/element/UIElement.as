@@ -27,6 +27,8 @@ package org.stylekit.ui.element
 	{
 		protected var _children:Vector.<UIElement>;
 		protected var _styles:Vector.<Style>;
+		protected var _styleSelectors:Vector.<ElementSelectorChain>;
+		protected var _evaluatedStyles:Object;
 		
 		protected var _styleEligible:Boolean = false;
 		
@@ -52,6 +54,7 @@ package org.stylekit.ui.element
 			super();
 			
 			this._baseUI = baseUI;
+			this._evaluatedStyles = {};
 			
 			this._children = new Vector.<UIElement>();
 			
@@ -421,9 +424,10 @@ package org.stylekit.ui.element
 		
 		public function updateStyles():void
 		{
-			// remove listeners
+			// TODO remove listeners
 			
 			this._styles = new Vector.<Style>();
+			this._styleSelectors = new Vector.<ElementSelectorChain>();
 			
 			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
 			{
@@ -443,9 +447,9 @@ package org.stylekit.ui.element
 							{
 								if (this._styles.indexOf(style) == -1)
 								{
-									// add listener
-									
+									// TODO add listener
 									this._styles.push(style);
+									this._styleSelectors.push(chain);
 								}
 								
 								break;
@@ -453,6 +457,63 @@ package org.stylekit.ui.element
 						}
 					}
 				}
+			}
+			
+			// Evaluate the new styles
+			this.evaluateStyles();
+		}
+		
+		protected function evaluateStyles():void
+		{
+			var previousEvaluatedStyles:Object = this._evaluatedStyles;
+			
+			// Begin specificity sort			
+			// Sort matched selectors by specificity
+			var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
+				sortedSelectorChains.sort(
+					function(x:ElementSelectorChain, y:ElementSelectorChain):Number
+					{
+						if(x.specificity > y.specificity)
+						{
+							return -1;
+						}
+						else if(x.specificity > y.specificity)
+						{
+							return 1;
+						}
+						else
+						{
+							return 0;
+						}
+					}
+				);
+			
+			// Loop over sorted selectors and use found index to sort corresponding style.
+			// The created vector is fixed in length.
+			var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
+			for(var i:uint=0; i < this._styles.length; i++)
+			{
+				var s:Style = this._styles[i];
+				// loop over style's selector chains and find index of any in the sorted selector vector, spector.
+				// the found index is the insertion index for this style.
+				for(var j:uint=0; j<s.elementSelectorChains.length; j++)
+				{
+					var fI:int = sortedSelectorChains.indexOf(s.elementSelectorChains[j]);
+					if(fI > -1)
+					{
+						sortedStyles[fI] = s;
+					}
+				}
+			}
+			// End specificity sort
+			
+			var newEvaluatedStyles:Object = {};
+			for(i=0; i < sortedStyles.length; i++)
+			{
+				// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
+				// went out of sync before or during this method's execution.
+				
+				
 			}
 		}
 		
