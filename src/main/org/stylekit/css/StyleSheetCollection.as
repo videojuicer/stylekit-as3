@@ -48,9 +48,13 @@ package org.stylekit.css {
 		*/
 		public function addStyleSheet(s:StyleSheet):Boolean
 		{
-			if(this.hasStyleSheet(s)) {
+			if(this.hasStyleSheet(s))
+			{
 				return false;
 			}
+			
+			s.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
+			
 			this._styleSheets.push(s);
 			
 			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
@@ -66,6 +70,9 @@ package org.stylekit.css {
 			if(this.hasStyleSheet(s))
 			{
 				this._styleSheets.splice(this._styleSheets.indexOf(s), 1);
+				
+				s.removeEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
+				
 				this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
 				
 				return true;
@@ -79,6 +86,9 @@ package org.stylekit.css {
 			return this._styleSheets.length;
 		}
 		
+		protected function onStyleSheetModified(e:StyleSheetEvent):void
+		{
+			this.dispatchEvent(e);
+		}
 	}
-	
 }

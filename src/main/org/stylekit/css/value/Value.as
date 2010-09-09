@@ -1,12 +1,14 @@
 package org.stylekit.css.value {
+	import flash.events.EventDispatcher;
+	
+	import org.stylekit.events.ValueEvent;
 	
 	/**
 	* The Value class represents any value attached to a CSS property. There are several specialised value types such as ColorValue and URLValue,
 	* but the basic Value class may be used to store basic string values for any property where a specialised Value type is not required.
 	*/
-	public class Value
+	public class Value extends EventDispatcher
 	{
-		
 		protected var _rawValue:String;
 		protected var _stringValue:String;
 		protected var _important:Boolean = false;
@@ -46,6 +48,11 @@ package org.stylekit.css.value {
 		public function set rawValue(s:String):void
 		{
 			this._rawValue = s;
+		}
+		
+		protected function modified():void
+		{
+			this.dispatchEvent(new ValueEvent(ValueEvent.VALUE_MODIFIED));
 		}
 		
 		public function isEquivalent(other:Value):Boolean

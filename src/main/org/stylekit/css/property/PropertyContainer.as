@@ -23,6 +23,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.VisibilityValue;
 	import org.stylekit.events.PropertyContainerEvent;
+	import org.stylekit.events.PropertyEvent;
 	import org.stylekit.ui.element.UIElement;
 	
 	/**
@@ -81,7 +82,11 @@ package org.stylekit.css.property
 		
 		public function addProperty(property:Property):void
 		{
+			property.addEventListener(PropertyEvent.PROPERTY_MODIFIED, this.onPropertyModified);
+			
 			this._properties.push(property);
+			
+			this.dispatchEvent(new PropertyContainerEvent(PropertyContainerEvent.PROPERTY_ADDED, this));
 		}
 		
 		public function evaluate(mergeParent:Object, uiElement:UIElement):Object
@@ -96,7 +101,16 @@ package org.stylekit.css.property
 		
 		public function removeProperty(property:Property):void
 		{
+			property.removeEventListener(PropertyEvent.PROPERTY_MODIFIED, this.onPropertyModified);
+			
 			this._properties.splice(this._properties.indexOf(property), 1);
+			
+			this.dispatchEvent(new PropertyContainerEvent(PropertyContainerEvent.PROPERTY_REMOVED, this));
+		}
+		
+		protected function onPropertyModified(e:PropertyEvent):void
+		{
+			this.dispatchEvent(new PropertyContainerEvent(PropertyContainerEvent.PROPERTY_MODIFIED, this));
 		}
 		
 		public static function get defaultStyles():Object

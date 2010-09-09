@@ -54,6 +54,8 @@
     <classEntry path="org.stylekit.spec.tests.css.value.DisplayValueTestCase"/>
     <classEntry path="org.stylekit.spec.tests.css.value.EdgeCompoundValueTestCase"/>
     <classEntry path="org.stylekit.spec.tests.css.value.InheritValue"/>
+    <classEntry path="org.stylekit.events.ValueEvent"/>
+    <classEntry path="org.stylekit.events.PropertyEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

@@ -1,6 +1,8 @@
 package org.stylekit.css.property
 {
 	
+	import flash.events.EventDispatcher;
+	
 	import mx.controls.List;
 	
 	import org.stylekit.css.value.BackgroundCompoundValue;
@@ -10,6 +12,8 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.events.PropertyEvent;
+	import org.stylekit.events.ValueEvent;
 	import org.stylekit.ui.element.UIElement;
 	
 	/**
@@ -17,7 +21,7 @@ package org.stylekit.css.property
 	* would be represented by a Property instance with name "padding" and an EdgeCompoundValue containing four size values.
 	*/
 	
-	public class Property
+	public class Property extends EventDispatcher
 	{
 		
 		protected var _name:String;
@@ -46,6 +50,13 @@ package org.stylekit.css.property
 		
 		public function set value(v:Value):void
 		{
+			if (this._value != null && this._value != v)
+			{
+				this._value.removeEventListener(ValueEvent.VALUE_MODIFIED, this.onValueModified);
+			}
+			
+			v.addEventListener(ValueEvent.VALUE_MODIFIED, this.onValueModified);
+			
 			this._value = v;
 		}
 		
@@ -194,6 +205,9 @@ package org.stylekit.css.property
 			return mergeParent;
 		}
 		
-	}
-	
+		protected function onValueModified(e:ValueEvent):void
+		{
+			this.dispatchEvent(new PropertyEvent(PropertyEvent.PROPERTY_MODIFIED, e));
+		}
+	}	
 }

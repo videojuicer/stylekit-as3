@@ -7,12 +7,12 @@ package org.stylekit.css {
 	*/ 
 	import flash.events.EventDispatcher;
 	
-	import org.stylekit.css.style.Style;
-	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Animation;
+	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Import;
-	
+	import org.stylekit.css.style.Style;
 	import org.stylekit.events.PropertyContainerEvent;
+	import org.stylekit.events.StyleSheetEvent;
 	
 	public class StyleSheet extends EventDispatcher
 	{
@@ -61,7 +61,11 @@ package org.stylekit.css {
 			{
 				return false;
 			}
+			
 			this._styles.splice(atIndex, 0, s);
+			
+			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+			
 			return true;
 		}
 		
@@ -74,8 +78,12 @@ package org.stylekit.css {
 			if(this.hasStyle(s))
 			{
 				this._styles.splice(this._styles.indexOf(s), 1);
+				
+				this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+				
 				return true;
 			}
+			
 			return false;
 		}
 		
@@ -91,6 +99,9 @@ package org.stylekit.css {
 				return false;
 			}
 			this._fontFaces.splice(atIndex, 0, s);
+			
+			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+			
 			return true;
 		}
 
@@ -103,8 +114,12 @@ package org.stylekit.css {
 			if(this.hasFontFace(s))
 			{
 				this._fontFaces.splice(this._fontFaces.indexOf(s), 1);
+				
+				this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+				
 				return true;
 			}
+			
 			return false;
 		}
 		
@@ -119,7 +134,11 @@ package org.stylekit.css {
 			{
 				return false;
 			}
+			
 			this._animations.splice(atIndex, 0, s);
+			
+			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+			
 			return true;
 		}
 
@@ -132,8 +151,12 @@ package org.stylekit.css {
 			if(this.hasAnimation(s))
 			{
 				this._animations.splice(this._animations.indexOf(s), 1);
+				
+				this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+				
 				return true;
 			}
+			
 			return false;
 		}
 		
@@ -148,7 +171,11 @@ package org.stylekit.css {
 			{
 				return false;
 			}
+			
 			this._imports.push(s);
+			
+			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+			
 			return true;
 		}
 
@@ -161,8 +188,12 @@ package org.stylekit.css {
 			if(this.hasImport(s))
 			{
 				this._imports.splice(this._imports.indexOf(s), 1);
+				
+				this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
+				
 				return true;
 			}
+			
 			return false;
 		}
 		
