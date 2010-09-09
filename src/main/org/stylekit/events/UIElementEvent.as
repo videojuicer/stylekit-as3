@@ -7,6 +7,7 @@ package org.stylekit.events
 	public class UIElementEvent extends Event
 	{
 		public static var EFFECTIVE_DIMENSIONS_CHANGED:String = "uiElementEffectiveDimensionsChanged";
+		public static var EVALUATED_STYLES_MODIFIED:String = "uiElementEvaluatedStylesModified";
 		
 		protected var _uiElement:UIElement;
 		

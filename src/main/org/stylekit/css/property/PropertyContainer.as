@@ -86,11 +86,6 @@ package org.stylekit.css.property
 		
 		public function evaluate(mergeParent:Object, uiElement:UIElement):Object
 		{
-			if (mergeParent == null)
-			{
-				mergeParent = new Object();
-			}
-			
 			for (var i:int = 0; i < this._properties.length; i++)
 			{
 				mergeParent = this._properties[i].evaluateProperty(mergeParent, uiElement);

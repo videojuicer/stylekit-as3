@@ -58,11 +58,6 @@ package org.stylekit.css.property
 		*/ 
 		public function evaluateProperty(mergeParent:Object, uiElement:UIElement):Object
 		{
-			if (mergeParent == null)
-			{
-				mergeParent = new Object();
-			}
-			
 			var val:Value = this.value;
 			// Store the !important flag for this value.
 			// Stored this way because compound values that are !important should lend their importance to all their sub-values.
@@ -72,8 +67,6 @@ package org.stylekit.css.property
 			{
 				val = (val as InheritValue).resolveValue(uiElement);
 			}
-			
-			
 
 			switch (this.name)
 			{

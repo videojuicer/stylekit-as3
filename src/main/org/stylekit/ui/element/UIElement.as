@@ -23,6 +23,14 @@ package org.stylekit.ui.element
 	 */
 	[Event(name="uiElementEffectiveDimensionsChanged", type="org.stylekit.events.UIElementEvent")]
 	
+	/**
+	 * Dispatched when the evaluated/computed styles for this element are changed by any mechanism.
+	 *
+	 * @eventType org.stylekit.events.UIElementEvent.EVALUATED_STYLES_MODIFIED
+	 */
+	[Event(name="uiElementEvaluatedStylesModified", type="org.stylekit.events.UIElementEvent")]
+	
+	
 	public class UIElement extends Sprite
 	{
 		protected var _children:Vector.<UIElement>;
@@ -197,6 +205,29 @@ package org.stylekit.ui.element
 		public function get parentIndex():uint
 		{
 			return this._parentIndex;
+		}
+		
+		public function get evaluatedStyles():Object
+		{
+			return this._evaluatedStyles;
+		}
+		
+		/**
+		* Sets a new object instance as the evaluated style hash for this object. Performs a comparison
+		* of the new object to the old and dispatches an EVALUATED_STYLES_MODIFIED UIElementEvent if there has been a change.
+		*/
+		
+		public function set evaluatedStyles(newEvaluatedStyles:Object):void
+		{
+			// Store old value locally and set new value
+			var previousEvaluatedStyles:Object = this.evaluatedStyles;
+			this._evaluatedStyles = newEvaluatedStyles;
+			
+			// Perform comparison
+			// A change is counted if:
+			// 1. The new styles contain a value not present on the old styles
+			// 2. The new styles are missing a value that is present on the old styles
+			// 3. Values present on both objects for the same key are not equivalent
 		}
 		
 		public function getElementsBySelector(selector:*):Vector.<UIElement>
@@ -465,8 +496,6 @@ package org.stylekit.ui.element
 		
 		protected function evaluateStyles():void
 		{
-			var previousEvaluatedStyles:Object = this._evaluatedStyles;
-			
 			// Begin specificity sort			
 			// Sort matched selectors by specificity
 			var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
@@ -493,15 +522,15 @@ package org.stylekit.ui.element
 			var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
 			for(var i:uint=0; i < this._styles.length; i++)
 			{
-				var s:Style = this._styles[i];
+				var sortCandidateStyle:Style = this._styles[i];
 				// loop over style's selector chains and find index of any in the sorted selector vector, spector.
 				// the found index is the insertion index for this style.
-				for(var j:uint=0; j<s.elementSelectorChains.length; j++)
+				for(var j:uint=0; j<sortCandidateStyle.elementSelectorChains.length; j++)
 				{
-					var fI:int = sortedSelectorChains.indexOf(s.elementSelectorChains[j]);
+					var fI:int = sortedSelectorChains.indexOf(sortCandidateStyle.elementSelectorChains[j]);
 					if(fI > -1)
 					{
-						sortedStyles[fI] = s;
+						sortedStyles[fI] = sortCandidateStyle;
 					}
 				}
 			}
@@ -513,8 +542,11 @@ package org.stylekit.ui.element
 				// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
 				// went out of sync before or during this method's execution.
 				
-				
+				var evalCandidateStyle:Style = sortedStyles[i];
+				newEvaluatedStyles = evalCandidateStyle.evaluate(newEvaluatedStyles, this);
 			}
+			// Setter carries the comparison check and event dispatch
+			this.evaluatedStyles = newEvaluatedStyles;
 		}
 		
 		public function matchesElementSelector(selector:ElementSelector):Boolean
