@@ -27,6 +27,8 @@ package org.stylekit.css.value
 		public function set visibility(value:uint):void
 		{
 			this._visibility = value;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):VisibilityValue
