@@ -71,6 +71,8 @@ package org.stylekit.css.value
 		public function set colorValue(v:ColorValue):void
 		{
 			this._colorValue = v;
+			
+			this.modified();
 		}
 		public function get sizeValue():SizeValue
 		{
@@ -80,6 +82,8 @@ package org.stylekit.css.value
 		public function set sizeValue(v:SizeValue):void
 		{
 			this._sizeValue = v;
+			
+			this.modified();
 		}
 		
 		public function get fontStyleValue():FontStyleValue
@@ -90,6 +94,8 @@ package org.stylekit.css.value
 		public function set fontStyleValue(v:FontStyleValue):void
 		{
 			this._fontStyleValue = v;
+			
+			this.modified();
 		}
 		
 		public function get fontWeightValue():FontWeightValue
@@ -100,6 +106,8 @@ package org.stylekit.css.value
 		public function set fontWeightValue(v:FontWeightValue):void
 		{
 			this._fontWeightValue = v;
+			
+			this.modified();
 		}
 		
 		public function get fontVariantValue():FontVariantValue
@@ -110,6 +118,8 @@ package org.stylekit.css.value
 		public function set fontVariantValue(v:FontVariantValue):void
 		{
 			this._fontVariantValue = v;
+			
+			this.modified();
 		}
 		
 		public function get fontFaceValue():Value
@@ -120,6 +130,8 @@ package org.stylekit.css.value
 		public function set fontFaceValue(v:Value):void
 		{
 			this._fontFaceValue = v;
+			
+			this.modified();
 		}
 	}
 }

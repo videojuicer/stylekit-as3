@@ -28,6 +28,8 @@ package org.stylekit.css.value
 		public function set textTransform(textTransform:uint):void
 		{
 			this._textTransform = textTransform;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):TextTransformValue

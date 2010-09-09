@@ -208,6 +208,8 @@ package org.stylekit.css.value
 		public function set hexValue(n:uint):void
 		{
 			this._hexValue = n;
+			
+			this.modified();
 		}
 		
 		public function get hexValue():uint

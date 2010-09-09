@@ -52,6 +52,8 @@ package org.stylekit.css.value
 		public function set cursorUrl(cursorUrl:URLValue):void
 		{
 			this._cursorUrl = cursorUrl;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):CursorValue

@@ -21,6 +21,8 @@ package org.stylekit.css.value
 		public function set positionValue(value:ListStylePositionValue):void
 		{
 			this._positionValue = value;
+			
+			this.modified();
 		}
 		
 		public function get urlValue():URLValue
@@ -31,6 +33,8 @@ package org.stylekit.css.value
 		public function set urlValue(value:URLValue):void
 		{
 			this._urlValue = value;
+			
+			this.modified();
 		}
 		
 		public function get typeValue():ListStyleTypeValue
@@ -41,6 +45,8 @@ package org.stylekit.css.value
 		public function set typeValue(value:ListStyleTypeValue):void
 		{
 			this._typeValue = value;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):ListStyleCompoundValue

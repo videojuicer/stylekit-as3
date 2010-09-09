@@ -58,6 +58,8 @@ package org.stylekit.css.value
 		public function set sizeValue(s:SizeValue):void
 		{
 			this._sizeValue = s;
+			
+			this.modified();
 		}
 		
 		public function get lineStyleValue():LineStyleValue
@@ -68,6 +70,8 @@ package org.stylekit.css.value
 		public function set lineStyleValue(l:LineStyleValue):void
 		{
 			this._lineStyleValue = l;
+			
+			this.modified();
 		}
 		
 		public function get colorValue():ColorValue
@@ -78,6 +82,8 @@ package org.stylekit.css.value
 		public function set colorValue(c:ColorValue):void
 		{
 			this._colorValue = c;
+			
+			this.modified();
 		}
 	}
 }

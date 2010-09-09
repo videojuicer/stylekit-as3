@@ -22,6 +22,8 @@ package org.stylekit.css.value
 		public function set leftValue(v:Value):void
 		{
 			this._leftValue = v;
+			
+			this.modified();
 		}
 		
 		public function get rightValue():Value
@@ -32,6 +34,8 @@ package org.stylekit.css.value
 		public function set rightValue(v:Value):void
 		{
 			this._rightValue = v;
+			
+			this.modified();
 		}
 		
 		public function get topValue():Value
@@ -42,6 +46,8 @@ package org.stylekit.css.value
 		public function set topValue(v:Value):void
 		{
 			this._topValue = v;
+			
+			this.modified();
 		}
 		
 		public function get bottomValue():Value
@@ -52,6 +58,8 @@ package org.stylekit.css.value
 		public function set bottomValue(v:Value):void
 		{
 			this._bottomValue = v;
+			
+			this.modified();
 		}
 	}
 }

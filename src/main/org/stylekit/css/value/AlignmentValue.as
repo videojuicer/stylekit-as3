@@ -80,6 +80,8 @@ package org.stylekit.css.value
 		public function set horizontalAlign(a:uint):void
 		{
 			this._horizontalAlign = a;
+			
+			this.modified();
 		}
 		
 		public function get verticalAlign():uint
@@ -90,6 +92,8 @@ package org.stylekit.css.value
 		public function set verticalAlign(a:uint):void
 		{
 			this._verticalAlign = a;
+			
+			this.modified();
 		}
 		
 		public function get leftAlign():Boolean

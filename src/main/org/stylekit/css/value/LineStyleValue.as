@@ -51,6 +51,8 @@ package org.stylekit.css.value
 		public function set lineStyle(l:uint):void
 		{
 			this._lineStyle = l;
+			
+			this.modified();
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

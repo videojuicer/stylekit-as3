@@ -28,6 +28,8 @@ package org.stylekit.css.value
 		public function set position(position:uint):void
 		{
 			this._position = position;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):PositionValue

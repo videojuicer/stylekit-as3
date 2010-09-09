@@ -97,6 +97,8 @@ package org.stylekit.css.value
 		public function set url(u:String):void
 		{
 			this._url = u;
+			
+			this.modified();
 		}
 		
 		public function get baseURL():String
@@ -107,6 +109,8 @@ package org.stylekit.css.value
 		public function set baseURL(b:String):void
 		{
 			this._baseURL = b;
+			
+			this.modified();
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

@@ -83,6 +83,8 @@ package org.stylekit.css.value
 		public function set fontWeight(fs:uint):void
 		{
 			this._fontWeight = fs;
+			
+			this.modified();
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

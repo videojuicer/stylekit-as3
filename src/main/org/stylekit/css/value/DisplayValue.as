@@ -43,6 +43,8 @@ package org.stylekit.css.value
 		public function set display(display:uint):void
 		{
 			this._display = display;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):DisplayValue

@@ -56,6 +56,8 @@ package org.stylekit.css.value
 		public function set horizontalRepeat(r:Boolean):void
 		{
 			this._horizontalRepeat = r;
+			
+			this.modified();
 		}
 		
 		public function get verticalRepeat():Boolean
@@ -66,6 +68,8 @@ package org.stylekit.css.value
 		public function set verticalRepeat(r:Boolean):void
 		{
 			this._verticalRepeat = r;
+			
+			this.modified();
 		}
 
 		public override function isEquivalent(other:Value):Boolean

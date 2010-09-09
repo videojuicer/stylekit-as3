@@ -93,6 +93,8 @@ package org.stylekit.css.value
 		public function set colorValue(c:ColorValue):void
 		{
 			this._colorValue = c;
+			
+			this.modified();
 		}
 		
 		public function get urlValue():URLValue
@@ -103,6 +105,8 @@ package org.stylekit.css.value
 		public function set urlValue(u:URLValue):void
 		{
 			this._urlValue = u;
+			
+			this.modified();
 		}
 		
 		public function get repeatValue():RepeatValue
@@ -113,6 +117,8 @@ package org.stylekit.css.value
 		public function set repeatValue(r:RepeatValue):void
 		{
 			this._repeatValue = r;
+			
+			this.modified();
 		}
 		
 		public function get alignmentValue():AlignmentValue
@@ -123,6 +129,8 @@ package org.stylekit.css.value
 		public function set alignmentValue(a:AlignmentValue):void
 		{
 			this._alignmentValue = a;
+			
+			this.modified();
 		}
 	}
 }

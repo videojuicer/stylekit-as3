@@ -41,6 +41,8 @@ package org.stylekit.css.value
 		public function set type(type:uint):void
 		{
 			this._type = type;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):ListStyleTypeValue

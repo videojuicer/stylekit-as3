@@ -44,6 +44,8 @@ package org.stylekit.css.value
 		public function set fontVariant(fs:uint):void
 		{
 			this._fontVariant = fs;
+			
+			this.modified();
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

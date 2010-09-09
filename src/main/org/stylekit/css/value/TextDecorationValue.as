@@ -29,6 +29,8 @@ package org.stylekit.css.value
 		public function set textDecoration(textDecoration:uint):void
 		{
 			this._textDecoration = textDecoration;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):TextDecorationValue

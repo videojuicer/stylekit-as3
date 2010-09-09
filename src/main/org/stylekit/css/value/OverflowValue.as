@@ -28,6 +28,8 @@ package org.stylekit.css.value
 		public function set overflow(overflow:uint):void
 		{
 			this._overflow = overflow;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):OverflowValue

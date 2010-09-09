@@ -28,6 +28,8 @@ package org.stylekit.css.value
 		public function set textAlign(textAlign:uint):void
 		{
 			this._textAlign = textAlign;
+			
+			this.modified();
 		}
 		
 		public static function parse(str:String):TextAlignValue

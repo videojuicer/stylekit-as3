@@ -60,6 +60,8 @@ package org.stylekit.css.value
 		public function set units(u:String):void
 		{
 			this._units = u;
+			
+			this.modified();
 		}
 		
 		public function get value():Number
@@ -70,6 +72,8 @@ package org.stylekit.css.value
 		public function set value(n:Number):void
 		{
 			this._value = n;
+			
+			this.modified();
 		}
 		
 		/**

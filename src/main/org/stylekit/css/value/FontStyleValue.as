@@ -46,6 +46,8 @@ package org.stylekit.css.value
 		public function set fontStyle(fs:uint):void
 		{
 			this._fontStyle = fs;
+			
+			this.modified();
 		}
 		
 		public override function isEquivalent(other:Value):Boolean
