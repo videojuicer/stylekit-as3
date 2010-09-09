@@ -33,17 +33,90 @@ package org.stylekit.ui.element
 	
 	public class UIElement extends Sprite
 	{
+		/**
+		* The child UIElement objects contained by the UIElement.
+		*/
 		protected var _children:Vector.<UIElement>;
+		
+		/**
+		* The Style objects currently being used to draw this UIElement.
+		*/
 		protected var _styles:Vector.<Style>;
+		
+		/**
+		* The ElementSelectorChains that were used to match the Style objects found in _styles.
+		* Parity is maintained between the two vectors, such that _styleSelectors[x] is always the
+		* selector that was used to match the style at _styles[x].
+		*/
 		protected var _styleSelectors:Vector.<ElementSelectorChain>;
+		
+		/**
+		* The evaluated (sometimes referred to as *computed*) styles for this element, as a flat object
+		* containing primitive Value types. By the time styles have been evaluated into this object, all
+		* "inherit" values have been resolved and replaced with the value they refer to, and all compound/shorthand
+		* statements have been made atomic. E.g. the "border-left" property will have been broken down into
+		* border-left-width, border-left-style, border-left-color.
+		*/
 		protected var _evaluatedStyles:Object;
 		
-		protected var _styleEligible:Boolean = false;
+		/**
+		* Determines if this UIElement is eligible to receive styles.
+		*/
+		protected var _styleEligible:Boolean = true;
 		
+		/**
+		* The total horizontal extent of this element, including content area, padding, borders and margins. It is the amount of
+		* space this element consumes within a layout.
+		*
+		* This value is recalculated when evaluating styles, and sometimes after a layout operation. See _contentWidth for details of this.
+		*
+		* A change to this value will result in the EFFECTIVE_DIMENSIONS_CHANGED event being dispatched.
+		* 
+		* @see org.stylekit.ui.element.UIElement._contentWidth
+		*/
 		protected var _effectiveWidth:int;
+		
+		/**
+		* The effective height of this element. Same behaviour as effectiveWidth.
+		* @see org.stylekit.ui.element.UIElement._effectiveWidth
+		*/ 
 		protected var _effectiveHeight:int;
+		
+		/**
+		* The *total effective width* of the content rendered within this element, including its margins. Recalculated after a layout operation.
+		* If the value changes after a layout operation and the width and height properties on this element are not fixed, this element's
+		* effectiveWidth and effectiveHeight will be recalculated and the element will be redrawn.
+		* 
+		* If this value changes after a layout operation AND the width or height properties on this element *are* fixed AND the overflow
+		* properties on this element demand the use of scrollbars, this element may be partially redrawn to add or remove scrollbars to the
+		* content area.
+		*/
 		protected var _contentWidth:int;
+		
+		/**
+		* The effective height of the content rendered within this element. Same behaviour as _contentWidth.
+		* @see org.stylekit.ui.element.UIElement._contentWidth
+		*/
 		protected var _contentHeight:int;
+		
+		/**
+		* The current width of the content area on this element - the area inside the element's padding into which content
+		* may be rendered. This is not necessarily the size of the *content itself* within the element.
+		*
+		* Depending on the overflow, width and height properties on this element, the effectiveContentWidth may be recalculated
+		* after a layout operation, triggering a full or partial redrawing of this element. See _contentWidth for details.
+		*
+		* The effectiveContentWidth is reduced by the presence of the vertical scrollbar.
+		*
+		* @see org.stylekit.ui.element.UIElement._contentWidth
+		*/
+		protected var _effectiveContentWidth:int;
+		
+		/**
+		* The height of the content area on this element. Same behaviour as _effectiveContentWidth.
+		* @see org.stylekit.ui.element.UIElement._effectiveContentWidth
+		*/
+		protected var _effectiveContentHeight:int;
 
 		protected var _parentIndex:uint = 0;
 		protected var _parentElement:UIElement;
@@ -228,6 +301,52 @@ package org.stylekit.ui.element
 			// 1. The new styles contain a value not present on the old styles
 			// 2. The new styles are missing a value that is present on the old styles
 			// 3. Values present on both objects for the same key are not equivalent
+			var changeFound:Boolean = false;
+			var alteredKeys:Vector.<String> = new Vector.<String>();
+			
+			
+			// Find new and modified keys
+			for(var newKey:String in newEvaluatedStyles)
+			{
+				if(previousEvaluatedStyles[newKey] == null || !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey]))
+				{
+					changeFound = true;
+					alteredKeys.push(newKey);
+				}
+			}
+			// Find missing keys
+			if(!changeFound)
+			{
+				for(var prevKey:String in previousEvaluatedStyles)
+				{
+					if(newEvaluatedStyles[prevKey] == null)
+					{
+						changeFound = true;
+						alteredKeys.push(prevKey);
+					}
+				}
+			}
+			
+			// Dispatch and perform local actions
+			if(changeFound)
+			{
+				this.dispatchEvent(new UIElementEvent(UIElementEvent.EVALUATED_STYLES_MODIFIED, this));
+				// TODO re-evaluate sizings
+			}
+		}
+		
+		/**
+		* Called when new evaluted styles are set. A vector of altered values keys
+		* (e.g. ["border-left-width", "float"]) is handed to this method, which then splits the keys out by whitelist
+		* and reacts appropriately.
+		*/
+		protected function onStylePropertyValuesChanged(alteredValues:Vector.<String>):void
+		{
+			// TODO react to changes that require a redraw (border, width, etc.)
+			// TODO react to changes that require a re-layout of this element's children (change to effectiveContentWidth, overflow etc.)
+			// TODO react to changes that require a re-layout of the parent's children (change to float, position)
+			// TODO react to changes in animation and transition (change to transition-property, animation)
+				// sub-TODO: this requires the implementation of local styles
 		}
 		
 		public function getElementsBySelector(selector:*):Vector.<UIElement>
