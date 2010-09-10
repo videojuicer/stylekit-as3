@@ -12,6 +12,8 @@ package org.stylekit.ui.element
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
@@ -458,20 +460,36 @@ package org.stylekit.ui.element
 			// Dispatch and perform local actions
 			if(changeFound)
 			{
+				this.onStylePropertyValuesChanged(alteredKeys);
 				this.dispatchEvent(new UIElementEvent(UIElementEvent.EVALUATED_STYLES_MODIFIED, this));
-				// TODO re-evaluate sizings
 			}
 		}
 		
 		/**
-		* Called when new evaluted styles are set. A vector of altered values keys
+		* Called when new evaluted styles are set. A vector of altered value keys
 		* (e.g. ["border-left-width", "float"]) is handed to this method, which then splits the keys out by whitelist
 		* and reacts appropriately.
 		*/
-		protected function onStylePropertyValuesChanged(alteredValues:Vector.<String>):void
+		
+		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = ["width", "height", "max-width", "max-height", "min-width", "min-height", "display"];
+		
+		protected function onStylePropertyValuesChanged(alteredKeys:Vector.<String>):void
 		{
+			var effectiveContentDimensionsRecalcNeeded:Boolean = false;
+						
+			for(var i:uint=0; i < alteredKeys.length; i++)
+			{
+				var k:String = alteredKeys[i];
+				if(UIElement.EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES.indexOf(k) > -1)
+				{
+					effectiveContentDimensionsRecalcNeeded = true;
+					break;
+				}
+			}
+			
+			if(effectiveContentDimensionsRecalcNeeded) this.recalculateEffectiveContentDimensions();
+			
 			// TODO react to changes that require a redraw (border, width, etc.)
-			// TODO react to changes that require a re-layout of this element's children (change to effectiveContentWidth, overflow etc.)
 			// TODO react to changes that require a re-layout of the parent's children (change to float, position)
 			// TODO react to changes in animation and transition (change to transition-property, animation)
 				// sub-TODO: this requires the implementation of local styles
@@ -482,8 +500,8 @@ package org.stylekit.ui.element
 		*/
 		protected function recalculateEffectiveDimensions():void
 		{
-			var w:int;
-			var h:int;
+			var w:int = 0;
+			var h:int = 0;
 			// TODO
 			// margins + borders + padding + effective content dimensions + scrollbars
 			this.setEffectiveDimensions(w, h);
@@ -495,7 +513,7 @@ package org.stylekit.ui.element
 		*/ 
 		protected function onEffectiveDimensionsModified():void
 		{
-			// TODO redraw
+			this.redraw();
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this));
 		}
 		
@@ -504,8 +522,8 @@ package org.stylekit.ui.element
 		*/
 		protected function recalculateContentDimensions():void
 		{
-			var w:int;
-			var h:int;
+			var w:int = 0;
+			var h:int = 0;
 			/* TODO
 				Width:
 					Search children to find greatest _x + effectiveWidth
@@ -530,23 +548,45 @@ package org.stylekit.ui.element
 		*/
 		protected function recalculateEffectiveContentDimensions():void
 		{
-			var w:int;
-			var h:int;
+			var w:int = 0;
+			var h:int = 0;
 			
 			/* TODO
-				Width:
-					use width style if set
-					use parent's effectiveContentWidth if display: block
-					use contentWidth if display: inline
-				Height:
-					use height style if set
-					use contentHeight otherwise
 				After:
 					Width:
 						subtract vertical scrollbar if vertical scrollbar required
 					Height:
 						subtract horizontal scrollbar if horizontal scrollbar required
 			*/
+			
+			// Width			
+			if(this.hasStyleProperty("width")) 
+			{
+				w = this.evalStyleSize("width");
+			}
+			else if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_BLOCK)
+			{
+				w = this.parentElement.effectiveContentWidth;
+			}
+			else
+			{
+				w = this.contentWidth;
+			}
+			// Apply width constraints
+			if(this.hasStyleProperty("min-width")) w = Math.max(w, this.evalStyleSize("min-width"));
+			if(this.hasStyleProperty("max-width")) w = Math.min(w, this.evalStyleSize("max-width"));
+			
+			// Height
+			if(this.hasStyleProperty("width"))
+			{
+				h = this.evalStyleSize("height");
+			}
+			else {
+				h = this.contentHeight;
+			}
+			// Apply height constraints
+			if(this.hasStyleProperty("min-height")) h = Math.max(h, this.evalStyleSize("min-height"));
+			if(this.hasStyleProperty("max-height")) h = Math.min(h, this.evalStyleSize("max-height"));
 			
 			this.setEffectiveContentDimensions(w, h);
 		}
@@ -557,8 +597,31 @@ package org.stylekit.ui.element
 		*/
 		protected function onEffectiveContentDimensionsModified():void
 		{
-			// TODO trigger a layout operation
+			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
+		}
+		
+		/**
+		* Evaluates a SizeValue within the scope of this element, and returns 0 by default.
+		*/
+		protected function evalSize(s:SizeValue):int
+		{
+			if(s == null)
+			{
+				return 0;
+			}
+			else
+			{
+				return s.evaluateSize(this);
+			}
+		}
+		
+		/**
+		* Evaluates a size for a given CSS property key.
+		*/
+		protected function evalStyleSize(key:String):int
+		{
+			return this.evalSize((this.getStyleValue(key) as SizeValue));
 		}
 		
 		public function getElementsBySelector(selector:*):Vector.<UIElement>
@@ -760,7 +823,7 @@ package org.stylekit.ui.element
 		
 		public function hasStyleProperty(propertyName:String):Boolean
 		{
-			if (this.getStyleProperty(propertyName) != null)
+			if (this.getStyleValue(propertyName) != null)
 			{
 				return true;
 			}
@@ -768,20 +831,10 @@ package org.stylekit.ui.element
 			return false;
 		}
 		
-		public function getStyleProperty(propertyName:String):Property
+		public function getStyleValue(propertyName:String):Value
 		{
-			for (var i:int = 0; i < this.styles.length; i++)
-			{
-				for (var j:int = 0; j < this.styles[i].properties.length; j++)
-				{
-					if (this.styles[i].properties[j].name == propertyName)
-					{
-						return this.styles[i].properties[j];
-					}
-				}
-			}
-			
-			return null;
+			// TODO compile compound values
+			return this._evaluatedStyles[propertyName];
 		}
 		
 		public function updateStyles():void

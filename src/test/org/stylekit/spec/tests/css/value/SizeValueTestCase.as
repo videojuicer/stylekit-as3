@@ -6,6 +6,7 @@ package org.stylekit.spec.tests.css.value
 	import org.flexunit.async.Async;
 
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.ui.element.UIElement;
 
 	public class SizeValueTestCase {
 		
@@ -53,6 +54,25 @@ package org.stylekit.spec.tests.css.value
 			Assert.assertTrue(SizeValue.identify("3em"));
 			Assert.assertFalse(SizeValue.identify("px"));
 			Assert.assertFalse(SizeValue.identify("5"));
+		}
+		
+		[Test(description="Ensures that a SizeValue may be evaluated to an actual pixel value.")]
+		public function sizeValuesEvaluateWithUIElements():void
+		{
+			var parent:UIElement = new UIElement();
+			parent.evaluatedStyles = {"width": SizeValue.parse("500px")}
+			var child:UIElement = new UIElement();
+			parent.addElement(child);
+			
+			var s1:SizeValue = SizeValue.parse("50px");
+
+			Assert.assertEquals(50, s1.evaluateSize(parent));
+			Assert.assertEquals(50, s1.evaluateSize(child));
+			
+			var s2:SizeValue = SizeValue.parse("50%");
+			
+			Assert.assertEquals(250, s2.evaluateSize(child));
+			
 		}
 		
 	}

@@ -297,6 +297,25 @@ package org.stylekit.spec.tests.ui.element
 			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px"), "added-value": SizeValue.parse("5%")};
 		}
 		
+		[Test(description="Ensures that a UIElement allows its size to be bounded by the min- and max- width/height CSS properties")]
+		public function effectiveContentDimensionsMayBeBounded():void
+		{
+			var e:UIElement = new UIElement();
+			e.evaluatedStyles = {"width": SizeValue.parse("100px"), "height": SizeValue.parse("200px")};
+			Assert.assertEquals(100, e.effectiveContentWidth);
+			Assert.assertEquals(200, e.effectiveContentHeight);
+			
+			// Now do maxima
+			e.evaluatedStyles = {"width": SizeValue.parse("100px"), "height": SizeValue.parse("200px"), "max-width": SizeValue.parse("50px"), "max-height": SizeValue.parse("100px")};
+			Assert.assertEquals(50, e.effectiveContentWidth);
+			Assert.assertEquals(100, e.effectiveContentHeight);
+			
+			// Now do minimums
+			e.evaluatedStyles = {"width": SizeValue.parse("100px"), "height": SizeValue.parse("200px"), "min-width": SizeValue.parse("200px"), "min-height": SizeValue.parse("400px")};
+			Assert.assertEquals(200, e.effectiveContentWidth);
+			Assert.assertEquals(400, e.effectiveContentHeight);
+		}
+		
 		[Test(async, description="Tests that a UIElement dispatches an EVALUATED_STYLES_MODIFIED event when keys are removed")]
 		public function dispatchesEvaluatedStylesModifiedOnRemovedKeys():void
 		{

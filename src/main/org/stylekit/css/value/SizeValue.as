@@ -15,6 +15,9 @@ package org.stylekit.css.value
 		public static var UNIT_FONTSIZE:String = "em";
 		public static var UNIT_PERCENTAGE:String = "%";
 		
+		public static var DIMENSION_WIDTH:String = "w";
+		public static var DIMENSION_HEIGHT:String = "h";
+		
 		protected var _units:String = "px";
 		protected var _value:Number = 0;
 		
@@ -80,9 +83,24 @@ package org.stylekit.css.value
 		* Calculates the actual pixel size of this SizeValue instance.
 		* Pass a UIElement instance to the method to allow relative percentage or fontsize-based calculations.
 		*/
-		public function evaluateSize(onElement:UIElement = null):void
+		public function evaluateSize(e:UIElement = null, dimension:String = null):int
 		{
+			if(dimension == null) dimension = SizeValue.DIMENSION_WIDTH;
 			
+			switch(this.units)
+			{
+				case SizeValue.UNIT_FONTSIZE:
+					break;
+				case SizeValue.UNIT_PERCENTAGE:
+					var baseVal:int = (dimension == SizeValue.DIMENSION_WIDTH)? e.parentElement.effectiveContentWidth : e.parentElement.effectiveContentHeight;
+				
+					return baseVal * (this.value / 100);
+					break;
+				default:
+					return this.value;
+					break;
+			}
+			return 0;
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

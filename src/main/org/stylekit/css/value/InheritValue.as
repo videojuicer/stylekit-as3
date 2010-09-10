@@ -23,17 +23,17 @@ package org.stylekit.css.value
 			
 			do
 			{
-				var property:Property = styleParent.getStyleProperty(this._propertyName);
+				var pVal:Value = styleParent.getStyleValue(this._propertyName);
 				
-				if (property != null)
+				if (pVal != null)
 				{
-					if (property.value is InheritValue)
+					if (pVal is InheritValue)
 					{
 						// keep going
 					}
 					else
 					{
-						value = property.value;
+						value = pVal;
 					}
 				}
 
