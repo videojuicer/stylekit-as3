@@ -14,6 +14,7 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.events.UIElementEvent;
+	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.spec.Fixtures;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
@@ -283,6 +284,49 @@ package org.stylekit.spec.tests.ui.element
 			child.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, asyncCallback);
 			
 			child.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, child));
+		}
+		
+		[Test(async, description="Tests that a UIElement dispatches an EVALUATED_STYLES_MODIFIED event when new keys are added")]
+		public function dispatchesEvaluatedStylesModifiedOnNewKeys():void
+		{
+			var element:UIElement = new UIElement();
+			var asyncCallback:Function = Async.asyncHandler(this, this.onEvaluatedStylesModified, 1000, { element: element }, this.onEvaluatedStylesModifiedTimeout);
+			
+			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px")};
+			element.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, asyncCallback);
+			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px"), "added-value": SizeValue.parse("5%")};
+		}
+		
+		[Test(async, description="Tests that a UIElement dispatches an EVALUATED_STYLES_MODIFIED event when keys are removed")]
+		public function dispatchesEvaluatedStylesModifiedOnRemovedKeys():void
+		{
+			var element:UIElement = new UIElement();
+			var asyncCallback:Function = Async.asyncHandler(this, this.onEvaluatedStylesModified, 1000, { element: element }, this.onEvaluatedStylesModifiedTimeout);
+			
+			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px")};
+			element.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, asyncCallback);
+			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("50%")};
+		}
+		
+		[Test(async, description="Tests that a UIElement dispatches an EVALUATED_STYLES_MODIFIED event when keys are no longer equivalent")]
+		public function dispatchesEvaluatedStylesModifiedKeysNotEquivalent():void
+		{
+			var element:UIElement = new UIElement();
+			var asyncCallback:Function = Async.asyncHandler(this, this.onEvaluatedStylesModified, 1000, { element: element }, this.onEvaluatedStylesModifiedTimeout);
+			
+			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px")};
+			element.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, asyncCallback);
+			element.evaluatedStyles = {};
+		}
+		
+		protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void
+		{
+			Assert.assertEquals(e.uiElement, passThru.element);
+		}
+		
+		protected function onEvaluatedStylesModifiedTimeout(passThru:Object):void
+		{
+			Assert.fail("Timed out waiting for UIElement instance to dispatch EVALUATED_STYLES_MODIFIED");
 		}
 		
 		protected function onEffectiveDimensionsChanged(e:UIElementEvent, passThru:Object):void
