@@ -518,7 +518,7 @@ package org.stylekit.ui.element
 		}
 		
 		/**
-		* Recalculates the effective extent of this element's children. Called after a layout operation.
+		* Recalculates the effective extent of this element's children. Called after a layout operation and ONLY valid after a layout operation.
 		*/
 		protected function recalculateContentDimensions():void
 		{
