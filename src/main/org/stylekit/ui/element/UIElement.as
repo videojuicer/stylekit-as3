@@ -83,7 +83,9 @@ package org.stylekit.ui.element
 		protected var _effectiveHeight:int;
 		
 		/**
-		* The *total effective width* of the content rendered within this element, including its margins. Recalculated after a layout operation.
+		* Just as each element has effective dimensions, so do each element's child elements. The contentWidth property on an element is defined
+		* as the total effective extent of an element's children, calculated by taking the furthest right-hand effective edge as the width, and 
+		* the furthest effective edge toward the bottom as the height. Recalculated after a layout operation.
 		* If the value changes after a layout operation and the width and height properties on this element are not fixed, this element's
 		* effectiveWidth and effectiveHeight will be recalculated and the element will be redrawn.
 		* 
@@ -183,9 +185,47 @@ package org.stylekit.ui.element
 			return this._effectiveWidth;
 		}
 		
+		/**
+		* Sets the effectiveWidth on this element, dispatching an event in the event that the value has changed.
+		* @see org.stylekit.ui.element.UIElement._effectiveWidth
+		*/
+		public function set effectiveWidth(e:int):void
+		{
+			var dispatch:Boolean = (e != this._effectiveWidth);
+			this._effectiveWidth = e;
+			
+			if(dispatch) this.onEffectiveDimensionsModified();
+		}
+		
 		public function get effectiveHeight():int
 		{
 			return this._effectiveHeight;
+		}
+		
+		/**
+		* Sets the effectiveHeight on this element, dispatching an event in the event that the value has changed.
+		* @see org.stylekit.ui.element.UIElement._effectiveHeight
+		*/
+		public function set effectiveHeight(e:int):void
+		{
+			var dispatch:Boolean = (e != this._effectiveHeight);
+			this._effectiveHeight = e;
+			
+			if(dispatch) this.onEffectiveDimensionsModified();
+		}
+		
+		/**
+		* Sets both the effectiveWidth and the effectiveHeight in one call, dispatching only a single event in the event that either has changed.
+		* @see org.stylekit.ui.element.UIElement._effectiveWidth
+		* @see org.stylekit.ui.element.UIElement._effectiveHeight
+		*/
+		public function setEffectiveDimensions(w:int, h:int):void
+		{
+			var dispatch:Boolean = (w != this._effectiveWidth || h != this._effectiveHeight);
+			this._effectiveWidth = w;
+			this._effectiveHeight = h;
+			
+			if(dispatch) this.onEffectiveDimensionsModified();
 		}
 		
 		public function get contentWidth():int
@@ -193,9 +233,97 @@ package org.stylekit.ui.element
 			return this._contentWidth;
 		}
 		
+		/**
+		* Sets the calculated effective extend of this element's children as they are currently laid out.
+		* If the new value differs from the old, then the need to redraw or add/remove scrollbars will be
+		* examined.
+		* @see org.stylekit.ui.element.UIElement._contentWidth
+		*/
+		public function set contentWidth(w:int):void
+		{
+			var dispatch:Boolean = (w != this._contentWidth);
+			this._contentWidth = w;
+			
+			if(dispatch) this.onContentDimensionsModified();
+		}
+		
 		public function get contentHeight():int
 		{
 			return this._contentHeight;
+		}
+		
+		/**
+		* Sets the calculated effective extend of this element's children as they are currently laid out.
+		* If the new value differs from the old, then the need to redraw or add/remove scrollbars will be
+		* examined.
+		* @see org.stylekit.ui.element.UIElement._contentHeight
+		*/
+		public function set contentHeight(h:int):void
+		{
+			var dispatch:Boolean = (h != this._contentHeight);
+			this._contentHeight = h;
+			
+			if(dispatch) this.onContentDimensionsModified();
+		}
+		
+		/**
+		* Set both the contentWidth and contentHeight in one step, dispatching only one event if either
+		* value has changed.
+		*/
+		public function setContentDimensions(w:int, h:int):void
+		{
+			var dispatch:Boolean = (w != this._contentWidth || h != this._contentHeight);
+			this._contentWidth = w;
+			this._contentHeight = h;
+			
+			if(dispatch) this.onContentDimensionsModified();
+		}
+		
+		public function get effectiveContentWidth():int
+		{
+			return this._effectiveContentWidth;
+		}
+		
+		/**
+		* Set the width of the content area for this element, triggering an internal dispatch if the value is modified.
+		* @see org.stylekit.ui.element.UIElement._effectiveContentWidth
+		*/
+		public function set effectiveContentWidth(w:int):void
+		{
+			var dispatch:Boolean = (w != this._effectiveContentWidth);
+			this._effectiveContentWidth = w;
+			
+			if(dispatch) this.onEffectiveContentDimensionsModified();
+		}
+		
+		public function get effectiveContentHeight():int
+		{
+			return this._effectiveContentHeight;
+		}
+		
+		/**
+		* Set the height of the content area for this element, triggering an internal dispatch if the value is modified.
+		* @see org.stylekit.ui.element.UIElement._effectiveContentHeight
+		*/
+		public function set effectiveContentHeight(h:int):void
+		{
+			var dispatch:Boolean = (h != this._effectiveContentHeight);
+			this._effectiveContentHeight = h;
+			
+			if(dispatch) this.onEffectiveContentDimensionsModified();
+		}
+		
+		/**
+		* Set the width of the content area for this element, triggering an internal dispatch if the value is modified.
+		* @see org.stylekit.ui.element.UIElement._effectiveContentWidth
+		*/
+		public function setEffectiveContentDimensions(w:int, h:int):void
+		{
+			var dispatch:Boolean = (w != this._effectiveContentWidth || h != this._effectiveContentHeight);
+			this._effectiveContentWidth = w;
+			this._effectiveContentHeight = h;
+			
+			if(dispatch) this.onEffectiveContentDimensionsModified();
 		}
 		
 		public function get children():Vector.<UIElement>
@@ -347,6 +475,90 @@ package org.stylekit.ui.element
 			// TODO react to changes that require a re-layout of the parent's children (change to float, position)
 			// TODO react to changes in animation and transition (change to transition-property, animation)
 				// sub-TODO: this requires the implementation of local styles
+		}
+		
+		/**
+		* Recalculates the effective extent dimensions for this element.
+		*/
+		protected function recalculateEffectiveDimensions():void
+		{
+			var w:int;
+			var h:int;
+			// TODO
+			// margins + borders + padding + effective content dimensions + scrollbars
+			this.setEffectiveDimensions(w, h);
+		}
+		
+		/**
+		* Called when the effective dimensions on this element are modified, by a new value being set in either direction
+		* or in both directions with setEffectiveDimensions.
+		*/ 
+		protected function onEffectiveDimensionsModified():void
+		{
+			// TODO redraw
+			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this));
+		}
+		
+		/**
+		* Recalculates the effective extent of this element's children. Called after a layout operation.
+		*/
+		protected function recalculateContentDimensions():void
+		{
+			var w:int;
+			var h:int;
+			/* TODO
+				Width:
+					Search children to find greatest _x + effectiveWidth
+				Height:
+					Search children to find greatest _y + effectiveHeight
+			*/
+			this.setContentDimensions(w, h);
+		}
+		
+		/**
+		* Called when the content of this element changes dimensions, by a new value being set in either direction
+		* or in both directions with setContentDimensions.
+		*/
+		protected function onContentDimensionsModified():void
+		{
+			// TODO update scrollbars
+			this.recalculateEffectiveContentDimensions();
+		}
+		
+		/**
+		* Recalculates the size of the content area for this element.
+		*/
+		protected function recalculateEffectiveContentDimensions():void
+		{
+			var w:int;
+			var h:int;
+			
+			/* TODO
+				Width:
+					use width style if set
+					use parent's effectiveContentWidth if display: block
+					use contentWidth if display: inline
+				Height:
+					use height style if set
+					use contentHeight otherwise
+				After:
+					Width:
+						subtract vertical scrollbar if vertical scrollbar required
+					Height:
+						subtract horizontal scrollbar if horizontal scrollbar required
+			*/
+			
+			this.setEffectiveContentDimensions(w, h);
+		}
+		
+		/**
+		* Called when the content area of this element changes dimensions, by a new value being set in either direction
+		* or in both directions with setEffectiveContentDimensions.
+		*/
+		protected function onEffectiveContentDimensionsModified():void
+		{
+			// TODO trigger a layout operation
+			this.recalculateEffectiveDimensions();
 		}
 		
 		public function getElementsBySelector(selector:*):Vector.<UIElement>
