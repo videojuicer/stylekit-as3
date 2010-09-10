@@ -8,6 +8,7 @@ package org.stylekit.spec.tests.css.property
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.events.PropertyEvent;
 	
 	public class PropertyTestCase
 	{
@@ -55,6 +56,31 @@ package org.stylekit.spec.tests.css.property
 		public function ableToEvaluateInherit():void
 		{
 			
+		}
+		
+		[Test(async, description="Tests that a Property dispatches a MODIFIED event when the inner Value is modified")]
+		public function propertyDispatchesWhenValueModified():void
+		{
+			var prop:Property = new Property("color", ColorValue.parse("#FFFFFF"));
+			
+			Assert.assertNotNull(prop.value);
+			
+			var async:Function = Async.asyncHandler(this, this.onPropertyModified, 2000, { prop: prop }, this.onPropertyModifiedTimeout);
+			
+			prop.addEventListener(PropertyEvent.PROPERTY_MODIFIED, async);
+			
+			(prop.value as ColorValue).hexValue = 0x000000;
+		}
+		
+		protected function onPropertyModified(e:PropertyEvent, passThru:Object):void
+		{
+			Assert.assertNotNull(passThru.prop);
+			Assert.assertEquals(0x000000, ((passThru.prop as Property).value as ColorValue).hexValue);
+		}
+		
+		protected function onPropertyModifiedTimeout(passThru:Object):void
+		{
+			Assert.fail("Timeout occured whilst waiting for a modification event from the Property");
 		}
 	}
 }

@@ -33,6 +33,8 @@ package org.stylekit.css.value {
 		public function set important(i:Boolean):void
 		{
 			this._important = i;
+			
+			this.modified();
 		}
 		
 		public function get stringValue():String

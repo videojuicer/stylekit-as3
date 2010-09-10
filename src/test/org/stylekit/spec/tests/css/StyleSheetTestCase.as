@@ -3,12 +3,15 @@ package org.stylekit.spec.tests.css
 	
 	import flexunit.framework.Assert;
 	import flexunit.framework.AsyncTestHelper;
-	import org.flexunit.async.Async;
 	
-	import org.stylekit.css.StyleSheetCollection;
+	import org.flexunit.async.Async;
 	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.events.PropertyContainerEvent;
+	import org.stylekit.events.StyleSheetEvent;
+	import org.stylekit.spec.Fixtures;
 	
 	public class StyleSheetTestCase
 	{
@@ -68,7 +71,28 @@ package org.stylekit.spec.tests.css
 			}
 		}
 		
+		[Test(async, description="Ensures that the StyleSheet dispatches a modified event when a Property mutates")]
+		public function dispatchesEventsWhenPropertyMutates():void
+		{
+			var parser:StyleSheetParser = new StyleSheetParser();
+			var parsed:StyleSheet = parser.parse(Fixtures.CSS_MIXED);
+			
+			var async:Function = Async.asyncHandler(this, this.onStyleSheetModified, 2000, { parsed: parsed }, this.onStyleSheetModifiedTimeout);
+			
+			parsed.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, async);
+			
+			// toggle the first property on the first stylesheet to use important
+			parsed.styles[0].properties[0].value.important = true;
+		}
 		
+		protected function onStyleSheetModified(e:StyleSheetEvent, passThru:Object):void
+		{
+			Assert.assertTrue((passThru.parsed as StyleSheet).styles[0].properties[0].value.important);
+		}
 		
+		protected function onStyleSheetModifiedTimeout(passThru:Object):void
+		{
+			Assert.fail("Timeout occured whilst waiting for a modification event from the StyleSheetCollection");
+		}
 	}
 }

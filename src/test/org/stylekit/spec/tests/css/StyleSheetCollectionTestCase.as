@@ -7,12 +7,16 @@ package org.stylekit.spec.tests.css
 	import org.flexunit.async.Async;
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.events.StyleSheetEvent;
+	import org.stylekit.spec.Fixtures;
 	
 	public class StyleSheetCollectionTestCase
 	{
 		protected var _styleSheetCollection:StyleSheetCollection;
 		protected var _styleSheets:Vector.<StyleSheet>;
+		
+		protected var _parsed:StyleSheet;
 		
 		[Before]
 		public function setUp():void
@@ -23,6 +27,10 @@ package org.stylekit.spec.tests.css
 			{
 				this._styleSheets.push(new StyleSheet());
 			}
+			
+			var parser:StyleSheetParser = new StyleSheetParser();
+			
+			this._parsed = parser.parse(Fixtures.CSS_MIXED);
 		}
 		
 		[After]
@@ -86,6 +94,27 @@ package org.stylekit.spec.tests.css
 		protected function onStyleSheetAddTimeout(passThru:Object):void
 		{
 			Assert.assertFalse("Timeout reached whilst waiting for STYLESHEET_MODIFIED on the StyleSheetCollection");
+		}
+		
+		[Test(async,description="Tests that a StyleSheetCollection is able to dispatch a MODIFIED event when a property in the collection is mutated")]
+		public function ableToDispatchModificationEventsFromAProperty():void
+		{
+			var async:Function = Async.asyncHandler(this, this.onStyleSheetModified, 2000, null, this.onStyleSheetModifiedTimeout);
+			
+			this._parsed.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, async);
+			
+			// toggle the first property on the first stylesheet to use important
+			this._parsed.styles[0].properties[0].value.important = true;
+		}
+		
+		protected function onStyleSheetModified(e:StyleSheetEvent, passThru:Object):void
+		{
+			Assert.assertTrue(this._parsed.styles[0].properties[0].value.important);
+		}
+		
+		protected function onStyleSheetModifiedTimeout(passThru:Object):void
+		{
+			Assert.fail("Timeout occured whilst waiting for a modification event from the StyleSheetCollection");
 		}
 		
 		[Test(async,description="Tests that the StyleSheetCollection dispatches the correct STYLESHEET_MODIFIED event when the collection is altered")]

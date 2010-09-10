@@ -55,7 +55,10 @@ package org.stylekit.css.property
 				this._value.removeEventListener(ValueEvent.VALUE_MODIFIED, this.onValueModified);
 			}
 			
-			v.addEventListener(ValueEvent.VALUE_MODIFIED, this.onValueModified);
+			if (v != null)
+			{
+				v.addEventListener(ValueEvent.VALUE_MODIFIED, this.onValueModified);
+			}
 			
 			this._value = v;
 		}
