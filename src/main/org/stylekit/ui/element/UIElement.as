@@ -11,9 +11,9 @@ package org.stylekit.ui.element
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
-	import org.stylekit.css.value.Value;
-	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
@@ -502,8 +502,48 @@ package org.stylekit.ui.element
 		{
 			var w:int = 0;
 			var h:int = 0;
+			
 			// TODO
 			// margins + borders + padding + effective content dimensions + scrollbars
+			
+			// margin
+			var marginTop:SizeValue = (this.getStyleValue("margin-top") as SizeValue);
+			var marginBottom:SizeValue = (this.getStyleValue("margin-bottom") as SizeValue);
+			var marginLeft:SizeValue = (this.getStyleValue("margin-left") as SizeValue);
+			var marginRight:SizeValue = (this.getStyleValue("margin-right") as SizeValue);
+			
+			var mTop:int = (marginTop != null ? marginTop.evaluateSize(this) : 0);
+			var mBottom:int = (marginBottom != null ? marginBottom.evaluateSize(this) : 0);
+			var mLeft:int = (marginLeft != null ? marginLeft.evaluateSize(this) : 0);
+			var mRight:int = (marginRight != null ? marginRight.evaluateSize(this) : 0);
+			
+			// borders
+			var borderTop:SizeValue = (this.getStyleValue("border-top-width") as SizeValue);
+			var borderBottom:SizeValue = (this.getStyleValue("border-bottom-width") as SizeValue);
+			var borderLeft:SizeValue = (this.getStyleValue("border-left-width") as SizeValue);
+			var borderRight:SizeValue = (this.getStyleValue("border-right-width") as SizeValue);
+			
+			var bTop:int = (borderTop != null ? borderTop.evaluateSize(this) : 0);
+			var bBottom:int = (borderBottom != null ? borderBottom.evaluateSize(this) : 0);
+			var bLeft:int = (borderLeft != null ? borderLeft.evaluateSize(this) : 0);
+			var bRight:int = (borderRight != null ? borderRight.evaluateSize(this) : 0);
+			
+			// padding
+			var paddingTop:SizeValue = (this.getStyleValue("padding-top") as SizeValue);
+			var paddingBottom:SizeValue = (this.getStyleValue("padding-bottom") as SizeValue);
+			var paddingLeft:SizeValue = (this.getStyleValue("padding-left") as SizeValue);
+			var paddingRight:SizeValue = (this.getStyleValue("padding-right") as SizeValue);
+			
+			var pTop:int = (paddingTop != null ? paddingTop.evaluateSize(this) : 0);
+			var pBottom:int = (paddingBottom != null ? paddingBottom.evaluateSize(this) : 0);
+			var pLeft:int = (paddingLeft != null ? paddingLeft.evaluateSize(this) : 0);
+			var pRight:int = (paddingRight != null ? paddingRight.evaluateSize(this) : 0);
+			
+			// scrollbars
+			
+			w = this.effectiveContentWidth + (pLeft + pRight) + (bLeft + bRight) + (mLeft + mRight);
+			h = this.effectiveContentHeight + (pTop + pBottom) + (bTop + bBottom) + (mTop + mBottom);
+			
 			this.setEffectiveDimensions(w, h);
 		}
 		
