@@ -7,10 +7,12 @@ package org.stylekit.css.property
 	
 	import org.stylekit.css.value.BackgroundCompoundValue;
 	import org.stylekit.css.value.BorderCompoundValue;
+	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FontCompoundValue;
 	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
+	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.PropertyEvent;
 	import org.stylekit.events.ValueEvent;
@@ -102,6 +104,13 @@ package org.stylekit.css.property
 												borderValue.lineStyleValue, importance);
 					mergePropertyWithImportance(mergeParent, ["border-left-width", "border-right-width", "border-top-width", "border-bottom-width"], 	
 												borderValue.sizeValue, importance);
+					
+					break;
+				case "border-radius":
+					var radiusValue:SizeValue = (val as SizeValue);
+					
+					mergePropertyWithImportance(mergeParent, ["border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius", "border-top-left-radius"], 	
+						radiusValue, importance);
 					
 					break;
 				case "border-left":

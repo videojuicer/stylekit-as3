@@ -1,3 +1,4 @@
+
 package org.stylekit.spec.tests.ui.element
 {
 	import flexunit.framework.Assert;
@@ -13,8 +14,8 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
-	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.spec.Fixtures;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
@@ -336,6 +337,15 @@ package org.stylekit.spec.tests.ui.element
 			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px")};
 			element.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, asyncCallback);
 			element.evaluatedStyles = {};
+		}
+		
+		[Test(description="Tests that a UIElement can calculate effective dimensions correctly")]
+		public function calculatesEffectiveDimensionsCorrectly():void
+		{
+			var el:UIElement = new UIElement();
+			el.evaluatedStyles = { "width": SizeValue.parse("100px"), "padding": SizeValue.parse("10px"), "margin": SizeValue.parse("5px") };
+			
+			Assert.assertEquals(130, el.effectiveWidth);
 		}
 		
 		protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void

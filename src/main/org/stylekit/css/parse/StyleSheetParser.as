@@ -21,6 +21,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.BackgroundCompoundValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
+	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.CursorValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
@@ -644,6 +645,12 @@ package org.stylekit.css.parse
 						break;
 					case "border-top": case "border-left": case "border-right": case "border-bottom":
 						property.value = BorderCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "border-top-right-radius": case "border-bottom-right-radius": case "border-bottom-left-radius": case "border-top-left-radius":
+						property.value = SizeValue.parse(unparsedPropertyValue);
+						break;
+					case "border-radius":
+						property.value = CornerCompoundValue.parse(unparsedPropertyValue);
 						break;
 					case "list-style-position":
 						property.value = ListStylePositionValue.parse(unparsedPropertyValue);

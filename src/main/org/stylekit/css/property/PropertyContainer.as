@@ -143,6 +143,12 @@ package org.stylekit.css.property
 				"border-bottom-style": LineStyleValue.parse("none"),
 				"border-bottom-color": ColorValue.parse("transparent"),
 				
+				// border-radius
+				"border-top-right-radius": SizeValue.parse("0px"),
+				"border-bottom-right-radius": SizeValue.parse("0px"),
+				"border-bottom-left-radius": SizeValue.parse("0px"),
+				"border-top-left-radius": SizeValue.parse("0px"),
+				
 				// positions
 				"bottom": SizeValue.parse("auto"),
 				"left": SizeValue.parse("auto"),

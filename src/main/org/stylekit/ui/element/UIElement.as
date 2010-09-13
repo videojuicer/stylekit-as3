@@ -4,6 +4,8 @@ package org.stylekit.ui.element
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	
+	import mx.skins.Border;
+	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
@@ -12,13 +14,18 @@ package org.stylekit.ui.element
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
+	import org.stylekit.css.value.BorderCompoundValue;
+	import org.stylekit.css.value.ColorValue;
+	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
+	import org.stylekit.ui.element.paint.UIElementPainter;
 	
 	/**
 	 * Dispatched when the effective dimensions are changed on the UI element.
@@ -791,7 +798,7 @@ package org.stylekit.ui.element
 		
 		public function redraw():void
 		{
-			
+			UIElementPainter.paint(this);
 		}
 		
 		protected function updateParentIndex(index:uint):void
@@ -880,8 +887,93 @@ package org.stylekit.ui.element
 		
 		public function getStyleValue(propertyName:String):Value
 		{
+			var value:Value = null;
+			
 			// TODO compile compound values
-			return this._evaluatedStyles[propertyName];
+			switch (propertyName)
+			{
+				case "border":
+					var border:EdgeCompoundValue = new EdgeCompoundValue();
+					
+					border.leftValue = this.getStyleValue("border-left");
+					border.rightValue = this.getStyleValue("border-right");
+					border.topValue = this.getStyleValue("border-top");
+					border.bottomValue = this.getStyleValue("border-bottom");
+					
+					value = border;
+					break;
+				case "border-left":
+					var borderLeft:BorderCompoundValue = new BorderCompoundValue();
+					
+					borderLeft.colorValue = this.getStyleValue("border-left-color") as ColorValue;
+					borderLeft.lineStyleValue = this.getStyleValue("border-left-style") as LineStyleValue;
+					borderLeft.sizeValue = this.getStyleValue("border-left-width") as SizeValue;
+					
+					if (borderLeft.lineStyleValue == null)
+					{
+						borderLeft = null;
+					}
+					
+					value = borderLeft;
+					break;
+				case "border-right":
+					var borderRight:BorderCompoundValue = new BorderCompoundValue();
+					
+					borderRight.colorValue = this.getStyleValue("border-right-color") as ColorValue;
+					borderRight.lineStyleValue = this.getStyleValue("border-right-style") as LineStyleValue;
+					borderRight.sizeValue = this.getStyleValue("border-right-width") as SizeValue;
+					
+					if (borderRight.lineStyleValue == null)
+					{
+						borderRight = null;
+					}
+					
+					value = borderRight;
+					break;
+				case "border-bottom":
+					var borderBottom:BorderCompoundValue = new BorderCompoundValue();
+					
+					borderBottom.colorValue = this.getStyleValue("border-bottom-color") as ColorValue;
+					borderBottom.lineStyleValue = this.getStyleValue("border-bottom-style") as LineStyleValue;
+					borderBottom.sizeValue = this.getStyleValue("border-bottom-width") as SizeValue;
+					
+					if (borderBottom.lineStyleValue == null)
+					{
+						borderBottom = null;
+					}
+					
+					value = borderBottom;
+					break;
+				case "border-top":
+					var borderTop:BorderCompoundValue = new BorderCompoundValue();
+					
+					borderTop.colorValue = this.getStyleValue("border-top-color") as ColorValue;
+					borderTop.lineStyleValue = this.getStyleValue("border-top-style") as LineStyleValue;
+					borderTop.sizeValue = this.getStyleValue("border-top-width") as SizeValue;
+					
+					if (borderTop.lineStyleValue == null)
+					{
+						borderTop = null;
+					}
+					
+					value = borderTop;
+					break;
+				case "border-radius":
+					var radius:CornerCompoundValue = new CornerCompoundValue();
+					
+					radius.topRightValue = this.getStyleValue("border-top-right-radius") as SizeValue;
+					radius.bottomRightValue = this.getStyleValue("border-bottom-right-radius") as SizeValue;
+					radius.bottomLeftValue = this.getStyleValue("border-bottom-left-radius") as SizeValue;
+					radius.topLeftValue = this.getStyleValue("border-top-left-radius") as SizeValue;
+					
+					value = radius;
+					break;
+				default:
+					value = this._evaluatedStyles[propertyName]
+					break;
+			}
+			
+			return value;
 		}
 		
 		public function updateStyles():void
