@@ -12,6 +12,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
@@ -523,10 +524,15 @@ package org.stylekit.ui.element
 			var borderLeft:SizeValue = (this.getStyleValue("border-left-width") as SizeValue);
 			var borderRight:SizeValue = (this.getStyleValue("border-right-width") as SizeValue);
 			
-			var bTop:int = (borderTop != null ? borderTop.evaluateSize(this) : 0);
-			var bBottom:int = (borderBottom != null ? borderBottom.evaluateSize(this) : 0);
-			var bLeft:int = (borderLeft != null ? borderLeft.evaluateSize(this) : 0);
-			var bRight:int = (borderRight != null ? borderRight.evaluateSize(this) : 0);
+			var borderTopStyle:LineStyleValue = (this.getStyleValue("border-top-style") as LineStyleValue);
+			var borderBottomStyle:LineStyleValue = (this.getStyleValue("border-bottom-style") as LineStyleValue);
+			var borderLeftStyle:LineStyleValue = (this.getStyleValue("border-left-style") as LineStyleValue);
+			var borderRightStyle:LineStyleValue = (this.getStyleValue("border-right-style") as LineStyleValue);
+			
+			var bTop:int = (borderTop != null && borderTopStyle != null && borderTopStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderTop.evaluateSize(this) : 0);
+			var bBottom:int = (borderBottom != null && borderBottomStyle != null && borderBottomStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderBottom.evaluateSize(this) : 0);
+			var bLeft:int = (borderLeft != null && borderLeftStyle != null && borderLeftStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderLeft.evaluateSize(this) : 0);
+			var bRight:int = (borderRight != null && borderRightStyle != null && borderRightStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderRight.evaluateSize(this) : 0);
 			
 			// padding
 			var paddingTop:SizeValue = (this.getStyleValue("padding-top") as SizeValue);
