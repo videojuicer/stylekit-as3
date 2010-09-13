@@ -60,7 +60,7 @@ package org.stylekit.spec.tests.css.value
 		public function sizeValuesEvaluateWithUIElements():void
 		{
 			var parent:UIElement = new UIElement();
-			parent.evaluatedStyles = {"width": SizeValue.parse("500px")}
+			parent.evaluatedStyles = {"width": SizeValue.parse("500px"), "font-size": SizeValue.parse("50px")};
 			var child:UIElement = new UIElement();
 			parent.addElement(child);
 			
@@ -72,6 +72,10 @@ package org.stylekit.spec.tests.css.value
 			var s2:SizeValue = SizeValue.parse("50%");
 			
 			Assert.assertEquals(250, s2.evaluateSize(child));
+			
+			var s3:SizeValue = SizeValue.parse("0.5em");
+			
+			Assert.assertEquals(25, s3.evaluateSize(child));
 			
 		}
 		

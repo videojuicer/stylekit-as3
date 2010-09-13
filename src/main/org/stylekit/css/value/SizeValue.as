@@ -18,6 +18,18 @@ package org.stylekit.css.value
 		public static var DIMENSION_WIDTH:String = "w";
 		public static var DIMENSION_HEIGHT:String = "h";
 		
+		public static var BASE_EM_ABS_VALUE:Number = 12; // 1em == 12px for our purposes.
+		
+		public static var WORD_VALUE_MAP:Object = {
+			"xx-small": "0.3em",
+			"x-small": "0.4em",
+			"small": "0.6em",
+			"medium": "1em",
+			"large": "1.3em",
+			"x-large": "1.6em",
+			"xx-large": "2em"
+		};
+		
 		protected var _units:String = "px";
 		protected var _value:Number = 0;
 		
@@ -31,6 +43,13 @@ package org.stylekit.css.value
 			str = StringUtil.trim(str.toLowerCase());
 			var sVal:SizeValue = new SizeValue();
 				sVal.rawValue = str;
+			
+			// Substitute word sizings
+			if(SizeValue.WORD_VALUE_MAP[str])
+			{
+				str = SizeValue.WORD_VALUE_MAP[str];
+			}
+			
 			var unitPattern:RegExp = new RegExp("[%a-zA-Z]+");
 			var unitIndex:int = str.search(unitPattern);
 
@@ -83,18 +102,35 @@ package org.stylekit.css.value
 		* Calculates the actual pixel size of this SizeValue instance.
 		* Pass a UIElement instance to the method to allow relative percentage or fontsize-based calculations.
 		*/
-		public function evaluateSize(e:UIElement = null, dimension:String = null):int
+		public function evaluateSize(e:UIElement = null, dimension:String = null):Number
 		{
 			if(dimension == null) dimension = SizeValue.DIMENSION_WIDTH;
+			var baseVal:Number;
 			
 			switch(this.units)
 			{
-				case SizeValue.UNIT_FONTSIZE:
-					break;
-				case SizeValue.UNIT_PERCENTAGE:
-					var baseVal:int = (dimension == SizeValue.DIMENSION_WIDTH)? e.parentElement.effectiveContentWidth : e.parentElement.effectiveContentHeight;
-				
+				case SizeValue.UNIT_PERCENTAGE:				
+					baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? e.parentElement.effectiveContentWidth : e.parentElement.effectiveContentHeight;
 					return baseVal * (this.value / 100);
+					break;
+				case SizeValue.UNIT_FONTSIZE:
+					// Find baseline fontsize and resolve to pixel value
+					baseVal = SizeValue.BASE_EM_ABS_VALUE;
+					
+					// Loop up the element tree, starting with the given element's parent, and use the nearest font-size style.
+					var p:UIElement = e.parentElement;
+					while(p != null && !p.hasStyleProperty("font-size"))
+					{
+						p = p.parentElement;
+					}
+					// At this point either p is null or we've found an item
+					if(p && p.hasStyleProperty("font-size"))
+					{
+						baseVal = (p.getStyleValue("font-size") as SizeValue).evaluateSize(p, SizeValue.DIMENSION_HEIGHT);
+					}
+					
+					// Factor with the value
+					return this.value * baseVal;
 					break;
 				default:
 					return this.value;
