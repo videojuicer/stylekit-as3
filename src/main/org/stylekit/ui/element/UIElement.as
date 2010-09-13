@@ -168,7 +168,12 @@ package org.stylekit.ui.element
 		
 		public function set parentElement(parent:UIElement):void
 		{
+			if(this._parentElement != null)
+			{
+				this._parentElement.removeEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
+			}
 			this._parentElement = parent;
+			this._parentElement.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
 		}
 		
 		public function get baseUI():BaseUI
@@ -658,7 +663,7 @@ package org.stylekit.ui.element
 		/**
 		* Evaluates a SizeValue within the scope of this element, and returns 0 by default.
 		*/
-		protected function evalSize(s:SizeValue):int
+		protected function evalSize(s:SizeValue):Number
 		{
 			if(s == null)
 			{
@@ -673,7 +678,7 @@ package org.stylekit.ui.element
 		/**
 		* Evaluates a size for a given CSS property key.
 		*/
-		protected function evalStyleSize(key:String):int
+		protected function evalStyleSize(key:String):Number
 		{
 			return this.evalSize((this.getStyleValue(key) as SizeValue));
 		}
@@ -828,10 +833,11 @@ package org.stylekit.ui.element
 				throw new IllegalOperationError("Child belongs to a different BaseUI, cannot add to this UIElement");
 			}
 			
-			child._parentElement = this;
+			child.parentElement = this;
 			child._baseUI = this.baseUI;
 			
 			child.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this.onChildDimensionsChanged);
+			
 			
 			if (index < this._children.length)
 			{
@@ -1135,6 +1141,11 @@ package org.stylekit.ui.element
 			}
 			
 			return true;
+		}
+		
+		protected function onParentElementEvaluatedStylesModified(e:UIElementEvent):void
+		{
+			this.evaluateStyles();
 		}
 		
 		protected function onChildDimensionsChanged(e:UIElementEvent):void

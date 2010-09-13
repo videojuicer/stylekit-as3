@@ -170,7 +170,7 @@ package org.stylekit.css.property
 				// font
 				"font-family": Value.parse("sans-serif"),
 				"font-size": SizeValue.parse("medium"),
-				"font-style": FontStyleValue.parse("normal"),
+				"font-style": FontStyleValue.parse("medium"),
 				"font-variant": FontVariantValue.parse("normal"),
 				"font-weight": FontWeightValue.parse("normal"),
 				
