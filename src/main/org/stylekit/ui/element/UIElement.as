@@ -514,10 +514,10 @@ package org.stylekit.ui.element
 			var marginLeft:SizeValue = (this.getStyleValue("margin-left") as SizeValue);
 			var marginRight:SizeValue = (this.getStyleValue("margin-right") as SizeValue);
 			
-			var mTop:int = (marginTop != null ? marginTop.evaluateSize(this) : 0);
-			var mBottom:int = (marginBottom != null ? marginBottom.evaluateSize(this) : 0);
-			var mLeft:int = (marginLeft != null ? marginLeft.evaluateSize(this) : 0);
-			var mRight:int = (marginRight != null ? marginRight.evaluateSize(this) : 0);
+			var mTop:int = (marginTop != null ? marginTop.evaluateSize(this, SizeValue.DIMENSION_HEIGHT) : 0);
+			var mBottom:int = (marginBottom != null ? marginBottom.evaluateSize(this, SizeValue.DIMENSION_HEIGHT) : 0);
+			var mLeft:int = (marginLeft != null ? marginLeft.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+			var mRight:int = (marginRight != null ? marginRight.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
 			
 			// borders
 			var borderTop:SizeValue = (this.getStyleValue("border-top-width") as SizeValue);
@@ -530,10 +530,10 @@ package org.stylekit.ui.element
 			var borderLeftStyle:LineStyleValue = (this.getStyleValue("border-left-style") as LineStyleValue);
 			var borderRightStyle:LineStyleValue = (this.getStyleValue("border-right-style") as LineStyleValue);
 			
-			var bTop:int = (borderTop != null && borderTopStyle != null && borderTopStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderTop.evaluateSize(this) : 0);
-			var bBottom:int = (borderBottom != null && borderBottomStyle != null && borderBottomStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderBottom.evaluateSize(this) : 0);
-			var bLeft:int = (borderLeft != null && borderLeftStyle != null && borderLeftStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderLeft.evaluateSize(this) : 0);
-			var bRight:int = (borderRight != null && borderRightStyle != null && borderRightStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderRight.evaluateSize(this) : 0);
+			var bTop:int = (borderTop != null && borderTopStyle != null && borderTopStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderTop.evaluateSize(this, SizeValue.DIMENSION_HEIGHT) : 0);
+			var bBottom:int = (borderBottom != null && borderBottomStyle != null && borderBottomStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderBottom.evaluateSize(this, SizeValue.DIMENSION_HEIGHT) : 0);
+			var bLeft:int = (borderLeft != null && borderLeftStyle != null && borderLeftStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderLeft.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+			var bRight:int = (borderRight != null && borderRightStyle != null && borderRightStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderRight.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
 			
 			// padding
 			var paddingTop:SizeValue = (this.getStyleValue("padding-top") as SizeValue);
@@ -541,10 +541,10 @@ package org.stylekit.ui.element
 			var paddingLeft:SizeValue = (this.getStyleValue("padding-left") as SizeValue);
 			var paddingRight:SizeValue = (this.getStyleValue("padding-right") as SizeValue);
 			
-			var pTop:int = (paddingTop != null ? paddingTop.evaluateSize(this) : 0);
-			var pBottom:int = (paddingBottom != null ? paddingBottom.evaluateSize(this) : 0);
-			var pLeft:int = (paddingLeft != null ? paddingLeft.evaluateSize(this) : 0);
-			var pRight:int = (paddingRight != null ? paddingRight.evaluateSize(this) : 0);
+			var pTop:int = (paddingTop != null ? paddingTop.evaluateSize(this, SizeValue.DIMENSION_HEIGHT) : 0);
+			var pBottom:int = (paddingBottom != null ? paddingBottom.evaluateSize(this, SizeValue.DIMENSION_HEIGHT) : 0);
+			var pLeft:int = (paddingLeft != null ? paddingLeft.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+			var pRight:int = (paddingRight != null ? paddingRight.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
 			
 			// scrollbars
 			
