@@ -8,6 +8,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.property.Property;
+	import org.stylekit.css.property.PropertyContainer;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
@@ -966,7 +967,7 @@ package org.stylekit.ui.element
 			}
 			// End specificity sort
 			
-			var newEvaluatedStyles:Object = {};
+			var newEvaluatedStyles:Object = PropertyContainer.defaultStyles;
 			for(i=0; i < sortedStyles.length; i++)
 			{
 				// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
