@@ -4,6 +4,7 @@ package org.stylekit.ui.element.paint
 	import flash.geom.Point;
 	
 	import org.stylekit.css.value.BorderCompoundValue;
+	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.LineStyleValue;
@@ -17,12 +18,16 @@ package org.stylekit.ui.element.paint
 		{
 			var graphics:Graphics = uiElement.graphics;
 			
-			//graphics.beginFill(0xEEEEEE, 0.8);
+			// one monster method, alot of variables here because we have to retreive everything
+			// we skip some null checks because most properties should be set by default
+			// 
 			
-			//var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize();
-			//var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize();
-			//var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize();
-			//var marginBottom:Number = (uiElement.getStyleValue("margin-bottom") as SizeValue).evaluateSize();
+			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
+			
+			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize();
+			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize();
+			var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize();
+			var marginBottom:Number = (uiElement.getStyleValue("margin-bottom") as SizeValue).evaluateSize();
 			
 			var borderCompound:EdgeCompoundValue = (uiElement.getStyleValue("border") as EdgeCompoundValue);
 			var radiusCompound:CornerCompoundValue = (uiElement.getStyleValue("border-radius") as CornerCompoundValue);
@@ -32,84 +37,82 @@ package org.stylekit.ui.element.paint
 			var borderRight:BorderCompoundValue = (borderCompound.rightValue as BorderCompoundValue);
 			var borderBottom:BorderCompoundValue = (borderCompound.bottomValue as BorderCompoundValue);
 			
+			var borderTopColor:uint = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderTop.colorValue.hexValue);
+			var borderLeftColor:uint = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderLeft.colorValue.hexValue);
+			var borderRightColor:uint = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderRight.colorValue.hexValue);
+			var borderBottomColor:uint = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderBottom.colorValue.hexValue);
+			
+			var borderTopSize:int = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderTop.sizeValue.evaluateSize(uiElement));
+			var borderLeftSize:int = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderLeft.sizeValue.evaluateSize(uiElement));
+			var borderRightSize:int = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderRight.sizeValue.evaluateSize(uiElement));
+			var borderBottomSize:int = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderBottom.sizeValue.evaluateSize(uiElement));
+
 			var topRightRadius:SizeValue = (radiusCompound.topRightValue as SizeValue);
 			var bottomRightRadius:SizeValue = (radiusCompound.bottomRightValue as SizeValue);
 			var bottomLeftRadius:SizeValue = (radiusCompound.bottomLeftValue as SizeValue);
 			var topLeftRadius:SizeValue = (radiusCompound.topLeftValue as SizeValue);
 			
-			trace("Painting ...", uiElement);
+			var topRightR:Number = (borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderRight.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? topRightRadius.evaluateSize(uiElement) : 0);
+			var bottomRightR:Number = (borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderRight.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? bottomRightRadius.evaluateSize(uiElement) : 0);
+			var bottomLeftR:Number = (borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? bottomLeftRadius.evaluateSize(uiElement) : 0);
+			var topLeftR:Number = (borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? topLeftRadius.evaluateSize(uiElement) : 0);
 			
-			if (borderTop != null && borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE)
-			{
-				graphics.lineStyle(borderTop.sizeValue.evaluateSize(), borderTop.colorValue.hexValue, 1);
-
-				graphics.moveTo(topLeftRadius.evaluateSize() / 2, 0);
-				graphics.lineTo(uiElement.effectiveContentWidth - (topLeftRadius.evaluateSize() / 2), 0);
-			}
+			graphics.moveTo(marginLeft + topLeftR / 2, marginTop);
 			
-			if (borderLeft != null && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE)
-			{ 
-				graphics.lineStyle(borderLeft.sizeValue.evaluateSize(), borderLeft.colorValue.hexValue, 1);
-				
-				graphics.moveTo(0, topLeftRadius.evaluateSize() / 2);
-				graphics.lineTo(0, uiElement.effectiveContentHeight - (bottomLeftRadius.evaluateSize() / 2));
-			}
-			
-			if (topRightRadius != null && topRightRadius.evaluateSize() > 0)
-			{
-				trace("Move: "+(uiElement.effectiveContentWidth - (topRightRadius.evaluateSize() / 2))+"/0", uiElement);
-				trace("Curve: "+uiElement.effectiveContentWidth+"/0 "+uiElement.effectiveContentWidth+"/"+(topRightRadius.evaluateSize() / 2));
-				
-				graphics.moveTo((uiElement.effectiveContentWidth - (topRightRadius.evaluateSize() / 2)), 0);
-				graphics.curveTo(uiElement.effectiveContentWidth, 0, uiElement.effectiveContentWidth, (topRightRadius.evaluateSize() / 2));
-			}
-			
-			if (topLeftRadius != null && topLeftRadius.evaluateSize() > 0)
-			{
-				trace("Move: "+(uiElement.effectiveContentWidth - (topLeftRadius.evaluateSize() / 2))+"/0", uiElement);
-				trace("Curve: "+uiElement.effectiveContentWidth+"/0 "+uiElement.effectiveContentWidth+"/"+(topLeftRadius.evaluateSize() / 2));
-				
-				graphics.moveTo((topLeftRadius.evaluateSize() / 2), 0);
-				graphics.curveTo(0, 0, 0, (topLeftRadius.evaluateSize() / 2));
-			}
-			
-			if (borderRight != null && borderRight.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE)
-			{
-				graphics.lineStyle(borderRight.sizeValue.evaluateSize(), borderRight.colorValue.hexValue, 1);
-				
-				graphics.moveTo(uiElement.effectiveContentWidth, topLeftRadius.evaluateSize() / 2);
-				graphics.lineTo(uiElement.effectiveContentWidth, uiElement.effectiveContentHeight - (bottomRightRadius.evaluateSize() / 2));
-			}
-			
-			if (borderBottom != null && borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE)
-			{
-				graphics.lineStyle(borderBottom.sizeValue.evaluateSize(), borderBottom.colorValue.hexValue, 1);
-				
-				graphics.moveTo((bottomLeftRadius.evaluateSize() / 2), uiElement.effectiveContentHeight);
-				graphics.lineTo(uiElement.effectiveContentWidth - (bottomRightRadius.evaluateSize() / 2), uiElement.effectiveContentHeight);
-			}
-			
-			if (bottomRightRadius != null && bottomRightRadius.evaluateSize() > 0)
-			{
-				trace("Move: "+(uiElement.effectiveContentWidth - (bottomRightRadius.evaluateSize() / 2))+"/0", uiElement);
-				trace("Curve: "+uiElement.effectiveContentWidth+"/0 "+uiElement.effectiveContentWidth+"/"+(bottomRightRadius.evaluateSize() / 2));
-				
-				graphics.moveTo(uiElement.effectiveContentWidth, uiElement.effectiveContentHeight - (bottomRightRadius.evaluateSize() / 2));
-				graphics.curveTo(uiElement.effectiveContentWidth, uiElement.effectiveContentHeight, uiElement.effectiveContentWidth - (bottomRightRadius.evaluateSize() / 2), uiElement.effectiveContentHeight);
-			}
-			
-			if (bottomLeftRadius != null && bottomLeftRadius.evaluateSize() > 0)
-			{
-				trace("Move: "+(uiElement.effectiveContentWidth - (bottomLeftRadius.evaluateSize() / 2))+"/0", uiElement);
-				trace("Curve: "+uiElement.effectiveContentWidth+"/0 "+uiElement.effectiveContentWidth+"/"+(bottomLeftRadius.evaluateSize() / 2));
-				
-				graphics.moveTo(0, uiElement.effectiveContentHeight - (bottomLeftRadius.evaluateSize() / 2));
-				graphics.curveTo(0, uiElement.effectiveContentHeight, (bottomLeftRadius.evaluateSize() / 2), uiElement.effectiveContentHeight);
-			}
-			
+			graphics.beginFill(backgroundColor);
 			graphics.lineStyle(0, 0);
 			
-			//graphics.endFill();
+			trace("Painting ...", uiElement);
+			
+			if (borderTop != null)
+			{
+				graphics.lineStyle(borderTopSize, borderTopColor, 1);
+
+				graphics.lineTo(marginLeft + uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
+			}
+			
+			if (topRightR > 0)
+			{
+				graphics.curveTo(marginLeft + uiElement.effectiveWidth - marginRight, marginTop, marginLeft + uiElement.effectiveWidth - marginRight, marginTop + (topRightR / 2));
+			}
+			
+			if (borderRight != null)
+			{
+				graphics.lineStyle(borderRightSize, borderRightColor, 1);
+				
+				graphics.lineTo(marginLeft + uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) + marginTop - marginBottom);
+			}
+			
+			if (bottomRightR > 0)
+			{
+				graphics.curveTo(marginLeft + uiElement.effectiveWidth - marginRight, marginTop + uiElement.effectiveHeight - marginBottom, marginLeft + uiElement.effectiveWidth - (bottomRightR / 2) - marginRight, marginTop + uiElement.effectiveHeight - marginBottom);
+			}
+			
+			if (borderBottom != null)
+			{
+				graphics.lineStyle(borderBottomSize, borderBottomColor, 1);
+				
+				graphics.lineTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight + marginTop - marginBottom);
+			}
+			
+			if (bottomLeftR > 0)
+			{
+				graphics.curveTo(marginLeft, uiElement.effectiveHeight + marginTop - marginBottom, marginLeft, uiElement.effectiveHeight - (bottomLeftR / 2) + marginTop - marginBottom);
+			}
+			
+			if (borderLeft != null)
+			{ 
+				graphics.lineStyle(borderLeftSize, borderLeftColor, 1);
+			
+				graphics.lineTo(marginLeft, (topLeftR / 2) + marginTop);
+			}
+			
+			if (topLeftR > 0)
+			{
+				graphics.curveTo(marginLeft, marginTop, marginLeft + (topLeftR / 2), marginTop);
+			}
+
+			graphics.endFill();
 		}
 	}
 }

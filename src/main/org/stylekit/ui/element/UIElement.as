@@ -798,7 +798,25 @@ package org.stylekit.ui.element
 		
 		public function layoutChildren():void
 		{
+			for (var k:int = 0; k < this.children.length; k++)
+			{
+				if (this.children[k].parent != null)
+				{
+					var childIndex:int = this.getChildIndex(this.children[k]);
+					
+					if (childIndex > -1)
+					{
+						this.removeChildAt(childIndex);
+					}
+				}
+			}
 			
+			for (var i:int = 0; i < this.children.length; i++)
+			{
+				trace("Adding new child to UIElement content");
+				
+				super.addChild(this.children[i]);
+			}
 		}
 		
 		public function redraw():void
@@ -837,7 +855,6 @@ package org.stylekit.ui.element
 			child._baseUI = this.baseUI;
 			
 			child.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this.onChildDimensionsChanged);
-			
 			
 			if (index < this._children.length)
 			{
