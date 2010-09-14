@@ -821,7 +821,7 @@ package org.stylekit.ui.element
 			// this is always our starting point of our content
 			point.x = (this.getStyleValue("padding-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-left-width") as SizeValue).evaluateSize(this);
 			point.y = (this.getStyleValue("padding-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-top-width") as SizeValue).evaluateSize(this);
-			
+
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				trace("Adding new child to UIElement content");
