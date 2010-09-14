@@ -3,6 +3,7 @@ package org.stylekit.ui.element
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
+	import flash.geom.Point;
 	
 	import mx.skins.Border;
 	
@@ -143,6 +144,8 @@ package org.stylekit.ui.element
 		protected var _elementClassNames:Vector.<String>;
 		protected var _elementPseudoClasses:Vector.<String>;
 		
+		protected var _painter:UIElementPainter;
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
@@ -154,6 +157,8 @@ package org.stylekit.ui.element
 			
 			this._elementClassNames = new Vector.<String>();
 			this._elementPseudoClasses = new Vector.<String>();
+			
+			this._painter = new UIElementPainter(this);
 			
 			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
 			{
@@ -811,17 +816,28 @@ package org.stylekit.ui.element
 				}
 			}
 			
+			var point:Point = new Point();
+			
+			// this is always our starting point of our content
+			point.x = (this.getStyleValue("padding-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-left-width") as SizeValue).evaluateSize(this);
+			point.y = (this.getStyleValue("padding-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-top-width") as SizeValue).evaluateSize(this);
+			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				trace("Adding new child to UIElement content");
 				
-				super.addChild(this.children[i]);
+				var child:UIElement = this.children[i];
+				
+				child.x = point.x;
+				child.y = point.y;
+				
+				super.addChild(child);
 			}
 		}
 		
 		public function redraw():void
 		{
-			UIElementPainter.paint(this);
+			this._painter.paint();
 		}
 		
 		protected function updateParentIndex(index:uint):void

@@ -1,7 +1,15 @@
 package org.stylekit.ui.element.paint
 {
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Graphics;
+	import flash.display.Loader;
+	import flash.events.Event;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import flash.utils.ByteArray;
+	
+	import mx.controls.SWFLoader;
 	
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
@@ -9,13 +17,29 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.URLValue;
 	import org.stylekit.ui.element.UIElement;
+	import org.utilkit.crypto.Base64;
 	import org.utilkit.logger.Logger;
+	import org.utilkit.net.RedirectLoader;
+	import org.utilkit.parser.DataURIParser;
 	
 	public class UIElementPainter
 	{
-		public static function paint(uiElement:UIElement):void
+		protected var _backgroundLoader:Loader;
+		protected var _backgroundBytes:ByteArray;
+		protected var _backgroundBitmapData:BitmapData;
+		
+		protected var _uiElement:UIElement;
+		
+		public function UIElementPainter(uiElement:UIElement)
 		{
+			this._uiElement = uiElement;
+		}
+		
+		public function paint():void
+		{
+			var uiElement:UIElement = this._uiElement;
 			var graphics:Graphics = uiElement.graphics;
 			
 			// one monster method, alot of variables here because we have to retreive everything
@@ -23,6 +47,7 @@ package org.stylekit.ui.element.paint
 			// 
 			
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
+			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
 			
 			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize();
 			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize();
@@ -60,6 +85,27 @@ package org.stylekit.ui.element.paint
 			graphics.moveTo(marginLeft + topLeftR / 2, marginTop);
 			
 			graphics.beginFill(backgroundColor);
+			
+			if (backgroundImage != null)
+			{
+				if (this._backgroundLoader == null)
+				{
+					this._backgroundLoader = new Loader();
+					this._backgroundLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onBackgroundLoaderComplete);
+				
+					var dataURI:DataURIParser = new DataURIParser(backgroundImage.url);
+				
+					this._backgroundLoader.loadBytes(Base64.decodeToByteArray(dataURI.data));
+				}
+				else
+				{
+					if (this._backgroundBitmapData != null)
+					{
+						graphics.beginBitmapFill(this._backgroundBitmapData, null, true, true);
+					}
+				}
+			}
+			
 			graphics.lineStyle(0, 0);
 			
 			trace("Painting ...", uiElement);
@@ -113,6 +159,15 @@ package org.stylekit.ui.element.paint
 			}
 
 			graphics.endFill();
+		}
+		
+		protected function onBackgroundLoaderComplete(e:Event):void
+		{
+			trace("image loaded");
+			
+			this._backgroundBitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
+			
+			this.paint();
 		}
 	}
 }
