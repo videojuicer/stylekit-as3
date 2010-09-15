@@ -7,6 +7,7 @@ package org.stylekit.ui.element.paint
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
 	
 	import mx.controls.SWFLoader;
@@ -16,6 +17,8 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
 	import org.stylekit.ui.element.UIElement;
@@ -23,6 +26,7 @@ package org.stylekit.ui.element.paint
 	import org.utilkit.logger.Logger;
 	import org.utilkit.net.RedirectLoader;
 	import org.utilkit.parser.DataURIParser;
+	import org.utilkit.parser.URLParser;
 	
 	public class UIElementPainter
 	{
@@ -35,6 +39,11 @@ package org.stylekit.ui.element.paint
 		public function UIElementPainter(uiElement:UIElement)
 		{
 			this._uiElement = uiElement;
+		}
+		
+		public function get uiElement():UIElement
+		{
+			return this._uiElement;
 		}
 		
 		public function paint():void
@@ -91,11 +100,21 @@ package org.stylekit.ui.element.paint
 				if (this._backgroundLoader == null)
 				{
 					this._backgroundLoader = new Loader();
+					
 					this._backgroundLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onBackgroundLoaderComplete);
 				
-					var dataURI:DataURIParser = new DataURIParser(backgroundImage.url);
+					if (backgroundImage.url.indexOf("data:") == 0)
+					{
+						var dataURI:DataURIParser = new DataURIParser(backgroundImage.url);
 				
-					this._backgroundLoader.loadBytes(Base64.decodeToByteArray(dataURI.data));
+						this._backgroundLoader.loadBytes(Base64.decodeToByteArray(dataURI.data));
+					}
+					else
+					{
+						var uriParser:URLParser = new URLParser(backgroundImage.url);
+						
+						this._backgroundLoader.load(new URLRequest(uriParser.url));
+					}
 				}
 				else
 				{
@@ -105,7 +124,7 @@ package org.stylekit.ui.element.paint
 					}
 				}
 			}
-			
+	
 			graphics.lineStyle(0, 0);
 			
 			trace("Painting ...", uiElement);
@@ -163,9 +182,28 @@ package org.stylekit.ui.element.paint
 		
 		protected function onBackgroundLoaderComplete(e:Event):void
 		{
-			trace("image loaded");
+			trace("Background Image Loaded");
 			
-			this._backgroundBitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
+			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
+			var backgroundRepeat:RepeatValue = (uiElement.getStyleValue("background-repeat") as RepeatValue);
+			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
+			
+			var tempBitmapData:BitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
+			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveContentWidth, this.uiElement.effectiveContentHeight, true, backgroundColor);
+			
+			// need to draw the image repeated and positioned like the rules above in the bitmapData object
+			var xRepeat:int = Math.round(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 0);
+			var yRepeat:int = Math.round(backgroundRepeat.verticalRepeat ? (bitmapData.height / tempBitmapData.height) : 0);
+			
+			for (var y:int = 0; y < yRepeat; y++)
+			{
+				for (var x:int = 0; x < xRepeat; x++)
+				{
+					bitmapData.setPixels(new Rectangle((x * tempBitmapData.width), (y * tempBitmapData.height), tempBitmapData.width, tempBitmapData.height), tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height)));
+				}
+			}
+			
+			this._backgroundBitmapData = bitmapData;
 			
 			this.paint();
 		}
