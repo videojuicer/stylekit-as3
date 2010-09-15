@@ -42,6 +42,8 @@
     <classEntry path="org.stylekit.css.value.TextAlignValue"/>
     <classEntry path="org.stylekit.css.value.TextDecorationValue"/>
     <classEntry path="org.stylekit.css.value.CursorValue"/>
+    <classEntry path="org.stylekit.css.value.PropertyListValue"/>
+    <classEntry path="org.stylekit.css.value.TimingFunctionValue"/>
     <classEntry path="org.stylekit.css.value.InheritValue"/>
     <classEntry path="org.stylekit.spec.tests.css.property.PropertyTestCase"/>
     <classEntry path="org.stylekit.spec.tests.css.value.VisibilityValueTestCase"/>
