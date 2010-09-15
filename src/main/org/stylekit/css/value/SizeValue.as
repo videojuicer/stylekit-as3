@@ -144,7 +144,7 @@ package org.stylekit.css.value
 			// type matches
 			if (other is SizeValue)
 			{
-				return (this.units == (other as SizeValue).units);
+				return (this.units == (other as SizeValue).units && this.value == (other as SizeValue).value);
 			}
 			
 			return super.isEquivalent(other);

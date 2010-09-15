@@ -209,6 +209,10 @@ package org.stylekit.css.property
 				"padding-top": SizeValue.parse("0"),
 				
 				"z-index": SizeValue.parse("auto")
+				
+				// transitions
+				
+				// animations
 			};
 			
 			return defaults;

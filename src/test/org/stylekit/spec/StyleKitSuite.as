@@ -23,6 +23,7 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.OverflowValueTestCase;
 	import org.stylekit.spec.tests.css.value.PositionValueTestCase;
 	import org.stylekit.spec.tests.css.value.SizeValueTestCase;
+	import org.stylekit.spec.tests.css.value.TimeValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextAlignValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextDecorationValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextTransformValueTestCase;
@@ -48,6 +49,7 @@ package org.stylekit.spec
 		public var animationTest:AnimationTestCase;
 		
 		public var sizeValueTest:SizeValueTestCase;
+		public var timeValueTest:TimeValueTestCase;
 		public var alignmentValueTest:AlignmentValueTestCase;
 		public var urlValueTest:URLValueTestCase;
 		public var colorValueTest:ColorValueTestCase;

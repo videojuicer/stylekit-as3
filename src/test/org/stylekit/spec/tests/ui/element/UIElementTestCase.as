@@ -343,8 +343,15 @@ package org.stylekit.spec.tests.ui.element
 		public function calculatesEffectiveDimensionsCorrectly():void
 		{
 			var el:UIElement = new UIElement();
-			el.evaluatedStyles = { "width": SizeValue.parse("100px"), "padding": SizeValue.parse("10px"), "margin": SizeValue.parse("5px") };
+			el.evaluatedStyles = { 
+				"width": SizeValue.parse("100px"), 
+				"padding-left": SizeValue.parse("10px"), 
+				"padding-right": SizeValue.parse("10px"), 
+				"margin-left": SizeValue.parse("5px"),
+				"margin-right": SizeValue.parse("5px")
+			};
 			
+			Assert.assertEquals(100, el.effectiveContentWidth);
 			Assert.assertEquals(130, el.effectiveWidth);
 		}
 		

@@ -7,6 +7,8 @@ package org.stylekit.ui.element
 	
 	import mx.skins.Border;
 	
+	import org.utilkit.util.ObjectUtil;
+	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
@@ -151,7 +153,7 @@ package org.stylekit.ui.element
 			super();
 			
 			this._baseUI = baseUI;
-			this._evaluatedStyles = {};
+			this.evaluatedStyles = {};
 			
 			this._children = new Vector.<UIElement>();
 			
@@ -443,7 +445,7 @@ package org.stylekit.ui.element
 		{
 			// Store old value locally and set new value
 			var previousEvaluatedStyles:Object = this.evaluatedStyles;
-			this._evaluatedStyles = newEvaluatedStyles;
+			this._evaluatedStyles = ObjectUtil.merge(PropertyContainer.defaultStyles, newEvaluatedStyles);
 			
 			// Perform comparison
 			// A change is counted if:
