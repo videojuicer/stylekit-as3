@@ -69,7 +69,7 @@ package org.stylekit.css.value
 		public static function identify(str:String):Boolean
 		{
 			str = StringUtil.trim(str.toLowerCase());
-			var unitPattern:RegExp = new RegExp("[0-9.]+[%a-zA-Z]+");
+			var unitPattern:RegExp = new RegExp("[0-9.]+(px|em|%)+");
 			var unitIndex:int = str.search(unitPattern);
 			return (unitIndex == 0);
 		}
