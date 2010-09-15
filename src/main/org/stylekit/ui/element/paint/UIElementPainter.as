@@ -57,7 +57,7 @@ package org.stylekit.ui.element.paint
 			
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
-			
+
 			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize();
 			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize();
 			var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize();
@@ -124,7 +124,7 @@ package org.stylekit.ui.element.paint
 					}
 				}
 			}
-	
+
 			graphics.lineStyle(0, 0);
 			
 			trace("Painting ...", uiElement);
