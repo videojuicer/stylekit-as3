@@ -29,6 +29,7 @@ package org.stylekit.css.value
 		public function set timingFunction(f:String):void
 		{
 			this._timingFunction = f;
+			this.modified();
 		}
 		
 		public static function parse(str:String):TimingFunctionValue
@@ -48,7 +49,12 @@ package org.stylekit.css.value
 		
 		public override function isEquivalent(other:Value):Boolean
 		{
-			return false;
+			if(other is TimingFunctionValue)
+			{
+				return (this.timingFunction == (other as TimingFunctionValue).timingFunction);
+			}
+			
+			return super.isEquivalent(other);
 		}
 	}
 }

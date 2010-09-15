@@ -52,7 +52,7 @@ package org.stylekit.css.value
 				}
 				else
 				{
-					plVal._properties.push(tokens[i]);
+					plVal.addProperty(tokens[i]);
 				}
 			}
 			
@@ -67,6 +67,28 @@ package org.stylekit.css.value
 			var unitPattern:RegExp = /(([a-z-]+,?))+/;
 			var unitIndex:int = str.search(unitPattern);
 			return (unitIndex == 0);
+		}
+		
+		public function addProperty(p:String):void
+		{
+			if(!this.hasProperty(p))
+			{
+				this._properties.push(p);
+				this.modified();
+			}
+		}
+		
+		public function removeProperty(p:String):void
+		{
+			if(this.hasProperty(p))
+			{
+				var i:int = this._properties.indexOf(p);
+				if(i > -1)
+				{
+					this._properties.splice(i, 1);
+					this.modified();
+				}
+			}
 		}
 		
 		public function hasProperty(p:String):Boolean
