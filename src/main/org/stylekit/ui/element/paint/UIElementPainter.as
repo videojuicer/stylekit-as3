@@ -119,7 +119,7 @@ package org.stylekit.ui.element.paint
 				{
 					if (this._backgroundBitmapData != null)
 					{
-						graphics.beginBitmapFill(this._backgroundBitmapData, null, true, true);
+						graphics.beginBitmapFill(this._backgroundBitmapData, null, false, true);
 					}
 				}
 			}
@@ -188,17 +188,40 @@ package org.stylekit.ui.element.paint
 			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
 			
 			var tempBitmapData:BitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
-			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveContentWidth, this.uiElement.effectiveContentHeight, true, backgroundColor);
+			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveWidth, this.uiElement.effectiveHeight, true, backgroundColor);
 			
 			// need to draw the image repeated and positioned like the rules above in the bitmapData object
-			var xRepeat:int = Math.round(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 0);
-			var yRepeat:int = Math.round(backgroundRepeat.verticalRepeat ? (bitmapData.height / tempBitmapData.height) : 0);
+			var xRepeat:int = Math.ceil(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 1);
+			var yRepeat:int = Math.ceil(backgroundRepeat.verticalRepeat ? (bitmapData.height / tempBitmapData.height) : 1);
+
+			var bitmapBytes:ByteArray = tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height));
 			
 			for (var y:int = 0; y < yRepeat; y++)
 			{
 				for (var x:int = 0; x < xRepeat; x++)
 				{
-					bitmapData.setPixels(new Rectangle((x * tempBitmapData.width), (y * tempBitmapData.height), tempBitmapData.width, tempBitmapData.height), tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height)));
+					bitmapBytes.position = 0;
+					
+					var width:int = ((xRepeat - 1) == x ? bitmapData.width - (tempBitmapData.width * (xRepeat - 1)) : tempBitmapData.width);
+					var height:int = ((yRepeat - 1) == y ? bitmapData.height - (tempBitmapData.height * (yRepeat - 1)) : tempBitmapData.height);
+					
+					var rect:Rectangle = new Rectangle((x * tempBitmapData.width), (y * tempBitmapData.height), width, height);
+					
+					//bitmapData.setPixels(rect, bitmapBytes);
+					
+					// starting position
+					var startX:int = tempBitmapData.width * x;
+					var startY:int = tempBitmapData.height * y;
+					
+					trace("Drawing from: "+startX+"/"+startY+" -> "+xRepeat+"/"+yRepeat);
+					
+					for (var h:int = 0; h < height; h++)
+					{
+						for (var w:int = 0; w < width; w++)
+						{
+							bitmapData.setPixel32(w + startX, h + startY, tempBitmapData.getPixel32(w, h));
+						}
+					}
 				}
 			}
 			
