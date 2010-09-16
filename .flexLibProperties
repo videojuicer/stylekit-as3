@@ -58,6 +58,7 @@
     <classEntry path="org.stylekit.events.PropertyEvent"/>
     <classEntry path="org.stylekit.css.value.CornerCompoundValue"/>
     <classEntry path="org.stylekit.ui.element.paint.UIElementPainter"/>
+    <classEntry path="org.stylekit.css.value.FloatValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

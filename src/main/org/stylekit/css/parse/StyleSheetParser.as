@@ -25,6 +25,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.CursorValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
+	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.FontCompoundValue;
 	import org.stylekit.css.value.FontStyleValue;
 	import org.stylekit.css.value.FontVariantValue;
@@ -607,6 +608,8 @@ package org.stylekit.css.parse
 						
 						property.value = edgeValue;
 						break;
+					case "float":
+						property.value = FloatValue.parse(unparsedPropertyValue);
 					case "font":
 						property.value = FontCompoundValue.parse(unparsedPropertyValue);
 						break;

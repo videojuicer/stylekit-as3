@@ -9,6 +9,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.AlignmentValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.FontStyleValue;
 	import org.stylekit.css.value.FontVariantValue;
 	import org.stylekit.css.value.FontWeightValue;
@@ -156,7 +157,7 @@ package org.stylekit.css.property
 				"top": SizeValue.parse("auto"),
 				
 				"clear": AlignmentValue.parse("none"),				
-				"float": AlignmentValue.parse("none"),
+				"float": FloatValue.parse("none"),
 				"position": PositionValue.parse("static"),
 				"text-align": AlignmentValue.parse("left"),
 				"vertical-align": AlignmentValue.parse("left"),

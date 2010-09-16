@@ -4,10 +4,11 @@ package org.stylekit.ui.element
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	
+	import flashx.textLayout.formats.Float;
 	
 	import mx.skins.Border;
-	
-	import org.utilkit.util.ObjectUtil;
 	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
@@ -17,18 +18,22 @@ package org.stylekit.ui.element
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
+	import org.stylekit.css.value.AlignmentValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
+	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.paint.UIElementPainter;
+	import org.utilkit.util.ObjectUtil;
 	
 	/**
 	 * Dispatched when the effective dimensions are changed on the UI element.
@@ -590,12 +595,34 @@ package org.stylekit.ui.element
 		{
 			var w:int = 0;
 			var h:int = 0;
+
 			/* TODO
 				Width:
 					Search children to find greatest _x + effectiveWidth
 				Height:
 					Search children to find greatest _y + effectiveHeight
 			*/
+			
+			for (var i:int = 0; i < this.children.length; i++)
+			{
+				var child:UIElement = this.children[i];
+				
+				if ((child.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_LEFT || (child.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_RIGHT)
+				{
+					continue;
+				}
+				
+				if ((child.x + child.effectiveWidth) > w)
+				{
+					w = child.x + child.effectiveWidth;
+				}
+				
+				if ((child.y + child.effectiveHeight) > h)
+				{
+					h = child.y + child.effectiveHeight;
+				}
+			}
+			
 			this.setContentDimensions(w, h);
 		}
 		
@@ -805,6 +832,7 @@ package org.stylekit.ui.element
 		
 		public function layoutChildren():void
 		{
+			// remove the children so we can start a fresh
 			for (var k:int = 0; k < this.children.length; k++)
 			{
 				if (this.children[k].parent != null)
@@ -813,7 +841,7 @@ package org.stylekit.ui.element
 					
 					if (childIndex > -1)
 					{
-						this.removeChildAt(childIndex);
+						super.removeChildAt(childIndex);
 					}
 				}
 			}
@@ -824,17 +852,57 @@ package org.stylekit.ui.element
 			point.x = (this.getStyleValue("padding-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-left-width") as SizeValue).evaluateSize(this);
 			point.y = (this.getStyleValue("padding-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-top-width") as SizeValue).evaluateSize(this);
 			
+			var leftFloats:int = 0;
+			var rightFloats:int = 0;
+			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				trace("Adding new child to UIElement content");
 				
 				var child:UIElement = this.children[i];
 				
-				child.x = point.x;
-				child.y = point.y;
+				var float:FloatValue = (child.getStyleValue("float") as FloatValue);
+				var position:PositionValue = (child.getStyleValue("position") as PositionValue);
 				
+				var x:Number = point.x;
+				var y:Number = point.y;
+				
+				if (float.float == FloatValue.FLOAT_RIGHT)
+				{
+					// position on the right, and include the space for the padding + margin + border
+					x = this.effectiveWidth - (this.getStyleValue("padding-right") as SizeValue).evaluateSize(this) - child.effectiveWidth - (this.getStyleValue("border-right-width") as SizeValue).evaluateSize(this);
+				
+					rightFloats++;
+				}
+				else if (float.float == FloatValue.FLOAT_LEFT)
+				{
+					leftFloats++;
+				}
+				
+				if (position.position == PositionValue.POSITION_ABSOLUTE)
+				{
+					if (child.getStyleValue("right") != null)
+					{
+						// position on the right, and include the space for the padding + margin + border
+						//x = this.effectiveWidth - (child.getStyleValue("right") as SizeValue).evaluateSize(this) - (this.getStyleValue("padding-right") as SizeValue).evaluateSize(this) - child.effectiveWidth - (this.getStyleValue("border-right-width") as SizeValue).evaluateSize(this);
+					}
+					
+					if (child.getStyleValue("bottom") != null)
+					{
+						// position on the bottom and include the space for the padding + margin + border
+						y = this.effectiveHeight - (this.getStyleValue("padding-bottom") as SizeValue).evaluateSize(this) - child.effectiveHeight - (this.getStyleValue("border-bottom-width") as SizeValue).evaluateSize(this);
+					}
+				}
+				
+				// move the child on the sprite
+				child.x = x;
+				child.y = y;
+				
+				// add it
 				super.addChild(child);
 			}
+			
+			this.recalculateContentDimensions();
 		}
 		
 		public function redraw():void
