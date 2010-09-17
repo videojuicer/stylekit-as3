@@ -657,7 +657,7 @@ package org.stylekit.ui.element
 			{
 				w = this.evalStyleSize("width");
 			}
-			else if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_BLOCK)
+			else if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_BLOCK) // todo also trigger if float is set
 			{
 				w = this.parentElement.effectiveContentWidth;
 			}

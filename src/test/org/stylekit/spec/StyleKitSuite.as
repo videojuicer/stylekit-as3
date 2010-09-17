@@ -29,6 +29,9 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.TextDecorationValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextTransformValueTestCase;
 	import org.stylekit.spec.tests.css.value.TimingFunctionValueTestCase;
+	import org.stylekit.spec.tests.css.value.AnimationIterationCountValueTestCase;
+	import org.stylekit.spec.tests.css.value.AnimationDirectionValueTestCase;
+	import org.stylekit.spec.tests.css.value.ValueArrayTestCase;
 	import org.stylekit.spec.tests.css.value.URLValueTestCase;
 	import org.stylekit.spec.tests.css.value.VisibilityValueTestCase;
 	import org.stylekit.spec.tests.ui.element.UIElementTestCase;
@@ -61,6 +64,11 @@ package org.stylekit.spec
 		public var fontWeightValueTest:FontWeightValueTestCase;
 		public var propertyListValueTest:PropertyListValueTestCase;
 		public var timingFunctionValueTest:TimingFunctionValueTestCase;
+		
+		public var valueArrayTest:ValueArrayTestCase;
+		
+		public var animationIterationCountValueTest:AnimationIterationCountValueTestCase;
+		public var animationDirectionValueTest:AnimationDirectionValueTestCase;
 		
 		public var backgroundCompoundValueTest:BackgroundCompoundValueTestCase;
 		public var borderCompoundValueTest:BorderCompoundValueTestCase;
