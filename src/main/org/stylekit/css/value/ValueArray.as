@@ -31,7 +31,7 @@ package org.stylekit.css.value
 		
 		public static function parse(str:String, valueClass:Class = null):ValueArray
 		{
-			if(valueClass == Null)
+			if(valueClass == null)
 			{
 				valueClass = Value;
 			} 
@@ -75,11 +75,11 @@ package org.stylekit.css.value
 				var otherVal:ValueArray = (other as ValueArray); // AS3 precompiler won't work otherwise.aaaargh.
 				for(var i:uint = 0; i < this.values.length; i++)
 				{
-					if(!this.valueAt.isEquivalent(otherVal.valueAt[i])) return false;
+					if(!this.valueAt(i).isEquivalent(otherVal.valueAt(i))) return false;
 				}
-				for(var i=0; i < otherVal.values.length; i++)
+				for(i=0; i < otherVal.values.length; i++)
 				{
-					if(!otherVal.valueAt(i).isEquivalent(this.valueAt[i])) return false;
+					if(!otherVal.valueAt(i).isEquivalent(this.valueAt(i))) return false;
 				}
 				return true;
 			}
