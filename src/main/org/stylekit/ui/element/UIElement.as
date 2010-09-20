@@ -421,6 +421,12 @@ package org.stylekit.ui.element
 			return this._elementId;
 		}
 		
+		public function set elementId(s:String):void
+		{
+			this._elementId = s;
+			this.updateStyles();
+		}
+		
 		public function get isFirstChild():Boolean
 		{
 			return (this.parentIndex == 0);

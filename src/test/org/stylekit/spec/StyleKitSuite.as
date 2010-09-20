@@ -35,7 +35,7 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.URLValueTestCase;
 	import org.stylekit.spec.tests.css.value.VisibilityValueTestCase;
 	import org.stylekit.spec.tests.ui.element.UIElementTestCase;
-
+	import org.stylekit.spec.tests.ui.element.layout.FlowControlLineTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -52,6 +52,7 @@ package org.stylekit.spec
 		public var uiElementTest:UIElementTestCase;
 		public var mediaSelectorTest:MediaSelectorTestCase;
 		public var animationTest:AnimationTestCase;
+		public var flowControlLineTest:FlowControlLineTestCase;
 		
 		public var sizeValueTest:SizeValueTestCase;
 		public var timeValueTest:TimeValueTestCase;

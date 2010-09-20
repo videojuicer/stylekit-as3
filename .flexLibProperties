@@ -31,6 +31,7 @@
     <classEntry path="org.stylekit.css.style.FontFace"/>
     <classEntry path="org.stylekit.css.style.Import"/>
     <classEntry path="org.stylekit.ui.element.UIElement"/>
+    <classEntry path="org.stylekit.ui.element.layout.FlowControlLine"/>
     <classEntry path="org.stylekit.events.UIElementEvent"/>
     <classEntry path="org.stylekit.ui.BaseUI"/>
     <classEntry path="org.stylekit.events.StyleSheetEvent"/>
