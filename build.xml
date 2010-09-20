@@ -106,7 +106,7 @@
 		<mxmlc file="${example.src.loc}/StyleKitPlayer.as" output="${bin.loc}/stylekit-as3-example.swf" static-link-runtime-shared-libraries="true">
 			<source-path path-element="${example.src.loc}" />
 			<library-path dir="${bin.loc}" append="true">
-				<include name="smilkit-as3.swc" />
+				<include name="stylekit-as3.swc" />
 			</library-path>
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
 			<compiler.headless-server>true</compiler.headless-server>
