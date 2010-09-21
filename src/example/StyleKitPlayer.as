@@ -68,10 +68,10 @@ package
 			this._baseUI.addElement(this._toolbar);
 			
 			this._toolbar.evaluatedStyles = {
-				"width": SizeValue.parse("100%"),
+				"width": SizeValue.parse("100px"),
 				"height": SizeValue.parse("20px"),
 				
-				"padding": SizeValue.parse("5px"),
+				"margin-bottom": SizeValue.parse("5px"),
 				
 				"background-color": ColorValue.parse("red")
 			};
@@ -84,7 +84,7 @@ package
 				"width": SizeValue.parse("100%"),
 				"height": SizeValue.parse("10px"),
 					
-				"padding": SizeValue.parse("5px"),
+				"margin-bottom": SizeValue.parse("5px"),
 					
 				"background-color": ColorValue.parse("green")
 			};

@@ -50,10 +50,11 @@ package org.stylekit.ui.element.layout
 		{
 			super();
 			this._flowDirection = flowDirection;
+			this._maxWidth = maxWidth;
 			
 			this._elements = new Vector.<UIElement>();
 			
-			this.setMaxWidth(maxWidth);
+			//this.setMaxWidth(maxWidth);
 		}
 		
 		public function get elements():Vector.<UIElement>
@@ -173,7 +174,7 @@ package org.stylekit.ui.element.layout
 			{
 				this._elements.push(e);
 				this._elementTotalEffectiveWidth += e.effectiveWidth;
-				this.layoutElements();
+				//this.layoutElements();
 			}
 			return added;
 		}
@@ -199,7 +200,7 @@ package org.stylekit.ui.element.layout
 			}
 
 			// when full, return remainder of the element list
-			this.layoutElements();
+			//this.layoutElements();
 			return ((addedToIndex < 0)? oldElements : oldElements.slice(addedToIndex+1));
 		}
 		
@@ -259,7 +260,7 @@ package org.stylekit.ui.element.layout
 		/*
 		* Actually performs the layout of all elements on this line.
 		*/
-		protected function layoutElements():void
+		public function layoutElements():void
 		{
 			var leftFloatXCollector:int = 0;
 			var rightFloatXCollector:int = 0;
@@ -273,7 +274,7 @@ package org.stylekit.ui.element.layout
 				// if the element is right floated, rack it up against the existing right floats
 				// if the element is inline, wait for all floats to be processed and then treat this element as a float in the flowDirection of this line.
 				
-				trace("Adding UIElement to FlowControlLine ...", e);
+				trace("Adding UIElement to FlowControlLine contents ...", e);
 				
 				super.addChild(e);
 			}
