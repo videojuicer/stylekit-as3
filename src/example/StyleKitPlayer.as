@@ -15,6 +15,7 @@ package
 	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
+	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
 	
 	/**
@@ -31,6 +32,13 @@ package
 		protected var _image:UIElement;
 		protected var _image2:UIElement;
 		
+		protected var _baseUI:BaseUI;
+		
+		protected var _toolbar:UIElement;
+		protected var _toolbar2:UIElement;
+		protected var _toolbar3:UIElement;
+		protected var _buttons:Vector.<UIElement>;
+		
 		public function StyleKitPlayer()
 		{
 			this.setupImages();
@@ -45,6 +53,61 @@ package
 			this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
 			this.graphics.endFill();
 			
+			this._baseUI = new BaseUI();
+			
+			this.addChild(this._baseUI);
+			
+			this._baseUI.evaluatedStyles = {
+				"width": SizeValue.parse("100%"),
+				"height": SizeValue.parse("80%"),
+				"background-color": ColorValue.parse("transparent")
+			};
+
+			this._toolbar = this._baseUI.createUIElement();
+			
+			this._baseUI.addElement(this._toolbar);
+			
+			this._toolbar.evaluatedStyles = {
+				"width": SizeValue.parse("100%"),
+				"height": SizeValue.parse("20px"),
+				
+				"padding": SizeValue.parse("5px"),
+				
+				"background-color": ColorValue.parse("red")
+			};
+			
+			this._toolbar2 = this._baseUI.createUIElement();
+			
+			this._baseUI.addElement(this._toolbar2);
+			
+			this._toolbar2.evaluatedStyles = {
+				"width": SizeValue.parse("100%"),
+				"height": SizeValue.parse("10px"),
+					
+				"padding": SizeValue.parse("5px"),
+					
+				"background-color": ColorValue.parse("green")
+			};
+			
+			trace("Redraw ...");
+			
+			this._baseUI.layoutChildren();
+			
+			/*
+			this._toolbar3 = this._baseUI.createUIElement();
+			
+			this._baseUI.addElement(this._toolbar3);
+			
+			this._toolbar3.evaluatedStyles = {
+				"width": SizeValue.parse("100%"),
+				"height": SizeValue.parse("10px"),
+					
+				"padding": SizeValue.parse("5px"),
+					
+				"background-color": ColorValue.parse("yellow")
+			};*/
+			
+			/*
 			this._parent = new UIElement();
 			this._parent.evaluatedStyles = {
 				"width": SizeValue.parse("820px"),
@@ -180,6 +243,7 @@ package
 			
 			this._parent.redraw();
 			this._element.redraw();
+			*/
 		}
 		
 		private static var __backgroundImage:String;

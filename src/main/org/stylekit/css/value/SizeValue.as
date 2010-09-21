@@ -109,8 +109,15 @@ package org.stylekit.css.value
 			
 			switch(this.units)
 			{
-				case SizeValue.UNIT_PERCENTAGE:				
-					baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? e.parentElement.effectiveContentWidth : e.parentElement.effectiveContentHeight;
+				case SizeValue.UNIT_PERCENTAGE:
+					if (e.parentElement == null && e.baseUI == e)
+					{
+						baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? e.parent.width : e.parent.height;
+					}
+					else
+					{
+						baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? e.parentElement.effectiveContentWidth : e.parentElement.effectiveContentHeight;
+					}
 					return baseVal * (this.value / 100);
 					break;
 				case SizeValue.UNIT_FONTSIZE:
@@ -119,12 +126,12 @@ package org.stylekit.css.value
 					
 					// Loop up the element tree, starting with the given element's parent, and use the nearest font-size style.
 					var p:UIElement = e.parentElement;
-					while(p != null && !p.hasStyleProperty("font-size"))
+					while (p != null && !p.hasStyleProperty("font-size"))
 					{
 						p = p.parentElement;
 					}
 					// At this point either p is null or we've found an item
-					if(p && p.hasStyleProperty("font-size"))
+					if (p != null && p.hasStyleProperty("font-size"))
 					{
 						baseVal = (p.getStyleValue("font-size") as SizeValue).evaluateSize(p, SizeValue.DIMENSION_HEIGHT);
 					}

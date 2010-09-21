@@ -1,17 +1,16 @@
 package org.stylekit.ui.element.layout
 {
-	import flash.display.Stage;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.errors.IllegalOperationError;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
-	import org.stylekit.ui.element.UIElement;
-	
-	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
+	import org.stylekit.css.value.Value;
+	import org.stylekit.ui.element.UIElement;
 	
 	/**
 	* A FlowControlLine is used for the purposes of line wrapping and content flow control when laying out child elements
@@ -51,8 +50,10 @@ package org.stylekit.ui.element.layout
 		{
 			super();
 			this._flowDirection = flowDirection;
-			this._maxWidth = maxWidth;
+			
 			this._elements = new Vector.<UIElement>();
+			
+			this.setMaxWidth(maxWidth);
 		}
 		
 		public function get elements():Vector.<UIElement>
@@ -115,10 +116,7 @@ package org.stylekit.ui.element.layout
 			}
 		}
 		
-		/**
-		* Attempts to append an element to the line, returning true if the element was accepted.
-		*/
-		public function appendElement(e:UIElement):Boolean
+		public function acceptableElement(e:UIElement):Boolean
 		{
 			var added:Boolean = false;
 			
@@ -160,6 +158,16 @@ package org.stylekit.ui.element.layout
 					}
 				}
 			}
+			
+			return added;
+		}
+		
+		/**
+		* Attempts to append an element to the line, returning true if the element was accepted.
+		*/
+		public function appendElement(e:UIElement):Boolean
+		{
+			var added:Boolean = this.acceptableElement(e);
 			
 			if(added) 
 			{
@@ -255,13 +263,19 @@ package org.stylekit.ui.element.layout
 		{
 			var leftFloatXCollector:int = 0;
 			var rightFloatXCollector:int = 0;
+			
 			for(var i:uint = 0; i < this._elements.length; i++)
 			{
 				var e:UIElement = this._elements[i];
+				
 				// if the element is a block, give it 0,0
 				// if the element is left floated, rack it up against the existing left floats
 				// if the element is right floated, rack it up against the existing right floats
 				// if the element is inline, wait for all floats to be processed and then treat this element as a float in the flowDirection of this line.
+				
+				trace("Adding UIElement to FlowControlLine ...", e);
+				
+				super.addChild(e);
 			}
 		}
 		

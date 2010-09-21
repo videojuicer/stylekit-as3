@@ -3,6 +3,7 @@ package org.stylekit.ui.element
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
+	import flash.errors.StackOverflowError;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
@@ -32,6 +33,7 @@ package org.stylekit.ui.element
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
+	import org.stylekit.ui.element.layout.FlowControlLine;
 	import org.stylekit.ui.element.paint.UIElementPainter;
 	import org.utilkit.util.ObjectUtil;
 	
@@ -151,6 +153,8 @@ package org.stylekit.ui.element
 		protected var _elementClassNames:Vector.<String>;
 		protected var _elementPseudoClasses:Vector.<String>;
 		
+		protected var _controlLines:Vector.<FlowControlLine>;
+		
 		protected var _painter:UIElementPainter;
 		
 		public function UIElement(baseUI:BaseUI = null)
@@ -161,6 +165,7 @@ package org.stylekit.ui.element
 			this.evaluatedStyles = {};
 			
 			this._children = new Vector.<UIElement>();
+			this._controlLines = new Vector.<FlowControlLine>();
 			
 			this._elementClassNames = new Vector.<String>();
 			this._elementPseudoClasses = new Vector.<String>();
@@ -240,6 +245,18 @@ package org.stylekit.ui.element
 			this._effectiveHeight = e;
 			
 			if(dispatch) this.onEffectiveDimensionsModified();
+		}
+		
+		/**
+		 * The <code>FlowControlLine</code>s used to layout the contents of the <code>UIElement</code>.
+		 * 
+		 * Should not be used to access the contents of the <code>UIElement</code> as the <code>Vector</code>
+		 * could be empty (even with children present) or change completely on the next paint operation as the line
+		 * content will change if the <code>UIElement</code> has its dimensions modified.
+		 */
+		public function get controlLines():Vector.<FlowControlLine>
+		{
+			return this._controlLines;
 		}
 		
 		/**
@@ -696,6 +713,8 @@ package org.stylekit.ui.element
 		*/
 		protected function onEffectiveContentDimensionsModified():void
 		{
+			this._controlLines = null;
+			
 			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
@@ -836,76 +855,76 @@ package org.stylekit.ui.element
 			return false;
 		}
 		
-		public function layoutChildren():void
+		protected function refreshControlLines():void
 		{
-			// remove the children so we can start a fresh
-			for (var k:int = 0; k < this.children.length; k++)
-			{
-				if (this.children[k].parent != null)
-				{
-					var childIndex:int = this.getChildIndex(this.children[k]);
-					
-					if (childIndex > -1)
-					{
-						super.removeChildAt(childIndex);
-					}
-				}
-			}
+			this._controlLines = new Vector.<FlowControlLine>();
 			
-			var point:Point = new Point();
-			
-			// this is always our starting point of our content
-			point.x = (this.getStyleValue("padding-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-left") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-left-width") as SizeValue).evaluateSize(this);
-			point.y = (this.getStyleValue("padding-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-top-width") as SizeValue).evaluateSize(this);
-			
-			var leftFloats:int = 0;
-			var rightFloats:int = 0;
+			var previous:FlowControlLine = null;
+			var textAlign:AlignmentValue = (this.getStyleValue("text-align") as AlignmentValue);
 			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
-				trace("Adding new child to UIElement content");
-				
 				var child:UIElement = this.children[i];
 				
-				var float:FloatValue = (child.getStyleValue("float") as FloatValue);
-				var position:PositionValue = (child.getStyleValue("position") as PositionValue);
-				
-				var x:Number = point.x;
-				var y:Number = point.y;
-				
-				if (float.float == FloatValue.FLOAT_RIGHT)
+				if (previous == null || !previous.acceptableElement(child))
 				{
-					// position on the right, and include the space for the padding + margin + border
-					x = this.effectiveWidth - (this.getStyleValue("padding-right") as SizeValue).evaluateSize(this) - child.effectiveWidth - (this.getStyleValue("border-right-width") as SizeValue).evaluateSize(this);
-				
-					rightFloats++;
-				}
-				else if (float.float == FloatValue.FLOAT_LEFT)
-				{
-					leftFloats++;
-				}
-				
-				if (position.position == PositionValue.POSITION_ABSOLUTE)
-				{
-					if (child.getStyleValue("right") != null)
+					do
 					{
-						// position on the right, and include the space for the padding + margin + border
-						//x = this.effectiveWidth - (child.getStyleValue("right") as SizeValue).evaluateSize(this) - (this.getStyleValue("padding-right") as SizeValue).evaluateSize(this) - child.effectiveWidth - (this.getStyleValue("border-right-width") as SizeValue).evaluateSize(this);
-					}
+						previous = new FlowControlLine(this.effectiveContentWidth, (textAlign.leftAlign ? "left" : (textAlign.rightAlign ? "right" : "left")));
 					
-					if (child.getStyleValue("bottom") != null)
-					{
-						// position on the bottom and include the space for the padding + margin + border
-						y = this.effectiveHeight - (this.getStyleValue("padding-bottom") as SizeValue).evaluateSize(this) - child.effectiveHeight - (this.getStyleValue("border-bottom-width") as SizeValue).evaluateSize(this);
+						this._controlLines.push(previous);
+						
+						var b:Boolean = previous.widthAvailableForElement(child);
+						var a:Boolean = previous.acceptableElement(child);
 					}
+					while (!previous.acceptableElement(child));
 				}
 				
-				// move the child on the sprite
-				child.x = x;
-				child.y = y;
+				var result:Boolean = previous.appendElement(child);
 				
-				// add it
-				super.addChild(child);
+				if (!result)
+				{
+					throw new StackOverflowError("Found a FlowControlLine that isnt able to accept our UIElement after exhausting the stack of lines");
+				}
+			}
+			
+			trace("Added "+this._controlLines.length+" control lines");
+		}
+		
+		public function layoutChildren():void
+		{
+			for (var k:int = 0; k < super.numChildren; k++)
+			{
+				super.removeChildAt(i);
+			}
+			
+			if (this.controlLines == null || this.controlLines.length != this.numChildren)
+			{
+				this.refreshControlLines();
+			}
+			
+			if (this.controlLines != null)
+			{
+				// only we do now is stack the FlowControlLines onto the UIElements content space
+				// the FlowControlLines take care of laying out the indiviual UIElement children.
+				
+				// as were only dealing with lines all we need to do is stack the lines one by one
+				// with each line taking up the entire width, so we only need to think about stacking
+				// the lines with there height.
+				var y:Number = (this.getStyleValue("padding-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-top-width") as SizeValue).evaluateSize(this);
+				
+				for (var i:int = 0; i < this.controlLines.length; i++)
+				{
+					var line:FlowControlLine = this.controlLines[i];
+					
+					line.y = y;
+					
+					trace("Adding FlowControlLine at "+y);
+					
+					y += line.lineHeight * 100;
+					
+					super.addChild(line);
+				}
 			}
 			
 			this.recalculateContentDimensions();
@@ -1083,8 +1102,11 @@ package org.stylekit.ui.element
 					
 					value = radius;
 					break;
+				case "font-size":
+					value = this._evaluatedStyles[propertyName];
+					break;
 				default:
-					value = this._evaluatedStyles[propertyName]
+					value = this._evaluatedStyles[propertyName];
 					break;
 			}
 			
@@ -1185,6 +1207,9 @@ package org.stylekit.ui.element
 			}
 			// Setter carries the comparison check and event dispatch
 			this.evaluatedStyles = newEvaluatedStyles;
+			
+			// reset our control lines
+			this._controlLines = null;
 		}
 		
 		public function matchesElementSelector(selector:ElementSelector):Boolean
