@@ -918,10 +918,11 @@ package org.stylekit.ui.element
 					var line:FlowControlLine = this.controlLines[i];
 					
 					line.y = y;
+					line.layoutElements();
 					
 					trace("Adding FlowControlLine at "+y);
 					
-					y += line.lineHeight * 100;
+					y += line.lineHeight;
 					
 					super.addChild(line);
 				}
@@ -939,7 +940,7 @@ package org.stylekit.ui.element
 		{
 			this._parentIndex = index;
 			
-			this.updateStyles();
+			//this.updateStyles();
 		}
 		
 		protected function updateChildrenIndex():void
@@ -1116,6 +1117,7 @@ package org.stylekit.ui.element
 		public function updateStyles():void
 		{
 			// TODO remove listeners
+			// BUG: somewhere here the evalulatedStyles on the UIElement are reset to the defaults
 			
 			this._styles = new Vector.<Style>();
 			this._styleSelectors = new Vector.<ElementSelectorChain>();
