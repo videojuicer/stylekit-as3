@@ -47,6 +47,9 @@
     <classEntry path="org.stylekit.css.value.TimingFunctionValue"/>
     <classEntry path="org.stylekit.css.value.AnimationIterationCountValue"/>
     <classEntry path="org.stylekit.css.value.AnimationDirectionValue"/>
+    <classEntry path="org.stylekit.css.value.TimeValue"/>
+    <classEntry path="org.stylekit.css.value.AnimationCompoundValue"/>
+    <classEntry path="org.stylekit.css.value.TransitionCompoundValue"/>
     <classEntry path="org.stylekit.css.value.InheritValue"/>
     <classEntry path="org.stylekit.css.value.ValueArray"/>
     <classEntry path="org.stylekit.spec.tests.css.property.PropertyTestCase"/>

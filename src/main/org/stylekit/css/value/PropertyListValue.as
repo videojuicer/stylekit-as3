@@ -2,6 +2,7 @@ package org.stylekit.css.value
 {
 	
 	import org.utilkit.util.StringUtil;
+	import org.stylekit.css.property.PropertyContainer;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.parse.ValueParser;
 	
@@ -11,13 +12,32 @@ package org.stylekit.css.value
 		public static var METAPROPERTY_ALL:String = "all";
 		public static var METAPROPERTY_NONE:String = "none";
 		
+		public static var defaultStyles:Object;
+		
 		public var _properties:Vector.<String>;
 		public var _all:Boolean = false;
+		
+		
 		
 		public function PropertyListValue()
 		{
 			super();
 			this._properties = new Vector.<String>();
+		}
+		
+		public static function newInitialValue():PropertyListValue
+		{
+			var pl:PropertyListValue = new PropertyListValue();
+				pl._all = true;
+			return pl;
+		}
+		
+		public static function getDefaults():void
+		{
+			if(PropertyListValue.defaultStyles == null)
+			{
+				PropertyListValue.defaultStyles = PropertyContainer.defaultStyles;
+			}
 		}
 		
 		public function get properties():Vector.<String>
@@ -32,6 +52,7 @@ package org.stylekit.css.value
 		
 		public static function parse(str:String):PropertyListValue
 		{
+			PropertyListValue.getDefaults();
 			str = StringUtil.trim(str.toLowerCase());
 			var plVal:PropertyListValue = new PropertyListValue();
 				plVal.rawValue = str;
@@ -61,12 +82,20 @@ package org.stylekit.css.value
 		
 		public static function identify(str:String):Boolean
 		{
+			PropertyListValue.getDefaults();
 			str = StringUtil.trim(str.toLowerCase());
 				
 			var tokens:Vector.<String> = ValueParser.parseCommaDelimitedString(str);
-			var unitPattern:RegExp = /(([a-z-]+,?))+/;
-			var unitIndex:int = str.search(unitPattern);
-			return (unitIndex == 0);
+			for(var i:uint=0; i<tokens.length; i++)
+			{
+				var t:String = tokens[i];
+				if(t == PropertyListValue.METAPROPERTY_ALL || t == PropertyListValue.METAPROPERTY_NONE || PropertyListValue.defaultStyles.hasOwnProperty(t))
+				{
+					return true;
+				}
+			}
+			
+			return false;
 		}
 		
 		public function addProperty(p:String):void

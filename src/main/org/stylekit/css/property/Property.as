@@ -12,6 +12,8 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.FontCompoundValue;
 	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
+	import org.stylekit.css.value.AnimationCompoundValue;
+	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.PropertyEvent;
@@ -188,6 +190,26 @@ package org.stylekit.css.property
 					mergePropertyWithImportance(mergeParent, ["list-style-position"], listValue.positionValue, importance);
 					mergePropertyWithImportance(mergeParent, ["list-style-image"], listValue.urlValue, importance);
 					
+					break;
+				case "transition":
+					var tValue:TransitionCompoundValue = (val as TransitionCompoundValue);
+				
+					mergePropertyWithImportance(mergeParent, ["transition-property"], tValue.transitionPropertyValue, importance);
+					mergePropertyWithImportance(mergeParent, ["transition-duration"], tValue.transitionDurationValue, importance);
+					mergePropertyWithImportance(mergeParent, ["transition-delay"], tValue.transitionDelayValue, importance);
+					mergePropertyWithImportance(mergeParent, ["transition-timing-function"], tValue.transitionTimingFunctionValue, importance);
+				
+					break;
+				case "animation":
+					var aValue:AnimationCompoundValue = (val as AnimationCompoundValue);
+				
+					mergePropertyWithImportance(mergeParent, ["animation-name"], aValue.animationNameValue, importance);
+					mergePropertyWithImportance(mergeParent, ["animation-duration"], aValue.animationDurationValue, importance);
+					mergePropertyWithImportance(mergeParent, ["animation-timing-function"], aValue.animationTimingFunctionValue, importance);
+					mergePropertyWithImportance(mergeParent, ["animation-delay"], aValue.animationDelayValue, importance);
+					mergePropertyWithImportance(mergeParent, ["animation-iteration-count"], aValue.animationIterationCountValue, importance);
+					mergePropertyWithImportance(mergeParent, ["animation-direction"], aValue.animationDirectionValue, importance);
+				
 					break;
 				default:
 					mergePropertyWithImportance(mergeParent, [this.name], val, importance);
