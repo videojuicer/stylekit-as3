@@ -29,6 +29,10 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.TransitionCompoundValue;
+	import org.stylekit.css.value.AnimationCompoundValue;
+	import org.stylekit.css.value.PropertyListValue;
+	import org.stylekit.css.value.ValueArray;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
@@ -1102,6 +1106,27 @@ package org.stylekit.ui.element
 					radius.topLeftValue = this.getStyleValue("border-top-left-radius") as SizeValue;
 					
 					value = radius;
+					break;
+				case "animation":
+					var anim:AmimationCompoundValue = new AnimationCompoundValue();
+					
+					anim.animationNameValue = this.getStyleValue("animation-name") as ValueArray;
+					anim.animationDurationValue = this.getStyleValue("animation-duration") as ValueArray;
+					anim.animationTimingFunctionValue = this.getStyleValue("animation-timing-function") as ValueArray;
+					anim.animationDelayValue = this.getStyleValue("animation-delay") as ValueArray;
+					anim.animationIterationCountValue = this.getStyleValue("animation-iteration-count") as ValueArray;
+					anim.animationDirectionValue = this.getStyleValue("animation-direction") as ValueArray;
+				
+					value = anim;
+					break;
+				case "transition":
+					var tran:TransitionCompoundValue = new TransitionCompoundValue();
+					
+					tran.transitionPropertyValue = this.getStyleValue("transition-property") as PropertyListValue;
+					tran.transitionDurationValue = this.getStyleValue("transition-duration") as ValueArray;
+					tran.transitionTimingFunctionValue = this.getStyleValue("transition-timing-function") as ValueArray;
+					tran.transitionDelayValue = this.getStyleValue("transition-delay") as ValueArray;
+				
 					break;
 				case "font-size":
 					value = this._evaluatedStyles[propertyName];

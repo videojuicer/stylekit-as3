@@ -44,6 +44,14 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.URLValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.VisibilityValue;
+	import org.stylekit.css.value.TimeValue;
+	import org.stylekit.css.value.TimingFunctionValue;
+	import org.stylekit.css.value.AnimationIterationCountValue;
+	import org.stylekit.css.value.AnimationDirectionValue;
+	import org.stylekit.css.value.AnimationCompoundValue;
+	import org.stylekit.css.value.TransitionCompoundValue;
+	import org.stylekit.css.value.ValueArray;
+	import org.stylekit.css.value.PropertyListValue;
 	import org.utilkit.logger.Logger;
 	import org.utilkit.util.StringUtil;
 	
@@ -664,6 +672,24 @@ package org.stylekit.css.parse
 					case "list-style-image":
 						property.value = URLValue.parse(unparsedPropertyValue);
 						break;
+					case "animation":
+						property.value = AnimationCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "animation-name":
+						property.value = ValueArray.parse(unparsedPropertyValue, Value)
+						break;
+					case "animation-iteration-count":
+						property.value = ValueArray.parse(unparsedPropertyValue, AnimationIterationCountValue)
+						break;
+					case "animation-direction":
+						property.value = ValueArray.parse(unparsedPropertyValue, AnimationDirectionValue)
+						break;
+					case "transition":
+						property.value = TransitionCompoundValue(unparsedPropertyValue);
+						break;
+					case "transition-property":
+						property.value = PropertyListValue.parse(unparsedPropertyValue);
+						break;
 					default:
 						// overflow, overflow-x, overflow-y, text-overflow
 						if (propN.indexOf("overflow") > -1)
@@ -688,6 +714,14 @@ package org.stylekit.css.parse
 						else if (propN.indexOf("width") > -1 || propN.indexOf("height") > -1)
 						{
 							property.value = SizeValue.parse(unparsedPropertyValue);
+						}
+						else if(propN.indexOf("delay") > -1 || propN.indexOf("duration") > -1)
+						{
+							property.value = ValueArray.parse(unparsedPropertyValue, TimeValue);
+						}
+						else if(propN.indexOf("timing-function") > -1)
+						{
+							property.value = ValueArray.parse(unparsedPropertyValue, TimingFunctionValue);
 						}
 						else
 						{
