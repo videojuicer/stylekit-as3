@@ -110,7 +110,7 @@ package org.stylekit.css.value
 			switch(this.units)
 			{
 				case SizeValue.UNIT_PERCENTAGE:
-					if (e.parentElement == null && e.baseUI == e)
+					if (e.baseUI == e)
 					{
 						baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? e.parent.width : e.parent.height;
 					}

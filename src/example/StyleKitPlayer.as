@@ -9,6 +9,7 @@ package
 	import org.osmf.utils.URL;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
+	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.PositionValue;
@@ -60,7 +61,8 @@ package
 			this._baseUI.evaluatedStyles = {
 				"width": SizeValue.parse("100%"),
 				"height": SizeValue.parse("80%"),
-				"background-color": ColorValue.parse("transparent")
+				"background-color": ColorValue.parse("transparent"),
+				"padding-top": SizeValue.parse("0px")
 			};
 
 			this._toolbar = this._baseUI.createUIElement();
@@ -68,10 +70,12 @@ package
 			this._baseUI.addElement(this._toolbar);
 			
 			this._toolbar.evaluatedStyles = {
-				"width": SizeValue.parse("100px"),
-				"height": SizeValue.parse("20px"),
+				"display": DisplayValue.parse("inline"),
+				"width": SizeValue.parse("200px"),
+				"height": SizeValue.parse("40px"),
 				
 				"margin-bottom": SizeValue.parse("5px"),
+				"margin-left": SizeValue.parse("5px"),
 				
 				"background-color": ColorValue.parse("red")
 			};
@@ -81,31 +85,32 @@ package
 			this._baseUI.addElement(this._toolbar2);
 			
 			this._toolbar2.evaluatedStyles = {
-				"width": SizeValue.parse("100%"),
-				"height": SizeValue.parse("10px"),
+				"display": DisplayValue.parse("inline"),
+				"width": SizeValue.parse("200px"),
+				"height": SizeValue.parse("40px"),
+				"float": FloatValue.parse("right"),
 					
 				"margin-bottom": SizeValue.parse("5px"),
+				"margin-left": SizeValue.parse("5px"),
 					
+				"background-color": ColorValue.parse("yellow")
+			};
+			
+			this._toolbar3 = this._baseUI.createUIElement();
+			
+			this._baseUI.addElement(this._toolbar3);
+			
+			this._toolbar3.evaluatedStyles = {
+				"display": DisplayValue.parse("block"),
+				"width": SizeValue.parse("100%"),
+				"height": SizeValue.parse("40px"),
+				"margin-left": SizeValue.parse("5px"),
 				"background-color": ColorValue.parse("green")
 			};
 			
 			trace("Redraw ...");
 			
 			this._baseUI.layoutChildren();
-			
-			/*
-			this._toolbar3 = this._baseUI.createUIElement();
-			
-			this._baseUI.addElement(this._toolbar3);
-			
-			this._toolbar3.evaluatedStyles = {
-				"width": SizeValue.parse("100%"),
-				"height": SizeValue.parse("10px"),
-					
-				"padding": SizeValue.parse("5px"),
-					
-				"background-color": ColorValue.parse("yellow")
-			};*/
 			
 			/*
 			this._parent = new UIElement();

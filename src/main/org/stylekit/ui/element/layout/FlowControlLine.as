@@ -7,8 +7,10 @@ package org.stylekit.ui.element.layout
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
+	import org.stylekit.css.value.AlignmentValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
+	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.ui.element.UIElement;
 	
@@ -52,6 +54,7 @@ package org.stylekit.ui.element.layout
 			this._flowDirection = flowDirection;
 			this._maxWidth = maxWidth;
 			
+			this._occupiedByBlockElement = false;
 			this._elements = new Vector.<UIElement>();
 			
 			//this.setMaxWidth(maxWidth);
@@ -123,11 +126,11 @@ package org.stylekit.ui.element.layout
 			
 			if(this.treatElementAsNonFloatedBlock(e))
 			{
-				if(this._occupiedByBlockElement == false)
+				if(this._occupiedByBlockElement == false && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
 				{
 					// BLOCK ELEMS
 					added = true;
-					this._occupiedByBlockElement = true;
+					//this._occupiedByBlockElement = true;
 				}
 			}
 			else if(this._occupiedByBlockElement == false)
@@ -138,7 +141,7 @@ package org.stylekit.ui.element.layout
 					if(this.widthAvailableForElement(e))
 					{
 						added = true;
-						this._leftFloatElementCount++;
+						//this._leftFloatElementCount++;
 					}
 				}
 				else if(this.treatElementAsRightFloat(e))
@@ -147,7 +150,7 @@ package org.stylekit.ui.element.layout
 					if(this.widthAvailableForElement(e))
 					{
 						added = true;
-						this._rightFloatElementCount++;
+						//this._rightFloatElementCount++;
 					}
 				}
 				else
@@ -170,12 +173,35 @@ package org.stylekit.ui.element.layout
 		{
 			var added:Boolean = this.acceptableElement(e);
 			
-			if(added) 
+			if (added)
 			{
+				if(this.treatElementAsNonFloatedBlock(e))
+				{
+					if(this._occupiedByBlockElement == false && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
+					{
+						// BLOCK ELEMS
+						this._occupiedByBlockElement = true;
+					}
+				}
+				else if(this._occupiedByBlockElement == false)
+				{
+					if(this.treatElementAsLeftFloat(e))
+					{
+						// LEFT FLOATS
+						this._leftFloatElementCount++;
+					}
+					else if(this.treatElementAsRightFloat(e))
+					{
+						// RIGHT FLOATS
+						this._rightFloatElementCount++;
+					}
+				}
+
 				this._elements.push(e);
 				this._elementTotalEffectiveWidth += e.effectiveWidth;
 				//this.layoutElements();
 			}
+			
 			return added;
 		}
 		
@@ -265,6 +291,9 @@ package org.stylekit.ui.element.layout
 			var leftFloatXCollector:int = 0;
 			var rightFloatXCollector:int = 0;
 			
+			var leftEdgeCollector:int = 0;
+			var rightEdgeCollector:int = 0;
+			
 			for(var i:uint = 0; i < this._elements.length; i++)
 			{
 				var e:UIElement = this._elements[i];
@@ -273,6 +302,48 @@ package org.stylekit.ui.element.layout
 				// if the element is left floated, rack it up against the existing left floats
 				// if the element is right floated, rack it up against the existing right floats
 				// if the element is inline, wait for all floats to be processed and then treat this element as a float in the flowDirection of this line.
+				
+				var displayValue:DisplayValue = (e.getStyleValue("display") as DisplayValue);
+				var floatValue:FloatValue = (e.getStyleValue("float") as FloatValue);
+				
+				if (floatValue.float == FloatValue.FLOAT_LEFT)
+				{
+					e.x = leftFloatXCollector;
+					
+					leftFloatXCollector += e.effectiveWidth;
+				}
+				else if (floatValue.float == FloatValue.FLOAT_RIGHT)
+				{
+					e.x = (this._maxWidth - e.effectiveWidth - rightFloatXCollector);
+					
+					rightFloatXCollector += e.effectiveWidth;
+				}
+				else
+				{
+					if (displayValue.display == DisplayValue.DISPLAY_BLOCK)
+					{
+						e.x = leftFloatXCollector;
+						e.y = 0;
+						
+						leftEdgeCollector += e.effectiveWidth;
+					}
+					else if (displayValue.display == DisplayValue.DISPLAY_INLINE)
+					{
+						if (this._flowDirection == "right")
+						{
+							e.x = (this._maxWidth - rightEdgeCollector);
+							
+							rightEdgeCollector += e.effectiveWidth;
+						}
+						else
+						{
+							e.x = leftEdgeCollector;
+							
+							leftEdgeCollector += e.effectiveWidth;
+						}
+					}
+				}
+
 				
 				trace("Adding UIElement to FlowControlLine contents ...", e);
 				
