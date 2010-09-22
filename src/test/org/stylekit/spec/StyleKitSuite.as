@@ -34,6 +34,8 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.ValueArrayTestCase;
 	import org.stylekit.spec.tests.css.value.URLValueTestCase;
 	import org.stylekit.spec.tests.css.value.VisibilityValueTestCase;
+	import org.stylekit.spec.tests.css.value.TransitionCompoundValueTestCase;
+	import org.stylekit.spec.tests.css.value.AnimationCompoundValueTestCase;
 	import org.stylekit.spec.tests.ui.element.UIElementTestCase;
 	import org.stylekit.spec.tests.ui.element.layout.FlowControlLineTestCase;
 	
@@ -74,6 +76,8 @@ package org.stylekit.spec
 		public var backgroundCompoundValueTest:BackgroundCompoundValueTestCase;
 		public var borderCompoundValueTest:BorderCompoundValueTestCase;
 		public var fontCompoundValueTest:FontCompoundValueTestCase;
+		public var animationCompoundValueTest:AnimationCompoundValueTestCase;
+		public var transitionCompoundValueTest:TransitionCompoundValueTestCase;
 		
 		public var visibilityValueTest:VisibilityValueTestCase;
 		public var textTransformValueTest:TextTransformValueTestCase;

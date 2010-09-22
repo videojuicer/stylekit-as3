@@ -23,6 +23,13 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.TextTransformValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.VisibilityValue;
+	import org.stylekit.css.value.ValueArray;
+	import org.stylekit.css.value.TimingFunctionValue;
+	import org.stylekit.css.value.PropertyListValue;
+	import org.stylekit.css.value.TimeValue;
+	import org.stylekit.css.value.AnimationIterationCountValue;
+	import org.stylekit.css.value.AnimationDirectionValue;
+	
 	import org.stylekit.events.PropertyContainerEvent;
 	import org.stylekit.events.PropertyEvent;
 	import org.stylekit.ui.element.UIElement;
@@ -209,11 +216,22 @@ package org.stylekit.css.property
 				"padding-bottom": SizeValue.parse("0"),
 				"padding-top": SizeValue.parse("0"),
 				
-				"z-index": SizeValue.parse("auto")
+				"z-index": SizeValue.parse("auto"),
 				
 				// transitions
+				"transition-timing-function": 	ValueArray.parse("ease", TimingFunctionValue),
+				"transition-property": 			PropertyListValue.newInitialValue(), // avoids recursive call to this method
+				"transition-duration": 			ValueArray.parse("0s", TimeValue),
+				"transition-delay": 			ValueArray.parse("0s", TimeValue),
 				
 				// animations
+				"animation-name": 				null,
+				"animation-duration": 			ValueArray.parse("0s", TimeValue),
+				"animation-delay": 				ValueArray.parse("0s", TimeValue),
+				"animation-timing-function": 	ValueArray.parse("ease", TimingFunctionValue),
+				"animation-iteration-count": 	ValueArray.parse("1", AnimationIterationCountValue),
+				"animation-direction": 			ValueArray.parse("normal", AnimationDirectionValue),
+				"animation-play-state": 		ValueArray.parse("running")
 			};
 			
 			return defaults;

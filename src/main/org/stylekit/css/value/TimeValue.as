@@ -83,7 +83,7 @@ package org.stylekit.css.value
 					return this.value * 60 * 60 * 1000;
 					break;
 			}
-			return 0;
+			return this.value;
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

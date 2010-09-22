@@ -12,10 +12,12 @@ package org.stylekit.css.value
 	{
 		
 		protected var _values:Vector.<Value>;
+		protected var _valueClass:Class;
 		
-		public function ValueArray()
+		public function ValueArray(valueClass:Class = null)
 		{
 			super();
+			this._valueClass = valueClass;
 			this._values = new Vector.<Value>();
 		}
 		
@@ -37,6 +39,7 @@ package org.stylekit.css.value
 			} 
 			str = StringUtil.trim(str.toLowerCase());
 			var val:ValueArray = new ValueArray();
+				val._valueClass = valueClass;
 				
 				var tokens:Vector.<String> = ValueParser.parseCommaDelimitedString(str);
 				for(var i:uint; i < tokens.length; i++)
@@ -45,6 +48,15 @@ package org.stylekit.css.value
 				}
 				
 			return val;
+		}
+		
+		public function andParse(str:String):void
+		{
+			str = StringUtil.trim(str.toLowerCase());
+			if(this._valueClass == Value || this._valueClass.identify(str))
+			{
+				this._values.push(this._valueClass.parse(str));
+			}
 		}
 		
 		public function valueAt(index:uint):Value
