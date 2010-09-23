@@ -38,6 +38,7 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.AnimationCompoundValueTestCase;
 	import org.stylekit.spec.tests.ui.element.UIElementTestCase;
 	import org.stylekit.spec.tests.ui.element.layout.FlowControlLineTestCase;
+	import org.stylekit.spec.tests.ui.element.worker.TransitionWorkerTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -88,5 +89,7 @@ package org.stylekit.spec
 		
 		public var displayValueTest:DisplayValueTestCase;
 		public var cursorValueTest:CursorValueTestCase;
+		
+		public var transitionWorkerTest:TransitionWorkerTestCase;
 	}
 }
