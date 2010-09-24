@@ -13,6 +13,7 @@ package org.stylekit.events
 		public function TransitionWorkerEvent(type:String, value:Value, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
+			this._value = value;
 		}
 		
 		public function get value():Value
