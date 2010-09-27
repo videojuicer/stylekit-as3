@@ -18,6 +18,9 @@ package org.stylekit.css.parse
 	import org.stylekit.css.style.FontFace;
 	import org.stylekit.css.style.Import;
 	import org.stylekit.css.style.Style;
+	import org.stylekit.css.value.AnimationCompoundValue;
+	import org.stylekit.css.value.AnimationDirectionValue;
+	import org.stylekit.css.value.AnimationIterationCountValue;
 	import org.stylekit.css.value.BackgroundCompoundValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
@@ -35,23 +38,21 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.ListStylePositionValue;
 	import org.stylekit.css.value.ListStyleTypeValue;
+	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.OverflowValue;
 	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.TextDecorationValue;
 	import org.stylekit.css.value.TextTransformValue;
-	import org.stylekit.css.value.URLValue;
-	import org.stylekit.css.value.Value;
-	import org.stylekit.css.value.VisibilityValue;
 	import org.stylekit.css.value.TimeValue;
 	import org.stylekit.css.value.TimingFunctionValue;
-	import org.stylekit.css.value.AnimationIterationCountValue;
-	import org.stylekit.css.value.AnimationDirectionValue;
-	import org.stylekit.css.value.AnimationCompoundValue;
 	import org.stylekit.css.value.TransitionCompoundValue;
+	import org.stylekit.css.value.URLValue;
+	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
-	import org.stylekit.css.value.PropertyListValue;
+	import org.stylekit.css.value.VisibilityValue;
 	import org.utilkit.logger.Logger;
 	import org.utilkit.util.StringUtil;
 	
@@ -647,6 +648,9 @@ package org.stylekit.css.parse
 						break;
 					case "cursor":
 						property.value = CursorValue.parse(unparsedPropertyValue);
+						break;
+					case "opacity":
+						property.value = NumericValue.parse(unparsedPropertyValue);
 						break;
 					case "visibility":
 						property.value = VisibilityValue.parse(unparsedPropertyValue);

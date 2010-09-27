@@ -7,6 +7,8 @@ package org.stylekit.css.property
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.property.Property;
 	import org.stylekit.css.value.AlignmentValue;
+	import org.stylekit.css.value.AnimationDirectionValue;
+	import org.stylekit.css.value.AnimationIterationCountValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
@@ -14,22 +16,20 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.FontVariantValue;
 	import org.stylekit.css.value.FontWeightValue;
 	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.OverflowValue;
 	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.TextDecorationValue;
 	import org.stylekit.css.value.TextTransformValue;
-	import org.stylekit.css.value.Value;
-	import org.stylekit.css.value.VisibilityValue;
-	import org.stylekit.css.value.ValueArray;
-	import org.stylekit.css.value.TimingFunctionValue;
-	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.TimeValue;
-	import org.stylekit.css.value.AnimationIterationCountValue;
-	import org.stylekit.css.value.AnimationDirectionValue;
-	
+	import org.stylekit.css.value.TimingFunctionValue;
+	import org.stylekit.css.value.Value;
+	import org.stylekit.css.value.ValueArray;
+	import org.stylekit.css.value.VisibilityValue;
 	import org.stylekit.events.PropertyContainerEvent;
 	import org.stylekit.events.PropertyEvent;
 	import org.stylekit.ui.element.UIElement;
@@ -174,6 +174,7 @@ package org.stylekit.css.property
 				"display": DisplayValue.parse("inline"),
 				"color": ColorValue.parse("#000000"),
 				"visibility": VisibilityValue.parse("visible"),
+				"opacity": NumericValue.parse("1.0"),
 				
 				// font
 				"font-family": Value.parse("sans-serif"),
