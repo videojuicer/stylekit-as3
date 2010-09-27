@@ -7,6 +7,7 @@ package org.stylekit.ui.element.worker
 	// tweenables
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.NumericValue;
 	
 	// events
 	import org.stylekit.events.TransitionWorkerEvent;
@@ -192,6 +193,19 @@ package org.stylekit.ui.element.worker
 					
 					this._intermediateValue = iSizeVal;
 					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iSizeVal));
+				}
+				else if((this._initialValue is NumericValue) && (this._endValue is NumericValue))
+				{
+					var iNumVal:NumericValue = new NumericValue();
+					
+						// calcualte intermediate size value
+						var startVal:Number = (this._initialValue as NumericValue).value;
+						var endVal:Number = (this._endValue as SizeValue).value;
+					
+					iNumVal.value = startVal+((endVal-startVal)*tValue);
+				
+					this._intermediateValue = iNumVal;
+					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iNumVal));
 				}
 				else
 				{
