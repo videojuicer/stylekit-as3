@@ -5,8 +5,16 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.events.TextEvent;
+	import flash.text.TextField;
+	import flash.text.TextFieldType;
 	
 	import org.osmf.utils.URL;
+	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.DisplayValue;
@@ -39,6 +47,47 @@ package
 		protected var _toolbar2:UIElement;
 		protected var _toolbar3:UIElement;
 		protected var _buttons:Vector.<UIElement>;
+		protected var _button:UIElement;
+		
+		protected var _textField:TextField;
+		
+		protected function onStageResize(e:Event):void
+		{
+			
+			trace("StyleKitPlayer - Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
+			
+			this.graphics.clear();
+			
+			this.graphics.beginFill(0x000000, 0.1);
+			this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+			this.graphics.endFill();
+			
+			trace("StyleKitPlayer - Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
+		}
+		
+		protected function onTextInput(e:TextEvent):void
+		{
+			var char:String = e.text.substr(e.text.length - 1, 1);
+			
+			trace("CHAR --> "+char);
+		}
+		
+		protected function onMouseClick(e:Event):void
+		{
+			trace("CLICK CLICK");
+			
+			var parser:StyleSheetParser = new StyleSheetParser();
+			var styleSheet:StyleSheet = parser.parse(this._textField.text);
+
+			if (this._baseUI.styleSheetCollection.length > 0)
+			{
+				this._baseUI.styleSheetCollection.removeStyleSheet(this._baseUI.styleSheetCollection.styleSheets[0]);
+			}
+			
+			this._baseUI.styleSheetCollection.addStyleSheet(styleSheet);
+			
+			this._baseUI.layoutChildren();
+		}
 		
 		public function StyleKitPlayer()
 		{
@@ -54,7 +103,9 @@ package
 			this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
 			this.graphics.endFill();
 			
-			this._baseUI = new BaseUI();
+			this.stage.addEventListener(Event.RESIZE, this.onStageResize, false, 100);
+			
+			this._baseUI = new BaseUI(new StyleSheetCollection(), this.stage);
 			
 			this.addChild(this._baseUI);
 			
@@ -66,6 +117,8 @@ package
 			};
 
 			this._toolbar = this._baseUI.createUIElement();
+			this._toolbar.elementId = "toolbar1";
+			this._toolbar.name = "toolbar";
 			
 			this._baseUI.addElement(this._toolbar);
 			
@@ -75,12 +128,13 @@ package
 				"height": SizeValue.parse("40px"),
 				
 				"margin-bottom": SizeValue.parse("5px"),
-				"margin-left": SizeValue.parse("5px"),
 				
 				"background-color": ColorValue.parse("red")
 			};
 			
 			this._toolbar2 = this._baseUI.createUIElement();
+			this._toolbar2.elementId = "toolbar2";
+			this._toolbar2.name = "toolbar";
 			
 			this._baseUI.addElement(this._toolbar2);
 			
@@ -91,12 +145,13 @@ package
 				"float": FloatValue.parse("right"),
 					
 				"margin-bottom": SizeValue.parse("5px"),
-				"margin-left": SizeValue.parse("5px"),
-					
+				
 				"background-color": ColorValue.parse("yellow")
 			};
 			
 			this._toolbar3 = this._baseUI.createUIElement();
+			this._toolbar3.elementId = "toolbar3";
+			this._toolbar3.name = "toolbar";
 			
 			this._baseUI.addElement(this._toolbar3);
 			
@@ -104,13 +159,50 @@ package
 				"display": DisplayValue.parse("block"),
 				"width": SizeValue.parse("100%"),
 				"height": SizeValue.parse("40px"),
-				"margin-left": SizeValue.parse("5px"),
 				"background-color": ColorValue.parse("green")
 			};
+			
+			/*
+			this._button = new UIElement(this._baseUI);
+			
+			this._button = this._baseUI.createUIElement();
+			this._button.elementId = "go-button";
+			this._button.name = "button";
+			
+			this._baseUI.addElement(this._button);
+			
+			this._button.evaluatedStyles = {
+				"display": DisplayValue.parse("block"),
+				"width": SizeValue.parse("40px"),
+				"height": SizeValue.parse("40px"),
+				"background-color": ColorValue.parse("pink"),
+				"float": FloatValue.parse("right")
+			};
+			
+			this._button.addEventListener(MouseEvent.CLICK, this.onMouseClick);
+			*/
 			
 			trace("Redraw ...");
 			
 			this._baseUI.layoutChildren();
+			
+			/*this._textField = new TextField();
+			this._textField.width = this.stage.stageWidth;
+			this._textField.height = 100;
+			this._textField.text = "--!> CSS GOES HERE <!--";
+			this._textField.y = this.stage.stageHeight - 100;
+			this._textField.x = 0;
+			this._textField.type = TextFieldType.INPUT;
+			this._textField.border = true;
+			this._textField.borderColor = 0x333333;
+			this._textField.backgroundColor = 0x888888;
+			this._textField.textColor = 0xEEEEEE;
+			this._textField.multiline = true;
+			
+			this._textField.addEventListener(TextEvent.TEXT_INPUT, this.onTextInput);
+			
+			this.addChild(this._textField);
+			*/
 			
 			/*
 			this._parent = new UIElement();

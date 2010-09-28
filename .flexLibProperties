@@ -70,6 +70,7 @@
     <classEntry path="org.stylekit.ui.element.paint.UIElementPainter"/>
     <classEntry path="org.stylekit.css.value.FloatValue"/>
     <classEntry path="org.stylekit.css.value.NumericValue"/>
+    <classEntry path="StyleKitConsole"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

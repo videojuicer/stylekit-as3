@@ -513,6 +513,8 @@ package org.stylekit.ui.element
 			// Dispatch and perform local actions
 			if(changeFound)
 			{
+				trace(">>> CHANGE FOUND ON ", this, this.toString(), this.elementId, this.elementName);
+				
 				this.onStylePropertyValuesChanged(alteredKeys);
 				this.dispatchEvent(new UIElementEvent(UIElementEvent.EVALUATED_STYLES_MODIFIED, this));
 			}

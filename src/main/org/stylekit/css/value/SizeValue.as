@@ -2,6 +2,7 @@ package org.stylekit.css.value
 {
 	import org.stylekit.css.parse.ValueParser;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
 	import org.utilkit.util.StringUtil;
 	
@@ -112,7 +113,7 @@ package org.stylekit.css.value
 				case SizeValue.UNIT_PERCENTAGE:
 					if (e.baseUI == e)
 					{
-						baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? e.parent.width : e.parent.height;
+						baseVal = (dimension == SizeValue.DIMENSION_WIDTH)? (e as BaseUI).stageRoot.stage.stageWidth : (e as BaseUI).stageRoot.stage.stageHeight;
 					}
 					else
 					{

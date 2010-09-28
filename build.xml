@@ -112,6 +112,17 @@
 			<compiler.headless-server>true</compiler.headless-server>
 		</mxmlc>
 	</target>
+	
+	<target name="example-console" depends="compile" description="Compiles the example JS console using the StyleKit-as3 library">
+		<mxmlc file="${example.src.loc}/StyleKitConsole.as" output="${bin.loc}/stylekit-as3-example-console.swf" static-link-runtime-shared-libraries="true">
+			<source-path path-element="${example.src.loc}" />
+			<library-path dir="${bin.loc}" append="true">
+				<include name="stylekit-as3.swc" />
+			</library-path>
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</mxmlc>
+	</target>
 
 	<target name="asdocs" description="Generates asdocs from the StyleKit-as3 source">
 		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
