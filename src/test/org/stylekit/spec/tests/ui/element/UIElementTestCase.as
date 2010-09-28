@@ -355,6 +355,18 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(130, el.effectiveWidth);
 		}
 		
+		[Test(description="Ensures that properties with a defined transition and non-zero duration are not altered immediately")]
+		public function transitionsWithDurationsAreAnimated():void
+		{
+			
+		}
+		
+		[Test(description="Ensures that properties listed by transition-property but with a duration of zero are altered immedidately")]
+		public function transitionsWithZeroDurationsAreSkipped():void
+		{
+			
+		}
+		
 		protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void
 		{
 			Assert.assertEquals(e.uiElement, passThru.element);
