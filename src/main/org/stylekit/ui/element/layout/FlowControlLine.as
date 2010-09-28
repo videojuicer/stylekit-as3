@@ -120,9 +120,15 @@ package org.stylekit.ui.element.layout
 			}
 		}
 		
-		public function acceptableElement(e:UIElement):Boolean
+		/**
+		* Attempts to append an element to the line, returning true if the element was accepted.
+		*/
+		public function appendElement(e:UIElement):Boolean
 		{
 			var added:Boolean = false;
+			
+			trace("appendElement >> ", e, e.effectiveContentWidth, e.effectiveContentHeight, e.effectiveWidth, e.effectiveHeight);
+			trace("appendElement >> ", this, this._maxWidth, this.elements.length, this._elementTotalEffectiveWidth, this._leftFloatElementCount, this._rightFloatElementCount);
 			
 			if(this.treatElementAsNonFloatedBlock(e))
 			{
@@ -130,7 +136,8 @@ package org.stylekit.ui.element.layout
 				{
 					// BLOCK ELEMS
 					added = true;
-					//this._occupiedByBlockElement = true;
+					
+					this._occupiedByBlockElement = true;
 				}
 			}
 			else if(this._occupiedByBlockElement == false)
@@ -138,20 +145,16 @@ package org.stylekit.ui.element.layout
 				if(this.treatElementAsLeftFloat(e))
 				{
 					// LEFT FLOATS
-					if(this.widthAvailableForElement(e))
-					{
-						added = true;
-						//this._leftFloatElementCount++;
-					}
+					added = true;
+					
+					this._leftFloatElementCount++;
 				}
 				else if(this.treatElementAsRightFloat(e))
 				{
 					// RIGHT FLOATS
-					if(this.widthAvailableForElement(e))
-					{
-						added = true;
-						//this._rightFloatElementCount++;
-					}
+					added = true;
+					
+					this._rightFloatElementCount++;
 				}
 				else
 				{
@@ -163,45 +166,18 @@ package org.stylekit.ui.element.layout
 				}
 			}
 			
-			return added;
-		}
-		
-		/**
-		* Attempts to append an element to the line, returning true if the element was accepted.
-		*/
-		public function appendElement(e:UIElement):Boolean
-		{
-			var added:Boolean = this.acceptableElement(e);
-			
+			if (this.elements.length == 0)
+			{
+				added = true;
+			}
+
 			if (added)
 			{
-				if(this.treatElementAsNonFloatedBlock(e))
-				{
-					if(this._occupiedByBlockElement == false && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
-					{
-						// BLOCK ELEMS
-						this._occupiedByBlockElement = true;
-					}
-				}
-				else if(this._occupiedByBlockElement == false)
-				{
-					if(this.treatElementAsLeftFloat(e))
-					{
-						// LEFT FLOATS
-						this._leftFloatElementCount++;
-					}
-					else if(this.treatElementAsRightFloat(e))
-					{
-						// RIGHT FLOATS
-						this._rightFloatElementCount++;
-					}
-				}
-
 				this._elements.push(e);
 				this._elementTotalEffectiveWidth += e.effectiveWidth;
 				//this.layoutElements();
 			}
-			
+
 			return added;
 		}
 		
@@ -343,9 +319,8 @@ package org.stylekit.ui.element.layout
 						}
 					}
 				}
-
 				
-				trace("Adding UIElement to FlowControlLine contents ...", e);
+				trace("Adding UIElement to FlowControlLine contents ...", e, e.x, e.y);
 				
 				super.addChild(e);
 			}

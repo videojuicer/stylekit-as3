@@ -17,6 +17,7 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.CornerCompoundValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
@@ -89,9 +90,15 @@ package org.stylekit.ui.element.paint
 			var bottomRightR:Number = (borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderRight.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? bottomRightRadius.evaluateSize(uiElement) : 0);
 			var bottomLeftR:Number = (borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? bottomLeftRadius.evaluateSize(uiElement) : 0);
 			var topLeftR:Number = (borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? topLeftRadius.evaluateSize(uiElement) : 0);
+		
+			var alpha:Number = uiElement.hasStyleProperty("opacity") ? (uiElement.getStyleValue("opacity") as NumericValue).value : 1.0;
+			
+			uiElement.alpha = alpha;
+			
+			graphics.clear();
 			
 			graphics.moveTo(marginLeft + topLeftR / 2, marginTop);
-			
+		
 			graphics.beginFill(backgroundColor);
 			
 			if (backgroundImage != null)

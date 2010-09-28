@@ -865,36 +865,40 @@ package org.stylekit.ui.element
 		{
 			this._controlLines = new Vector.<FlowControlLine>();
 			
-			var previous:FlowControlLine = null;
 			var textAlign:AlignmentValue = (this.getStyleValue("text-align") as AlignmentValue);
+			
+			// create a new line
+			this.newControlLine(textAlign);
 			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				var child:UIElement = this.children[i];
-				
-				if (previous == null || !previous.acceptableElement(child))
+
+				if (!this.currentControlLine.appendElement(child))
 				{
-					do
-					{
-						previous = new FlowControlLine(this.effectiveContentWidth, (textAlign.leftAlign ? "left" : (textAlign.rightAlign ? "right" : "left")));
+					this.newControlLine(textAlign);
 					
-						this._controlLines.push(previous);
-						
-						var b:Boolean = previous.widthAvailableForElement(child);
-						var a:Boolean = previous.acceptableElement(child);
+					if (!this.currentControlLine.appendElement(child))
+					{
+						// this element won't fit on a new line so something is wrong
+						throw new StackOverflowError("Found a FlowControlLine that isnt able to accept our UIElement after exhausting the stack of lines");
 					}
-					while (!previous.acceptableElement(child));
-				}
-				
-				var result:Boolean = previous.appendElement(child);
-				
-				if (!result)
-				{
-					throw new StackOverflowError("Found a FlowControlLine that isnt able to accept our UIElement after exhausting the stack of lines");
 				}
 			}
 			
 			trace("Added "+this._controlLines.length+" control lines");
+		}
+		
+		protected function newControlLine(textAlign:AlignmentValue):void
+		{
+			this._controlLines.push(
+				     new FlowControlLine(this.effectiveContentWidth, (textAlign.leftAlign ? "left" : (textAlign.rightAlign ? "right" : "left")))
+			  );
+		}
+		
+		protected function get currentControlLine():FlowControlLine
+		{
+			return this._controlLines[this._controlLines.length - 1];
 		}
 		
 		public function layoutChildren():void
@@ -904,10 +908,7 @@ package org.stylekit.ui.element
 				super.removeChildAt(i);
 			}
 			
-			if (this.controlLines == null || this.controlLines.length != this.numChildren)
-			{
-				this.refreshControlLines();
-			}
+			this.refreshControlLines();
 			
 			if (this.controlLines != null)
 			{
@@ -917,7 +918,7 @@ package org.stylekit.ui.element
 				// as were only dealing with lines all we need to do is stack the lines one by one
 				// with each line taking up the entire width, so we only need to think about stacking
 				// the lines with there height.
-				var y:Number = (this.getStyleValue("padding-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("margin-top") as SizeValue).evaluateSize(this) + (this.getStyleValue("border-top-width") as SizeValue).evaluateSize(this);
+				var y:Number = this.evalStyleSize("padding-top") + this.evalStyleSize("margin-top") + this.evalStyleSize("border-top-width");
 				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
@@ -929,6 +930,7 @@ package org.stylekit.ui.element
 					trace("Adding FlowControlLine at "+y);
 					
 					y += line.lineHeight;
+					
 					
 					super.addChild(line);
 				}
@@ -1129,9 +1131,6 @@ package org.stylekit.ui.element
 					tran.transitionTimingFunctionValue = this.getStyleValue("transition-timing-function") as ValueArray;
 					tran.transitionDelayValue = this.getStyleValue("transition-delay") as ValueArray;
 				
-					break;
-				case "font-size":
-					value = this._evaluatedStyles[propertyName];
 					break;
 				default:
 					value = this._evaluatedStyles[propertyName];

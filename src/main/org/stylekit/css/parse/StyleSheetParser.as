@@ -619,6 +619,7 @@ package org.stylekit.css.parse
 						break;
 					case "float":
 						property.value = FloatValue.parse(unparsedPropertyValue);
+						break;
 					case "font":
 						property.value = FontCompoundValue.parse(unparsedPropertyValue);
 						break;

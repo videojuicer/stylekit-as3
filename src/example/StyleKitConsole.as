@@ -8,6 +8,7 @@ package
 	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
+	import org.stylekit.css.value.SizeValue;
 	
 	public class StyleKitConsole extends Sprite
 	{
@@ -28,6 +29,8 @@ package
 			
 			// setup the sandbox user interface that can be manipulated
 			this.setupSandboxInterface();
+			
+			this._baseUI.redraw();
 		}
 		
 		protected function setupSandboxInterface():void
@@ -36,21 +39,21 @@ package
 			
 			this.addChild(this._baseUI);
 			
+			this._baseUI.evaluatedStyles = { width: SizeValue.parse("100%"), height: SizeValue.parse("100%") };
+			
 			var hBox:UIElement = this.createUIElement(this._baseUI, "div", "hBox", [ 'toolbar' ]);
 			
-			var button1:UIElement = this.createUIElement(hBox, "span", "button1", [ 'button' ]);
-			//this.createUIElement(hBox, "span", "button2", [ 'button' ]);
-			//this.createUIElement(hBox, "span", "button3", [ 'button' ]);
+			//var button1:UIElement = this.createUIElement(hBox, "span", "button1", [ 'button' ]);
+			//var button2:UIElement = this.createUIElement(hBox, "span", "button2", [ 'button' ]);
+			//var button3:UIElement = this.createUIElement(hBox, "span", "button3", [ 'button' ]);
 			
-			/*
 			var vBox:UIElement = this.createUIElement(this._baseUI, "div", "vBox", [ 'toolbar' ]);
 			
-			this.createUIElement(vBox, "span", null, [ 'button' ]);
-			this.createUIElement(vBox, "span", null, [ 'button' ]);
-			this.createUIElement(vBox, "span", null, [ 'button' ]);
+			//var button4:UIElement = this.createUIElement(vBox, "span", "button4", [ 'button' ]);
+			//var button5:UIElement = this.createUIElement(vBox, "span", "button5", [ 'button' ]);
+			//var button6:UIElement = this.createUIElement(vBox, "span", "button6", [ 'button' ]);
 			
 			var empty:UIElement = this.createUIElement(this._baseUI, "div", "empty", [ 'toolbar' ]);
-			*/
 		}
 		
 		protected function createUIElement(parent:UIElement, elementName:String, elementId:String, classNames:Array):UIElement
