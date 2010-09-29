@@ -5,6 +5,7 @@ package org.stylekit.css.property
 	
 	import mx.controls.List;
 	
+	import org.stylekit.css.value.AnimationCompoundValue;
 	import org.stylekit.css.value.BackgroundCompoundValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.CornerCompoundValue;
@@ -12,9 +13,8 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.FontCompoundValue;
 	import org.stylekit.css.value.InheritValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
-	import org.stylekit.css.value.AnimationCompoundValue;
-	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.PropertyEvent;
 	import org.stylekit.events.ValueEvent;
@@ -98,7 +98,9 @@ package org.stylekit.css.property
 										
 					break;
 				case "border":
-					var borderValue:BorderCompoundValue = (val as BorderCompoundValue);
+					// EdgeCompoundValue
+					var edgeValue:EdgeCompoundValue = (val as EdgeCompoundValue);
+					var borderValue:BorderCompoundValue = edgeValue.leftValue as BorderCompoundValue;
 					
 					mergePropertyWithImportance(mergeParent, ["border-left-color", "border-right-color", "border-top-color", "border-bottom-color"], 	
 												borderValue.colorValue, importance);

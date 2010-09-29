@@ -313,7 +313,7 @@ package org.stylekit.ui.element.layout
 						}
 						else
 						{
-							e.x = leftEdgeCollector;
+							e.x = leftEdgeCollector + leftFloatXCollector;
 							
 							leftEdgeCollector += e.effectiveWidth;
 						}

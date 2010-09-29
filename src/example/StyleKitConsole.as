@@ -10,6 +10,8 @@ package
 	import org.stylekit.ui.element.UIElement;
 	import org.stylekit.css.value.SizeValue;
 	
+	import org.utilkit.logger.Logger;
+	
 	public class StyleKitConsole extends Sprite
 	{
 		protected var _parser:StyleSheetParser;
@@ -20,6 +22,8 @@ package
 		public function StyleKitConsole()
 		{
 			super();
+			
+			Logger.defaultRenderers();
 			
 			this._elements = new Vector.<UIElement>();
 			this._parser = new StyleSheetParser();
@@ -39,7 +43,7 @@ package
 			
 			this.addChild(this._baseUI);
 			
-			this._baseUI.evaluatedStyles = { width: SizeValue.parse("100%"), height: SizeValue.parse("100%") };
+			this._baseUI.evaluatedStyles = { width: SizeValue.parse("100%"), height: SizeValue.parse("100%"), padding: SizeValue.parse("0px") };
 			
 			var hBox:UIElement = this.createUIElement(this._baseUI, "div", "hBox", [ 'toolbar' ]);
 			
