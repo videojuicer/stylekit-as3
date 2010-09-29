@@ -132,6 +132,18 @@ package org.stylekit.css.value
 			}
 		}
 		
+		public function indexOfProperty(p:String):int
+		{
+			if(this._all)
+			{
+				return 0;
+			}
+			else
+			{
+				return this.properties.indexOf(p);
+			}
+		}
+		
 		public override function isEquivalent(other:Value):Boolean
 		{
 			if (other is PropertyListValue)
