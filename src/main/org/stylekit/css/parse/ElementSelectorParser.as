@@ -3,6 +3,7 @@ package org.stylekit.css.parse
 	import org.utilkit.util.StringUtil;
 	import org.utilkit.logger.Logger;
 	
+	import org.stylekit.StyleKit;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.selector.ElementSelector;
 	
@@ -187,19 +188,19 @@ package org.stylekit.css.parse
 					{
 						case ElementSelectorParser.ELEMENT_NAME:
 							// End the element name state
-							Logger.debug("Parsing element selector '"+str+"', built element name '"+token+"'", this);
+							StyleKit.logger.debug("Parsing element selector '"+str+"', built element name '"+token+"'", this);
 							elementSelector.elementName = token;
 							break;
 						case ElementSelectorParser.ELEMENT_ID:
-							Logger.debug("Parsing element selector '"+str+"', built element ID '"+token+"'", this);
+							StyleKit.logger.debug("Parsing element selector '"+str+"', built element ID '"+token+"'", this);
 							elementSelector.elementID = token;
 							break;
 						case ElementSelectorParser.ELEMENT_CLASSNAME:
-							Logger.debug("Parsing element selector '"+str+"', built class name '"+token+"'", this);
+							StyleKit.logger.debug("Parsing element selector '"+str+"', built class name '"+token+"'", this);
 							elementSelector.addElementClassName(token);
 							break;
 						case ElementSelectorParser.ELEMENT_PSEUDOCLASS:
-							Logger.debug("Parsing element selector '"+str+"', built pseudoclass '"+token+"'", this);
+							StyleKit.logger.debug("Parsing element selector '"+str+"', built pseudoclass '"+token+"'", this);
 							elementSelector.addElementPseudoClass(token);
 							break;
 						default:
