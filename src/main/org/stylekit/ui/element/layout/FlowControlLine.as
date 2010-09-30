@@ -142,14 +142,14 @@ package org.stylekit.ui.element.layout
 			}
 			else if(this._occupiedByBlockElement == false)
 			{
-				if(this.treatElementAsLeftFloat(e))
+				if(this.treatElementAsLeftFloat(e) && this.widthAvailableForElement(e))
 				{
 					// LEFT FLOATS
 					added = true;
 					
 					this._leftFloatElementCount++;
 				}
-				else if(this.treatElementAsRightFloat(e))
+				else if(this.treatElementAsRightFloat(e) && this.widthAvailableForElement(e))
 				{
 					// RIGHT FLOATS
 					added = true;
