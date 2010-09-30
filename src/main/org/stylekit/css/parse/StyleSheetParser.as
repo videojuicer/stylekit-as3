@@ -532,8 +532,11 @@ package org.stylekit.css.parse
 								this.enterState(StyleSheetParser.SELECTOR);
 							}
 						}
-						// Keep building the token
-						this._token += char;
+						// Keep building the token according to the blacklist
+						if(char != "{" && char != "}")
+						{
+							this._token += char;
+						}
 						break;
 				}
 			}
