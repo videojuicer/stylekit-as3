@@ -1,7 +1,6 @@
 package org.stylekit.css.parse
 {
 	import org.utilkit.util.StringUtil;
-	import org.utilkit.logger.Logger;
 	
 	import org.stylekit.StyleKit;
 	import org.stylekit.css.selector.ElementSelectorChain;

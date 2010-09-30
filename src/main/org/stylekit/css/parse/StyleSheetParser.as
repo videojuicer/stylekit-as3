@@ -54,7 +54,6 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
 	import org.stylekit.css.value.VisibilityValue;
-	import org.utilkit.logger.Logger;
 	import org.utilkit.util.StringUtil;
 	
 	public class StyleSheetParser extends EventDispatcher

@@ -71,6 +71,7 @@
     <classEntry path="org.stylekit.css.value.FloatValue"/>
     <classEntry path="org.stylekit.css.value.NumericValue"/>
     <classEntry path="StyleKitConsole"/>
+    <classEntry path="org.stylekit.ui.element.SpriteWrapperUIElement"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

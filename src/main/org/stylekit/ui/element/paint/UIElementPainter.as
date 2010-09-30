@@ -24,7 +24,6 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.URLValue;
 	import org.stylekit.ui.element.UIElement;
 	import org.utilkit.crypto.Base64;
-	import org.utilkit.logger.Logger;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.parser.URLParser;
 	
