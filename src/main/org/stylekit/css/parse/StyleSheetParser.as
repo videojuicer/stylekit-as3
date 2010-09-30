@@ -567,6 +567,7 @@ package org.stylekit.css.parse
 			return this._styleSheet;
 		}
 		
+		
 		protected function resetState():void
 		{
 			Logger.debug("Resetting parser state for new parse operation", this);
@@ -701,6 +702,11 @@ package org.stylekit.css.parse
 						{
 							property.value = OverflowValue.parse(unparsedPropertyValue);
 						}
+						// padding-left, margin-right etc.
+						else if(propN.indexOf("padding") == 0 || propN.indexOf("margin") == 0)
+						{
+							property.value = SizeValue.parse(unparsedPropertyValue);
+						}
 						// position, ruby-position, text-underline-position
 						else if (propN.indexOf("position") > -1)
 						{
@@ -731,7 +737,7 @@ package org.stylekit.css.parse
 						else
 						{
 							property.value = new Value();
-							property.value.rawValue = (unparsedPropertyValue);
+							property.value.rawValue = property.value.stringValue = (unparsedPropertyValue);
 						}
 						break;
 				}
@@ -744,6 +750,16 @@ package org.stylekit.css.parse
 			}
 			
 			this.currentPropertyTarget.addProperty(property);
+		}
+		
+		/**
+		* Parses a local style fragment such as "border: 1px solid red;", and outputs a style object with no style selector
+		*/
+		public function parseLocalStyleFragment(str:String):Style
+		{
+			str = "_local { "+str+"}";
+			var styleSheet:StyleSheet = this.parse(str);
+			return styleSheet.styles[0];
 		}
 		
 		protected function enterState(state:uint):void

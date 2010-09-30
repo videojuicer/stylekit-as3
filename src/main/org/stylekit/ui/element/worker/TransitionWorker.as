@@ -99,7 +99,7 @@ package org.stylekit.ui.element.worker
 		public function finish():void
 		{
 			this.killTimers();
-			this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.FINAL_VALUE_GENERATED, this._endValue));
+			this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.FINAL_VALUE_GENERATED, this._endValue, this));
 		}
 		
 		/**
@@ -177,7 +177,7 @@ package org.stylekit.ui.element.worker
 						iColorVal.hexValue = iColor;
 						
 					this._intermediateValue = iColorVal;
-					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iColorVal));
+					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iColorVal, this));
 				}
 				else if((this._initialValue is SizeValue) && (this._endValue is SizeValue))
 				{
@@ -192,7 +192,7 @@ package org.stylekit.ui.element.worker
 					iSizeVal.value = startSize+((endSize-startSize)*tValue);
 					
 					this._intermediateValue = iSizeVal;
-					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iSizeVal));
+					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iSizeVal, this));
 				}
 				else if((this._initialValue is NumericValue) && (this._endValue is NumericValue))
 				{
@@ -205,7 +205,7 @@ package org.stylekit.ui.element.worker
 					iNumVal.value = startVal+((endVal-startVal)*tValue);
 				
 					this._intermediateValue = iNumVal;
-					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iNumVal));
+					this.dispatchEvent(new TransitionWorkerEvent(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, iNumVal, this));
 				}
 				else
 				{

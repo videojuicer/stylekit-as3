@@ -11,6 +11,7 @@ package org.stylekit.ui.element
 	
 	import mx.skins.Border;
 	
+	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
@@ -29,6 +30,8 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.TimeValue;
+	import org.stylekit.css.value.TimingFunctionValue;
 	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.AnimationCompoundValue;
 	import org.stylekit.css.value.PropertyListValue;
@@ -36,9 +39,11 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.Value;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.UIElementEvent;
+	import org.stylekit.events.TransitionWorkerEvent;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.layout.FlowControlLine;
 	import org.stylekit.ui.element.paint.UIElementPainter;
+	import org.stylekit.ui.element.worker.TransitionWorker;
 	import org.utilkit.util.ObjectUtil;
 	
 	/**
@@ -58,6 +63,9 @@ package org.stylekit.ui.element
 	
 	public class UIElement extends Sprite
 	{
+		
+		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = ["width", "height", "max-width", "max-height", "min-width", "min-height", "display"];
+		
 		/**
 		* The child UIElement objects contained by the UIElement.
 		*/
@@ -83,6 +91,12 @@ package org.stylekit.ui.element
 		* border-left-width, border-left-style, border-left-color.
 		*/
 		protected var _evaluatedStyles:Object;
+		
+		/**
+		* Tracks the first time evaluated styles are set on this element. Transitions and some other operations
+		* are skipped on the first evaluation.
+		*/
+		protected var _runTransitions:Boolean = false;
 		
 		/**
 		* Determines if this UIElement is eligible to receive styles.
@@ -149,7 +163,6 @@ package org.stylekit.ui.element
 		protected var _parentElement:UIElement;
 		
 		protected var _baseUI:BaseUI;
-		protected var _localStyle:Style;
 		
 		protected var _elementName:String;
 		protected var _elementId:String;
@@ -161,18 +174,32 @@ package org.stylekit.ui.element
 		
 		protected var _painter:UIElementPainter;
 		
+		// An associative set of transition workers and the properties they relate to.
+		protected var _transitionWorkers:Vector.<TransitionWorker>;
+		protected var _transitionWorkerProperties:Vector.<String>;
+		
+		/**
+		* A reference to the Style object used to store this element's local styles. This Style is treated with a higher 
+		* priority than styles sourced from the BaseUI's stylesheet collection.
+		*/ 
+		protected var _localStyle:Style;
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
 			
 			this._baseUI = baseUI;
 			this.evaluatedStyles = {};
+			this._runTransitions = false;
 			
 			this._children = new Vector.<UIElement>();
 			this._controlLines = new Vector.<FlowControlLine>();
 			
 			this._elementClassNames = new Vector.<String>();
 			this._elementPseudoClasses = new Vector.<String>();
+			
+			this._transitionWorkers = new Vector.<TransitionWorker>();
+			this._transitionWorkerProperties = new Vector.<String>();
 			
 			this._painter = new UIElementPainter(this);
 			
@@ -205,6 +232,18 @@ package org.stylekit.ui.element
 		public function get localStyle():Style
 		{
 			return this._localStyle;
+		}
+		
+		public function set localStyle(s:Style):void
+		{
+			this._localStyle = s;
+			this.evaluateStyles();
+		}
+		
+		public function set localStyleString(s:String):void
+		{
+			var style:Style = (new StyleSheetParser()).parseLocalStyleFragment(s);
+			this.localStyle = style;
 		}
 		
 		public function get styleEligible():Boolean
@@ -471,8 +510,7 @@ package org.stylekit.ui.element
 		/**
 		* Sets a new object instance as the evaluated style hash for this object. Performs a comparison
 		* of the new object to the old and dispatches an EVALUATED_STYLES_MODIFIED UIElementEvent if there has been a change.
-		*/
-		
+		*/		
 		public function set evaluatedStyles(newEvaluatedStyles:Object):void
 		{
 			// Store old value locally and set new value
@@ -484,6 +522,7 @@ package org.stylekit.ui.element
 			// 1. The new styles contain a value not present on the old styles
 			// 2. The new styles are missing a value that is present on the old styles
 			// 3. Values present on both objects for the same key are not equivalent
+			
 			var changeFound:Boolean = false;
 			var alteredKeys:Vector.<String> = new Vector.<String>();
 			
@@ -509,6 +548,27 @@ package org.stylekit.ui.element
 					}
 				}
 			}
+
+			// check which altered keys require transitions:
+			// if the key requires a transition then the original value is restored and a transition
+			// worker is created to action the change.
+			// you might think that it's a bit odd to do this retroactively once the evaluatedStyles hash 
+			// has been saved against the element - however, it allows any new styles to set transition
+			// properties before the changed attributes are modified.
+			for(var i:int = alteredKeys.length-1; i >= 0; i--)
+			{
+				var k:String = alteredKeys[i];
+				if(this.shouldTransitionProperty(k))
+				{
+					// restore original value
+					var endValue:Value = this._evaluatedStyles[k];
+					this._evaluatedStyles[k] = previousEvaluatedStyles[k]
+					// start transition
+					this.beginPropertyTransition(k, this._evaluatedStyles[k], endValue);
+					// remove from alteredKeys
+					alteredKeys.splice(i, 1);
+				}
+			}
 			
 			// Dispatch and perform local actions
 			if(changeFound)
@@ -518,6 +578,15 @@ package org.stylekit.ui.element
 				this.onStylePropertyValuesChanged(alteredKeys);
 				this.dispatchEvent(new UIElementEvent(UIElementEvent.EVALUATED_STYLES_MODIFIED, this));
 			}
+			this._runTransitions = true;
+		}
+		
+		protected function overwriteEvaluatedStyle(propertyName:String, value:Value):void
+		{
+			this.evaluatedStyles[propertyName] = value;
+			var v:Vector.<String> = new Vector.<String>();
+				v.push(propertyName);
+			this.onStylePropertyValuesChanged(v);
 		}
 		
 		/**
@@ -525,9 +594,6 @@ package org.stylekit.ui.element
 		* (e.g. ["border-left-width", "float"]) is handed to this method, which then splits the keys out by whitelist
 		* and reacts appropriately.
 		*/
-		
-		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = ["width", "height", "max-width", "max-height", "min-width", "min-height", "display"];
-		
 		protected function onStylePropertyValuesChanged(alteredKeys:Vector.<String>):void
 		{
 			var effectiveContentDimensionsRecalcNeeded:Boolean = false;
@@ -1184,55 +1250,73 @@ package org.stylekit.ui.element
 		
 		protected function evaluateStyles():void
 		{
+			
 			// Begin specificity sort			
 			// Sort matched selectors by specificity
-			var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
-				sortedSelectorChains.sort(
-					function(x:ElementSelectorChain, y:ElementSelectorChain):Number
-					{
-						if(x.specificity > y.specificity)
-						{
-							return -1;
-						}
-						else if(x.specificity > y.specificity)
-						{
-							return 1;
-						}
-						else
-						{
-							return 0;
-						}
-					}
-				);
-			
-			// Loop over sorted selectors and use found index to sort corresponding style.
-			// The created vector is fixed in length.
-			var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
-			for(var i:uint=0; i < this._styles.length; i++)
+			if(this._styleSelectors != null)
 			{
-				var sortCandidateStyle:Style = this._styles[i];
-				// loop over style's selector chains and find index of any in the sorted selector vector, spector.
-				// the found index is the insertion index for this style.
-				for(var j:uint=0; j<sortCandidateStyle.elementSelectorChains.length; j++)
+				var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
+				var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
+				
+					sortedSelectorChains.sort(
+						function(x:ElementSelectorChain, y:ElementSelectorChain):Number
+						{
+							if(x.specificity > y.specificity)
+							{
+								return -1;
+							}
+							else if(x.specificity > y.specificity)
+							{
+								return 1;
+							}
+							else
+							{
+								return 0;
+							}
+						}
+					);
+				// Loop over sorted selectors and use found index to sort corresponding style.
+				// The created vector is fixed in length.
+
+				for(var i:uint=0; i < this._styles.length; i++)
 				{
-					var fI:int = sortedSelectorChains.indexOf(sortCandidateStyle.elementSelectorChains[j]);
-					if(fI > -1)
+					var sortCandidateStyle:Style = this._styles[i];
+					// loop over style's selector chains and find index of any in the sorted selector vector, spector.
+					// the found index is the insertion index for this style.
+					for(var j:uint=0; j<sortCandidateStyle.elementSelectorChains.length; j++)
 					{
-						sortedStyles[fI] = sortCandidateStyle;
+						var fI:int = sortedSelectorChains.indexOf(sortCandidateStyle.elementSelectorChains[j]);
+						if(fI > -1)
+						{
+							sortedStyles[fI] = sortCandidateStyle;
+						}
 					}
 				}
 			}
 			// End specificity sort
 			
+			// Set up initial values
 			var newEvaluatedStyles:Object = PropertyContainer.defaultStyles;
-			for(i=0; i < sortedStyles.length; i++)
+			
+			// Merge in the styles in order of specificity
+			if(this._styleSelectors != null)
 			{
-				// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
-				// went out of sync before or during this method's execution.
-				
-				var evalCandidateStyle:Style = sortedStyles[i];
-				newEvaluatedStyles = evalCandidateStyle.evaluate(newEvaluatedStyles, this);
+				for(i=0; i < sortedStyles.length; i++)
+				{
+					// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
+					// went out of sync before or during this method's execution.
+
+					var evalCandidateStyle:Style = sortedStyles[i];
+					newEvaluatedStyles = evalCandidateStyle.evaluate(newEvaluatedStyles, this);
+				}
 			}
+			
+			// Include local styles
+			if(this._localStyle != null)
+			{
+				newEvaluatedStyles = this._localStyle.evaluate(newEvaluatedStyles, this);
+			}
+			
 			// Setter carries the comparison check and event dispatch
 			this.evaluatedStyles = newEvaluatedStyles;
 			
@@ -1303,6 +1387,102 @@ package org.stylekit.ui.element
 			}
 			
 			return true;
+		}
+		
+		public function beginPropertyTransition(propertyName:String, initialValue:Value, endValue:Value):void
+		{
+			var pList:PropertyListValue = (this.getStyleValue("transition-property") as PropertyListValue);
+			var pInd:int = pList.indexOfProperty(propertyName);
+			if(pInd < 0)
+			{
+				return;
+			}
+			else
+			{
+				var durValue:TimeValue = ((this.getStyleValue("transition-duration") as ValueArray).valueAt(pInd) as TimeValue);
+				var delValue:TimeValue = ((this.getStyleValue("transition-delay") as ValueArray).valueAt(pInd) as TimeValue);
+				var tfValue:TimingFunctionValue = ((this.getStyleValue("transition-timing-function") as ValueArray).valueAt(pInd) as TimingFunctionValue);
+				
+				// Build the worker
+				var worker:TransitionWorker = new TransitionWorker(this, initialValue, endValue, delValue, durValue, tfValue);
+				
+				// Cancel any currently-running workers on this property
+				this.cancelPropertyTransition(propertyName);
+				
+				// Bind to events on the new worker
+				worker.addEventListener(TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, this.onTransitionIntermediateValueGenerated);
+				worker.addEventListener(TransitionWorkerEvent.FINAL_VALUE_GENERATED, this.onTransitionFinalValueGenerated);
+				
+				// Append to the vectors
+				this._transitionWorkers.push(worker);
+				this._transitionWorkerProperties.push(propertyName);
+				
+				// Kick it
+				worker.start();
+			}
+		}
+		
+		public function cancelPropertyTransition(propertyName:String, restoreValue:Value = null):void
+		{
+			var pInd:int = this._transitionWorkerProperties.indexOf(propertyName);
+			if(pInd > -1)
+			{
+				this._transitionWorkers[pInd].cancel();
+				
+				this._transitionWorkers[pInd].removeEventListener(
+					TransitionWorkerEvent.INTERMEDIATE_VALUE_GENERATED, this.onTransitionIntermediateValueGenerated
+					);
+				this._transitionWorkers[pInd].removeEventListener(
+					TransitionWorkerEvent.FINAL_VALUE_GENERATED, this.onTransitionFinalValueGenerated
+					);
+				
+				this._transitionWorkers.splice(pInd, 1);
+				this._transitionWorkerProperties.splice(pInd, 1);
+				
+				if(restoreValue != null)
+				{
+					this.overwriteEvaluatedStyle(propertyName, restoreValue);
+				}
+			}
+		}
+		
+		public function shouldTransitionProperty(p:String):Boolean
+		{
+			if(this._runTransitions == false)
+			{
+				return false;
+			}
+			
+			var pList:PropertyListValue = (this.getStyleValue("transition-property") as PropertyListValue);
+			var pInd:int = pList.indexOfProperty(p);
+			if(pInd < 0)
+			{
+				return false;
+			}
+			else
+			{
+				var durValue:TimeValue = ((this.getStyleValue("transition-duration") as ValueArray).valueAt(pInd) as TimeValue);
+				var delValue:TimeValue = ((this.getStyleValue("transition-delay") as ValueArray).valueAt(pInd) as TimeValue);
+				
+				return ((durValue.millisecondValue > 0) || (delValue.millisecondValue > 0));
+			}
+		}
+		
+		protected function onTransitionIntermediateValueGenerated(e:TransitionWorkerEvent):void
+		{
+			var pInd:int = this._transitionWorkers.indexOf(e.worker);
+			var pName:String = this._transitionWorkerProperties[pInd];
+			
+			this.overwriteEvaluatedStyle(pName, e.value);
+		}
+		
+		protected function onTransitionFinalValueGenerated(e:TransitionWorkerEvent):void
+		{
+			var pInd:int = this._transitionWorkers.indexOf(e.worker);
+			var pName:String = this._transitionWorkerProperties[pInd];
+			
+			this.onTransitionIntermediateValueGenerated(e);
+			this.cancelPropertyTransition(pName);
 		}
 		
 		protected function onParentElementEvaluatedStylesModified(e:UIElementEvent):void

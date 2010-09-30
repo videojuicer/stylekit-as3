@@ -7,6 +7,9 @@ package org.stylekit.spec.tests.ui.element
 	import mx.core.mx_internal;
 	import mx.utils.object_proxy;
 	
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
+	
 	import org.flexunit.async.Async;
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
@@ -14,7 +17,11 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
+	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.TimeValue;
+	import org.stylekit.css.value.ValueArray;
+	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.spec.Fixtures;
 	import org.stylekit.ui.BaseUI;
@@ -355,16 +362,88 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(130, el.effectiveWidth);
 		}
 		
-		[Test(description="Ensures that properties with a defined transition and non-zero duration are not altered immediately")]
+		[Test(description="Ensures that local styles are evaluated with other styles")]
+		public function localStylesAreEvaluated():void
+		{
+			var el:UIElement = new UIElement();
+			el.localStyleString = "padding: 10px; value-not-present-in-defaults: foo";
+			Assert.assertTrue(el.hasStyleProperty("padding-top"));
+			Assert.assertTrue(el.hasStyleProperty("padding-left"));
+			Assert.assertTrue(el.hasStyleProperty("padding-bottom"));
+			Assert.assertTrue(el.hasStyleProperty("padding-right"));
+			Assert.assertTrue(el.hasStyleProperty("value-not-present-in-defaults"));
+		}
+		
+		[Test(async, description="Ensures that properties with a defined transition and non-zero duration are not altered immediately")]
 		public function transitionsWithDurationsAreAnimated():void
 		{
+			var el:UIElement = new UIElement();
 			
+			el.localStyleString = "transition-property: padding-left; transition-duration: 2s; transition-delay: 1s; transition-timing-function: linear; padding-left: 10px;";
+			
+			Assert.assertTrue(el.shouldTransitionProperty("padding-left"));
+			Assert.assertFalse(el.shouldTransitionProperty("padding-right"));
+
+			var delayTimer:Timer = new Timer(800, 1);
+			var intermediateTimer:Timer = new Timer(1400, 1);
+			var completeTimer:Timer = new Timer(2300, 1);
+            
+			var asyncDelay:Function = Async.asyncHandler(
+				this, this.onTransitionDelayTimerComplete, 1000, { "el": el }, this.onTransitionWithDurationTimeout
+				);
+
+			var asyncIntermediate:Function = Async.asyncHandler(
+				this, this.onTransitionIntermediateTimerComplete, 1800, { "el": el }, this.onTransitionWithDurationTimeout
+				);
+
+			var asyncComplete:Function = Async.asyncHandler(
+				this, this.onTransitionWithDurationTimerComplete, 2500, { "el": el }, this.onTransitionWithDurationTimeout
+				);
+			
+			el.localStyleString = "transition-property: padding-left; transition-duration: 2s; transition-delay: 1s; transition-timing-function: linear; padding-left: 100px;";
+			
+			delayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, asyncDelay);
+			delayTimer.start();
+			intermediateTimer.addEventListener(TimerEvent.TIMER_COMPLETE, asyncIntermediate);
+			intermediateTimer.start();
+			completeTimer.addEventListener(TimerEvent.TIMER_COMPLETE, asyncComplete);
+			completeTimer.start();
+			
+			Assert.assertEquals(10, (el.getStyleValue("padding-left") as SizeValue).evaluateSize(el));
 		}
+			protected function onTransitionDelayTimerComplete(e:TimerEvent, passThru:Object):void
+			{
+				var el:UIElement = (passThru.el as UIElement);
+				var pl:Number = (el.getStyleValue("padding-left") as SizeValue).evaluateSize(el);
+				Assert.assertEquals(10, pl);
+			}
+			protected function onTransitionIntermediateTimerComplete(e:TimerEvent, passThru:Object):void
+			{
+				var el:UIElement = (passThru.el as UIElement);
+				var pl:Number = (el.getStyleValue("padding-left") as SizeValue).evaluateSize(el);
+				Assert.assertTrue(pl > 10);
+				Assert.assertTrue(pl < 100);
+			}
+			protected function onTransitionWithDurationTimerComplete(e:TimerEvent, passThru:Object):void
+			{
+				var el:UIElement = (passThru.el as UIElement);
+				var pl:Number = (el.getStyleValue("padding-left") as SizeValue).evaluateSize(el);
+				Assert.assertEquals(100, pl);
+			}
+			protected function onTransitionWithDurationTimeout(passThru:Object):void
+			{
+				Assert.fail("timed out");
+			}
 		
 		[Test(description="Ensures that properties listed by transition-property but with a duration of zero are altered immedidately")]
 		public function transitionsWithZeroDurationsAreSkipped():void
 		{
+			var el:UIElement = new UIElement();
+			Assert.assertFalse(el.shouldTransitionProperty("padding-left"));
 			
+			el.evaluatedStyles = {"padding-left": SizeValue.parse("1235px")};
+			
+			Assert.assertEquals(1235, (el.getStyleValue("padding-left") as SizeValue).evaluateSize(el))
 		}
 		
 		protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void

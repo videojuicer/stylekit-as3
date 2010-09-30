@@ -33,6 +33,14 @@ package org.stylekit.spec.tests.css.parse
 			this._parser = null;
 		}
 		
+		[Test(description="Ensures that a local style fragment may be parsed correctly")]
+		public function localFragmentParsesCorrectly():void
+		{
+			var style:Style = this._parser.parseLocalStyleFragment("border: 1px solid red; background: red;");
+			
+			Assert.assertEquals(2, style.properties.length);
+		}
+		
 		[Test(description="Test parsing of the CSS_MIXED fixture and ensure that the resulting StyleSheet's content matches expectations")]
 		public function mixedCSSParsesCorrectly():void
 		{
