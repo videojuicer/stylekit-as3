@@ -324,6 +324,7 @@ package org.stylekit.css.parse
 							// Special value exit - the !important flag is registered but not appended to the value token.
 							StyleKit.logger.debug("Found !important property value '"+this._token+"'. about to exit value state", this);
 							this._currentValueIsImportant = true;
+							this._lexerIndex += 10;
 						}
 						else
 						{
