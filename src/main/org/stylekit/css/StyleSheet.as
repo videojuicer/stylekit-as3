@@ -64,7 +64,15 @@ package org.stylekit.css {
 			
 			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onPropertyModified);
 			
-			this._styles.splice(atIndex, 0, s);
+			if(atIndex < 0)
+			{
+				this._styles.push(s);
+			}
+			else
+			{
+				this._styles.splice(atIndex, 0, s);
+			}
+			
 			
 			this.dispatchEvent(new StyleSheetEvent(StyleSheetEvent.STYLESHEET_MODIFIED));
 			
@@ -107,7 +115,13 @@ package org.stylekit.css {
 			{
 				return false;
 			}
-			this._fontFaces.splice(atIndex, 0, s);
+			if(atIndex < 0)
+			{
+				this._fontFaces.push(s);
+			}
+			else{
+				this._fontFaces.splice(atIndex, 0, s);
+			}
 			
 			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onPropertyModified);
 			
@@ -148,7 +162,14 @@ package org.stylekit.css {
 				return false;
 			}
 			
-			this._animations.splice(atIndex, 0, s);
+			if(atIndex < 0)
+			{
+				this._animations.push(s);
+			}
+			else
+			{
+				this._animations.splice(atIndex, 0, s);
+			}
 			
 			s.addEventListener(PropertyContainerEvent.PROPERTY_MODIFIED, this.onPropertyModified);
 			
