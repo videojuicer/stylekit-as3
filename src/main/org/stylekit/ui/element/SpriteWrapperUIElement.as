@@ -25,6 +25,16 @@ package org.stylekit.ui.element
 			this.layoutChildren();
 		}
 		
+		public override function get contentWidth():int
+		{
+			return this._sprite.width;
+		}
+		
+		public override function get contentHeight():int
+		{
+			return this._sprite.height;
+		}
+		
 		public override function layoutChildren():void
 		{
 			for (var i:int = 0; i < super.numChildren; i++)

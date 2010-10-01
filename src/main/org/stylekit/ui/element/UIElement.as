@@ -1263,11 +1263,11 @@ package org.stylekit.ui.element
 						{
 							if(x.specificity > y.specificity)
 							{
-								return -1;
-							}
-							else if(x.specificity > y.specificity)
-							{
 								return 1;
+							}
+							else if(x.specificity < y.specificity)
+							{
+								return -1;
 							}
 							else
 							{
