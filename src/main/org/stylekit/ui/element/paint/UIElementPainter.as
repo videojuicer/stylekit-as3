@@ -138,36 +138,36 @@ package org.stylekit.ui.element.paint
 			{
 				graphics.lineStyle(borderTopSize, borderTopColor, 1);
 
-				graphics.lineTo(marginLeft + uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
+				graphics.lineTo(uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
 			}
 			
 			if (topRightR > 0)
 			{
-				graphics.curveTo(marginLeft + uiElement.effectiveWidth - marginRight, marginTop, marginLeft + uiElement.effectiveWidth - marginRight, marginTop + (topRightR / 2));
+				graphics.curveTo(uiElement.effectiveWidth - marginRight, marginTop, uiElement.effectiveWidth - marginRight, marginTop + (topRightR / 2));
 			}
 			
 			if (borderRight != null)
 			{
 				graphics.lineStyle(borderRightSize, borderRightColor, 1);
 				
-				graphics.lineTo(marginLeft + uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) + marginTop - marginBottom);
+				graphics.lineTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) - marginBottom);
 			}
 			
 			if (bottomRightR > 0)
 			{
-				graphics.curveTo(marginLeft + uiElement.effectiveWidth - marginRight, marginTop + uiElement.effectiveHeight - marginBottom, marginLeft + uiElement.effectiveWidth - (bottomRightR / 2) - marginRight, marginTop + uiElement.effectiveHeight - marginBottom);
+				graphics.curveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - marginBottom, uiElement.effectiveWidth - (bottomRightR / 2) - marginRight, uiElement.effectiveHeight - marginBottom);
 			}
 			
 			if (borderBottom != null)
 			{
 				graphics.lineStyle(borderBottomSize, borderBottomColor, 1);
 				
-				graphics.lineTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight + marginTop - marginBottom);
+				graphics.lineTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight - marginBottom);
 			}
 			
 			if (bottomLeftR > 0)
 			{
-				graphics.curveTo(marginLeft, uiElement.effectiveHeight + marginTop - marginBottom, marginLeft, uiElement.effectiveHeight - (bottomLeftR / 2) + marginTop - marginBottom);
+				graphics.curveTo(marginLeft, uiElement.effectiveHeight - marginBottom, marginLeft, uiElement.effectiveHeight - (bottomLeftR / 2) - marginBottom);
 			}
 			
 			if (borderLeft != null)

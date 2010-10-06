@@ -2,6 +2,8 @@ package
 {
 	import flash.display.Sprite;
 	import flash.external.ExternalInterface;
+	import flash.display.StageAlign;
+	import flash.display.StageScaleMode;
 	
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
@@ -24,6 +26,9 @@ package
 			super();
 			
 			Logger.defaultRenderers();
+			
+			this.stage.scaleMode = StageScaleMode.NO_SCALE;
+			this.stage.align = StageAlign.TOP_LEFT;
 			
 			this._elements = new Vector.<UIElement>();
 			this._parser = new StyleSheetParser();

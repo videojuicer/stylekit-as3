@@ -794,7 +794,7 @@ package org.stylekit.ui.element
 		/**
 		* Evaluates a SizeValue within the scope of this element, and returns 0 by default.
 		*/
-		protected function evalSize(s:SizeValue):Number
+		public function evalSize(s:SizeValue):Number
 		{
 			if(s == null)
 			{
@@ -809,7 +809,7 @@ package org.stylekit.ui.element
 		/**
 		* Evaluates a size for a given CSS property key.
 		*/
-		protected function evalStyleSize(key:String):Number
+		public function evalStyleSize(key:String):Number
 		{
 			return this.evalSize((this.getStyleValue(key) as SizeValue));
 		}

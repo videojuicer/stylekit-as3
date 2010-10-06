@@ -670,6 +670,9 @@ package org.stylekit.css.parse
 					case "border-top-right-radius": case "border-bottom-right-radius": case "border-bottom-left-radius": case "border-top-left-radius":
 						property.value = SizeValue.parse(unparsedPropertyValue);
 						break;
+					case "left": case "right": case "top": case "bottom":
+						property.value = SizeValue.parse(unparsedPropertyValue);
+						break;
 					case "border-radius":
 						property.value = CornerCompoundValue.parse(unparsedPropertyValue);
 						break;

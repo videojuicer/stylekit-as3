@@ -7,9 +7,11 @@ package org.stylekit.ui.element.layout
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
+	import org.stylekit.StyleKit;
 	import org.stylekit.css.value.AlignmentValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
+	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.ui.element.UIElement;
@@ -24,7 +26,6 @@ package org.stylekit.ui.element.layout
 	*/
 	public class FlowControlLine extends Sprite
 	{
-		
 		public static var FLOW_DIRECTION_LEFT:String = "left";
 		public static var FLOW_DIRECTION_RIGHT:String = "right";
 		
@@ -51,13 +52,12 @@ package org.stylekit.ui.element.layout
 		public function FlowControlLine(maxWidth:Number, flowDirection:String = "left")
 		{
 			super();
+			
 			this._flowDirection = flowDirection;
 			this._maxWidth = maxWidth;
 			
 			this._occupiedByBlockElement = false;
 			this._elements = new Vector.<UIElement>();
-			
-			//this.setMaxWidth(maxWidth);
 		}
 		
 		public function get elements():Vector.<UIElement>
@@ -68,21 +68,29 @@ package org.stylekit.ui.element.layout
 		public function get lineHeight():Number
 		{
 			var h:int = 0;
+			
 			for(var i:uint=0; i < this._elements.length; i++)
 			{
 				var e:UIElement = this._elements[i];
-				if(e.effectiveHeight > h) h = e.effectiveHeight;
+				
+				if(e.effectiveHeight > h && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)
+				{
+					h = e.effectiveHeight;
+				}
 			}
+			
 			return h;
 		}
 		
 		// clears the line, removing all elements and resetting all counters
 		public function clear():void
 		{
-			for(var i:uint=0; i < this._elements.length; i++)
+			for(var i:uint = 0; i < super.numChildren; i++)
 			{
 				// remove sprites
+				super.removeChildAt(i);
 			}
+			
 			this._elements = new Vector.<UIElement>();
 			this._occupiedByBlockElement = false;
 			this._elementTotalEffectiveWidth = 0;
@@ -281,8 +289,69 @@ package org.stylekit.ui.element.layout
 				
 				var displayValue:DisplayValue = (e.getStyleValue("display") as DisplayValue);
 				var floatValue:FloatValue = (e.getStyleValue("float") as FloatValue);
+				var positionValue:PositionValue = (e.getStyleValue("position") as PositionValue);
 				
-				if (floatValue.float == FloatValue.FLOAT_LEFT)
+				StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
+				
+				super.addChild(e);
+				
+				e.x = 0;
+				e.y = 0;
+				
+				if (positionValue.position == PositionValue.POSITION_ABSOLUTE)
+				{
+					var relativeParent:UIElement = null;
+					var parent:UIElement = e.parentElement;
+					
+					do
+					{
+						var parentPosition:PositionValue = parent.getStyleValue("position") as PositionValue;
+						
+						if (parentPosition.position == PositionValue.POSITION_RELATIVE || parent == e.baseUI)
+						{
+							relativeParent = parent;
+						}
+						else
+						{
+							parent = parent.parentElement;
+						}
+					}
+					while (relativeParent == null);
+					
+					var point:Point = new Point(relativeParent.x, relativeParent.y);
+					
+					var lineX:Number = this.globalToLocal(point).x;
+					var lineY:Number = this.globalToLocal(point).y;
+					
+					StyleKit.logger.debug("Relative Parent -> "+point.x+"/"+point.y+"  "+lineX+"/"+lineY+" "+e.evalStyleSize("left")+"/"+e.evalStyleSize("right")+"/"+e.evalStyleSize("top"));
+					
+					// element exists at 0,0 in the line
+					// line exists at x,y
+					// 
+					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left")))
+					{
+						e.x = (lineX - e.evalStyleSize("left"));
+					}
+					
+					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right")))
+					{
+						e.x = (relativeParent.width - e.effectiveWidth) - e.evalStyleSize("right");
+					}
+					
+					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top")))
+					{
+						e.y = lineY + e.evalStyleSize("top");
+					}
+
+					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom")))
+					{
+						e.y = (relativeParent.height - e.effectiveHeight) - e.evalStyleSize("bottom");
+					}
+					
+					StyleKit.logger.debug("El -> "+e.x+"/"+e.y);
+					StyleKit.logger.debug("Glob -> "+this.globalToLocal(new Point(0, 0)).x+"/"+this.globalToLocal(new Point(0, 0)).y);
+				}
+				else if (floatValue.float == FloatValue.FLOAT_LEFT)
 				{
 					e.x = leftFloatXCollector;
 					
@@ -320,9 +389,31 @@ package org.stylekit.ui.element.layout
 					}
 				}
 				
-				trace("Adding UIElement to FlowControlLine contents ...", e, e.x, e.y);
-				
-				super.addChild(e);
+				if (positionValue.position == PositionValue.POSITION_RELATIVE)
+				{
+					// we've positioned the element as normal, now we adjust relative to our current position
+					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left")))
+					{
+						e.x = e.x + e.evalStyleSize("left");
+					}
+					
+					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right")))
+					{
+						e.x = e.x - e.evalStyleSize("right");
+					}
+					
+					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top")))
+					{
+						e.y = e.y + e.evalStyleSize("top");
+					}
+					
+					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom")))
+					{
+						e.y = e.y - e.evalStyleSize("bottom");
+					}
+				}
+
+				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
 			}
 		}
 		
