@@ -11,16 +11,17 @@ package org.stylekit.ui.element
 	
 	import mx.skins.Border;
 	
-	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
+	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.property.Property;
 	import org.stylekit.css.property.PropertyContainer;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.value.AlignmentValue;
+	import org.stylekit.css.value.AnimationCompoundValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
@@ -29,17 +30,16 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TimeValue;
 	import org.stylekit.css.value.TimingFunctionValue;
 	import org.stylekit.css.value.TransitionCompoundValue;
-	import org.stylekit.css.value.AnimationCompoundValue;
-	import org.stylekit.css.value.PropertyListValue;
-	import org.stylekit.css.value.ValueArray;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.css.value.ValueArray;
 	import org.stylekit.events.StyleSheetEvent;
-	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.events.TransitionWorkerEvent;
+	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.layout.FlowControlLine;
 	import org.stylekit.ui.element.paint.UIElementPainter;
@@ -530,7 +530,7 @@ package org.stylekit.ui.element
 			// Find new and modified keys
 			for(var newKey:String in newEvaluatedStyles)
 			{
-				if(previousEvaluatedStyles[newKey] == null || !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey]))
+				if(previousEvaluatedStyles[newKey] == null || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
 				{
 					changeFound = true;
 					alteredKeys.push(newKey);
@@ -967,6 +967,16 @@ package org.stylekit.ui.element
 			return this._controlLines[this._controlLines.length - 1];
 		}
 		
+		public function calculateContentPoint():Point
+		{
+			var point:Point = new Point();
+			
+			point.x = this.evalStyleSize("padding-left") + this.evalStyleSize("margin-left") + this.evalStyleSize("border-left-width");
+			point.y = this.evalStyleSize("padding-top") + this.evalStyleSize("margin-top") + this.evalStyleSize("border-top-width");
+			
+			return point;
+		}
+		
 		public function layoutChildren():void
 		{
 			for (var k:int = 0; k < super.numChildren; k++)
@@ -984,16 +994,18 @@ package org.stylekit.ui.element
 				// as were only dealing with lines all we need to do is stack the lines one by one
 				// with each line taking up the entire width, so we only need to think about stacking
 				// the lines with there height.
-				var y:Number = this.evalStyleSize("padding-top") + this.evalStyleSize("margin-top") + this.evalStyleSize("border-top-width");
+				var y:Number = this.calculateContentPoint().y;
+				var x:Number = this.calculateContentPoint().x;
 				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
 					var line:FlowControlLine = this.controlLines[i];
 					
+					line.x = x;
 					line.y = y;
 					line.layoutElements();
 					
-					trace("Adding FlowControlLine at "+y);
+					trace("Adding FlowControlLine at "+x+"/"+y);
 					
 					y += line.lineHeight;
 					

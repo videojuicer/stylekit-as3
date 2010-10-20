@@ -111,7 +111,9 @@ package org.stylekit.css.property
 					
 					break;
 				case "border-radius":
-					var radiusValue:SizeValue = (val as SizeValue);
+					var radiusEdgeValue:EdgeCompoundValue = (val as EdgeCompoundValue);
+					var radiusValue:SizeValue = (radiusEdgeValue.leftValue as SizeValue);
+					
 					
 					mergePropertyWithImportance(mergeParent, ["border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius", "border-top-left-radius"], 	
 						radiusValue, importance);

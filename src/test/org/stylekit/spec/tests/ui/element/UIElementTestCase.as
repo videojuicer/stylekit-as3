@@ -1,14 +1,15 @@
 
 package org.stylekit.spec.tests.ui.element
 {
+	import flash.events.TimerEvent;
+	import flash.geom.Point;
+	import flash.utils.Timer;
+	
 	import flexunit.framework.Assert;
 	import flexunit.framework.AsyncTestHelper;
 	
 	import mx.core.mx_internal;
 	import mx.utils.object_proxy;
-	
-	import flash.utils.Timer;
-	import flash.events.TimerEvent;
 	
 	import org.flexunit.async.Async;
 	import org.stylekit.css.StyleSheet;
@@ -17,11 +18,11 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
-	import org.stylekit.css.value.Value;
+	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TimeValue;
+	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
-	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.spec.Fixtures;
 	import org.stylekit.ui.BaseUI;
@@ -53,6 +54,32 @@ package org.stylekit.spec.tests.ui.element
 			this._element.addElement(child1);
 			this._element.addElement(child2);
 			this._element.addElement(child3);
+		}
+		
+		[Test(description="Tests that a UIElement can calculate its content area correctly")]
+		public function elementCanCalculateContentAreaPoint():void
+		{
+			var child:UIElement = new UIElement();
+			child.localStyleString = "margin: 10px; padding: 10px; border: solid 10px pink;";
+			
+			var point:Point = child.calculateContentPoint();
+			
+			Assert.assertEquals(30, point.x);
+			Assert.assertEquals(30, point.y);
+			
+			child.localStyleString = "margin: 10px; padding: 10px; border: solid 10px pink; margin-top: 5px; padding-top: 5px; border-top-width: 5px;";
+			
+			point = child.calculateContentPoint();
+			
+			Assert.assertEquals(30, point.x);
+			Assert.assertEquals(15, point.y);
+			
+			child.localStyleString = "margin: 10px; padding: 10px; border: solid 10px pink; margin-left: 5px; padding-left: 5px; border-left-width: 5px;";
+			
+			point = child.calculateContentPoint();
+			
+			Assert.assertEquals(15, point.x);
+			Assert.assertEquals(30, point.y);			
 		}
 		
 		[Test(description="Tests that a UIElement can contain children that belong to the parent and the children can be removed")]
