@@ -971,8 +971,18 @@ package org.stylekit.ui.element
 		{
 			var point:Point = new Point();
 			
-			point.x = this.evalStyleSize("padding-left") + this.evalStyleSize("margin-left") + this.evalStyleSize("border-left-width");
-			point.y = this.evalStyleSize("padding-top") + this.evalStyleSize("margin-top") + this.evalStyleSize("border-top-width");
+			point.x = this.evalStyleSize("padding-left") + this.evalStyleSize("margin-left");
+			point.y = this.evalStyleSize("padding-top") + this.evalStyleSize("margin-top");
+			
+			if ((this.getStyleValue("border-left-style") as LineStyleValue).lineStyle != LineStyleValue.LINE_STYLE_NONE)
+			{
+				point.x += this.evalStyleSize("border-left-width");
+			}
+			
+			if ((this.getStyleValue("border-top-style") as LineStyleValue).lineStyle != LineStyleValue.LINE_STYLE_NONE)
+			{
+				point.y += this.evalStyleSize("border-top-width");
+			}
 			
 			return point;
 		}
