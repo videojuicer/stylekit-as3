@@ -750,7 +750,7 @@ package org.stylekit.ui.element
 			// Width			
 			if(this.hasStyleProperty("width")) 
 			{
-				w = this.evalStyleSize("width");
+				w = this.evalStyleSize("width", SizeValue.DIMENSION_WIDTH);
 			}
 			else if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_BLOCK) // todo also trigger if float is set
 			{
@@ -761,20 +761,20 @@ package org.stylekit.ui.element
 				w = this.contentWidth;
 			}
 			// Apply width constraints
-			if(this.hasStyleProperty("min-width")) w = Math.max(w, this.evalStyleSize("min-width"));
-			if(this.hasStyleProperty("max-width")) w = Math.min(w, this.evalStyleSize("max-width"));
+			if(this.hasStyleProperty("min-width")) w = Math.max(w, this.evalStyleSize("min-width", SizeValue.DIMENSION_WIDTH));
+			if(this.hasStyleProperty("max-width")) w = Math.min(w, this.evalStyleSize("max-width", SizeValue.DIMENSION_WIDTH));
 			
 			// Height
 			if(this.hasStyleProperty("width"))
 			{
-				h = this.evalStyleSize("height");
+				h = this.evalStyleSize("height", SizeValue.DIMENSION_HEIGHT);
 			}
 			else {
 				h = this.contentHeight;
 			}
 			// Apply height constraints
-			if(this.hasStyleProperty("min-height")) h = Math.max(h, this.evalStyleSize("min-height"));
-			if(this.hasStyleProperty("max-height")) h = Math.min(h, this.evalStyleSize("max-height"));
+			if(this.hasStyleProperty("min-height")) h = Math.max(h, this.evalStyleSize("min-height", SizeValue.DIMENSION_HEIGHT));
+			if(this.hasStyleProperty("max-height")) h = Math.min(h, this.evalStyleSize("max-height", SizeValue.DIMENSION_HEIGHT));
 			
 			this.setEffectiveContentDimensions(w, h);
 		}
@@ -794,7 +794,7 @@ package org.stylekit.ui.element
 		/**
 		* Evaluates a SizeValue within the scope of this element, and returns 0 by default.
 		*/
-		public function evalSize(s:SizeValue):Number
+		public function evalSize(s:SizeValue, dimension:String = null):Number
 		{
 			if(s == null)
 			{
@@ -802,16 +802,16 @@ package org.stylekit.ui.element
 			}
 			else
 			{
-				return s.evaluateSize(this);
+				return s.evaluateSize(this, dimension);
 			}
 		}
 		
 		/**
 		* Evaluates a size for a given CSS property key.
 		*/
-		public function evalStyleSize(key:String):Number
+		public function evalStyleSize(key:String, dimension:String = null):Number
 		{
-			return this.evalSize((this.getStyleValue(key) as SizeValue));
+			return this.evalSize((this.getStyleValue(key) as SizeValue), dimension);
 		}
 		
 		public function getElementsBySelector(selector:*):Vector.<UIElement>

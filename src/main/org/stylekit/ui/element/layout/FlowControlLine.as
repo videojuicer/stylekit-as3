@@ -12,6 +12,7 @@ package org.stylekit.ui.element.layout
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.PositionValue;
+	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.ui.element.UIElement;
@@ -323,33 +324,32 @@ package org.stylekit.ui.element.layout
 					var lineX:Number = this.globalToLocal(point).x;
 					var lineY:Number = this.globalToLocal(point).y;
 					
-					StyleKit.logger.debug("Relative Parent -> "+point.x+"/"+point.y+"  "+lineX+"/"+lineY+" "+e.evalStyleSize("left")+"/"+e.evalStyleSize("right")+"/"+e.evalStyleSize("top"));
+					StyleKit.logger.debug("Relative Parent -> "+point.x+"/"+point.y+"  "+lineX+"/"+lineY+" "+e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT));
 					
 					// element exists at 0,0 in the line
 					// line exists at x,y
 					// 
-					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left")))
+					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (lineX - e.evalStyleSize("left"));
+						e.x = (lineX + e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH));
 					}
 					
-					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right")))
+					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (relativeParent.width - e.effectiveWidth) - e.evalStyleSize("right");
+						e.x = (relativeParent.width - e.effectiveWidth) - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
-					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top")))
+					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = lineY + e.evalStyleSize("top");
+						e.y = lineY + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 
-					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom")))
+					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = (relativeParent.height - e.effectiveHeight) - e.evalStyleSize("bottom");
+						e.y = (relativeParent.height - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
 					}
 					
 					StyleKit.logger.debug("El -> "+e.x+"/"+e.y);
-					StyleKit.logger.debug("Glob -> "+this.globalToLocal(new Point(0, 0)).x+"/"+this.globalToLocal(new Point(0, 0)).y);
 				}
 				else if (floatValue.float == FloatValue.FLOAT_LEFT)
 				{
@@ -392,24 +392,24 @@ package org.stylekit.ui.element.layout
 				if (positionValue.position == PositionValue.POSITION_RELATIVE)
 				{
 					// we've positioned the element as normal, now we adjust relative to our current position
-					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left")))
+					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = e.x + e.evalStyleSize("left");
+						e.x = e.x + e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH);
 					}
 					
-					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right")))
+					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = e.x - e.evalStyleSize("right");
+						e.x = e.x - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
-					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top")))
+					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = e.y + e.evalStyleSize("top");
+						e.y = e.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 					
-					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom")))
+					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = e.y - e.evalStyleSize("bottom");
+						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
 					}
 				}
 
