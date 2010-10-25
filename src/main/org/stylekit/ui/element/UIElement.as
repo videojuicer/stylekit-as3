@@ -4,6 +4,8 @@ package org.stylekit.ui.element
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.errors.StackOverflowError;
+	import flash.events.FocusEvent;
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
@@ -11,6 +13,7 @@ package org.stylekit.ui.element
 	
 	import mx.skins.Border;
 	
+	import org.stylekit.StyleKit;
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.ElementSelectorParser;
@@ -207,6 +210,12 @@ package org.stylekit.ui.element
 			{
 				this.baseUI.styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
 			}
+			
+			this.addEventListener(FocusEvent.FOCUS_IN, this.onFocusIn);
+			this.addEventListener(FocusEvent.FOCUS_OUT, this.onFocusOut);
+			
+			this.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
+			this.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
 		}
 		
 		public function get parentElement():UIElement
@@ -909,7 +918,10 @@ package org.stylekit.ui.element
 			
 			this._elementPseudoClasses.push(pseudoClass);
 			
+			StyleKit.logger.debug("Added "+pseudoClass, this);
+			
 			this.updateStyles();
+			this.redraw();
 			
 			return true;
 		}
@@ -920,7 +932,10 @@ package org.stylekit.ui.element
 			{
 				this._elementPseudoClasses.splice(this._elementClassNames.indexOf(pseudoClass), 1);
 				
+				StyleKit.logger.debug("Removed "+pseudoClass, this);
+				
 				this.updateStyles();
+				this.redraw();
 				
 				return true;
 			}
@@ -1522,6 +1537,26 @@ package org.stylekit.ui.element
 		protected function onStyleSheetModified(e:StyleSheetEvent):void
 		{
 			this.updateStyles();
+		}
+		
+		protected function onFocusIn(e:FocusEvent):void
+		{
+			this.addElementPseudoClass("focus");
+		}
+		
+		protected function onFocusOut(e:FocusEvent):void
+		{
+			this.removeElementPseudoClass("focus");
+		}
+		
+		protected function onMouseOver(e:MouseEvent):void
+		{
+			this.addElementPseudoClass("hover");
+		}
+		
+		protected function onMouseOut(e:MouseEvent):void
+		{
+			this.removeElementPseudoClass("hover");
 		}
 		
 		/* Overrides to block the Flash methods when they called outside of this class */
