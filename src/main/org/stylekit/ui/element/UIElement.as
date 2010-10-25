@@ -680,6 +680,7 @@ package org.stylekit.ui.element
 		protected function onEffectiveDimensionsModified():void
 		{
 			this.redraw();
+			
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this));
 		}
 		
@@ -734,7 +735,7 @@ package org.stylekit.ui.element
 		/**
 		* Recalculates the size of the content area for this element.
 		*/
-		protected function recalculateEffectiveContentDimensions():void
+		public function recalculateEffectiveContentDimensions():void
 		{
 			var w:int = 0;
 			var h:int = 0;
@@ -1013,6 +1014,7 @@ package org.stylekit.ui.element
 					
 					line.x = x;
 					line.y = y;
+					
 					line.layoutElements();
 					
 					trace("Adding FlowControlLine at "+x+"/"+y);
@@ -1525,35 +1527,19 @@ package org.stylekit.ui.element
 		/* Overrides to block the Flash methods when they called outside of this class */
 		
 		/**
-		 * @see UIElement.addElement
-		 */
-		public override function addChild(child:DisplayObject):DisplayObject
-		{
-			throw new IllegalOperationError("Method addChild not accessible on a UIElement");
-		}
-		
-		/**
 		 * @see UIElement.addElementAt
 		 */
-		public override function addChildAt(child:DisplayObject, index:int):DisplayObject
+		/*public override function addChildAt(child:DisplayObject, index:int):DisplayObject
 		{
 			throw new IllegalOperationError("Method addChildAt not accessible on a UIElement");
-		}
-		
-		/**
-		 * @see UIElement.removeElement
-		 */
-		public override function removeChild(child:DisplayObject):DisplayObject
-		{
-			throw new IllegalOperationError("Method removeChild not accessible on a UIElement");
-		}
+		}*/
 		
 		/**
 		 * @see UIElement.removeElementAt
 		 */
-		public override function removeChildAt(index:int):DisplayObject
+		/*public override function removeChildAt(index:int):DisplayObject
 		{
 			throw new IllegalOperationError("Method removeChildAt not accessible on a UIElement");
-		}
+		}*/
 	}
 }

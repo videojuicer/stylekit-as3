@@ -13,12 +13,12 @@ package org.stylekit.ui
 		
 		public function BaseUI(styleSheetCollection:StyleSheetCollection = null, root:DisplayObject = null)
 		{
-			super();
-			
 			this._styleSheetCollection = styleSheetCollection;
 			this._root = root;
 			
-			if (this._root != null)
+			super();
+			
+			if (this._root != null && this._root.stage != null)
 			{
 				this._root.stage.addEventListener(Event.RESIZE, this.onRootResized, false, 1);
 			}

@@ -293,7 +293,7 @@ package org.stylekit.ui.element.layout
 				var positionValue:PositionValue = (e.getStyleValue("position") as PositionValue);
 				
 				StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
-				
+					
 				super.addChild(e);
 				
 				e.x = 0;
@@ -414,6 +414,8 @@ package org.stylekit.ui.element.layout
 				}
 
 				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
+				
+				e.recalculateEffectiveContentDimensions();
 			}
 		}
 		

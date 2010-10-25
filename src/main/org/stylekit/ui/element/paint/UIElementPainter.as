@@ -12,6 +12,7 @@ package org.stylekit.ui.element.paint
 	
 	import mx.controls.SWFLoader;
 	
+	import org.stylekit.StyleKit;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
@@ -132,7 +133,7 @@ package org.stylekit.ui.element.paint
 
 			graphics.lineStyle(0, 0);
 			
-			trace("Painting ...", uiElement);
+			StyleKit.logger.debug("Painting ...", uiElement);
 			
 			if (borderTop != null)
 			{
