@@ -216,6 +216,12 @@ package org.stylekit.ui.element
 			
 			this.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			this.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
+			
+			this.addEventListener(MouseEvent.CLICK, this.onMouseClick);
+			this.addEventListener(MouseEvent.DOUBLE_CLICK, this.onMouseDoubleClick);
+			
+			this.addEventListener(MouseEvent.MOUSE_DOWN, this.onMouseDown);
+			this.addEventListener(MouseEvent.MOUSE_UP, this.onMouseUp);
 		}
 		
 		public function get parentElement():UIElement
@@ -1557,6 +1563,26 @@ package org.stylekit.ui.element
 		protected function onMouseOut(e:MouseEvent):void
 		{
 			this.removeElementPseudoClass("hover");
+		}
+		
+		protected function onMouseClick(e:MouseEvent):void
+		{
+			
+		}
+		
+		protected function onMouseDoubleClick(e:MouseEvent):void
+		{
+			
+		}
+		
+		protected function onMouseDown(e:MouseEvent):void
+		{
+			this.addElementPseudoClass("active");
+		}
+		
+		protected function onMouseUp(e:MouseEvent):void
+		{
+			this.removeElementPseudoClass("active");
 		}
 		
 		/* Overrides to block the Flash methods when they called outside of this class */
