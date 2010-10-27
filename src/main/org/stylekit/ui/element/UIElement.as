@@ -1581,8 +1581,6 @@ package org.stylekit.ui.element
 		
 		protected function onMouseClick(e:MouseEvent):void
 		{
-			e.stopImmediatePropagation();
-			
 			StyleKit.logger.debug("MouseClick", this);
 		}
 		
