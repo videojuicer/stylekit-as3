@@ -181,6 +181,9 @@ package org.stylekit.ui.element
 		protected var _transitionWorkers:Vector.<TransitionWorker>;
 		protected var _transitionWorkerProperties:Vector.<String>;
 		
+		protected var _rawContentWidth:int = 0;
+		protected var _rawContentHeight:int = 0;
+		
 		/**
 		* A reference to the Style object used to store this element's local styles. This Style is treated with a higher 
 		* priority than styles sourced from the BaseUI's stylesheet collection.
@@ -704,8 +707,8 @@ package org.stylekit.ui.element
 		*/
 		protected function recalculateContentDimensions():void
 		{
-			var w:int = 0;
-			var h:int = 0;
+			var w:int = this._rawContentWidth;
+			var h:int = this._rawContentHeight;
 
 			/* TODO
 				Width:
@@ -764,7 +767,7 @@ package org.stylekit.ui.element
 			*/
 			
 			// Width			
-			if(this.hasStyleProperty("width")) 
+			if(this.hasStyleProperty("width") && !isNaN((this.getStyleValue("width") as SizeValue).value)) 
 			{
 				w = this.evalStyleSize("width", SizeValue.DIMENSION_WIDTH);
 			}
@@ -781,7 +784,7 @@ package org.stylekit.ui.element
 			if(this.hasStyleProperty("max-width")) w = Math.min(w, this.evalStyleSize("max-width", SizeValue.DIMENSION_WIDTH));
 			
 			// Height
-			if(this.hasStyleProperty("width"))
+			if(this.hasStyleProperty("height") && !isNaN((this.getStyleValue("height") as SizeValue).value))
 			{
 				h = this.evalStyleSize("height", SizeValue.DIMENSION_HEIGHT);
 			}
@@ -1098,6 +1101,9 @@ package org.stylekit.ui.element
 			
 			this.updateChildrenIndex();
 			
+			child.updateStyles();
+			child.redraw();
+			
 			return child;
 		}
 		
@@ -1273,6 +1279,11 @@ package org.stylekit.ui.element
 						{
 							var chain:ElementSelectorChain = style.elementSelectorChains[k];
 							
+							if (chain.elementSelectors.length == 2)
+							{
+								trace("mmm");
+							}
+							
 							if (this.matchesElementSelectorChain(chain))
 							{
 								if (this._styles.indexOf(style) == -1)
@@ -1414,7 +1425,9 @@ package org.stylekit.ui.element
 		
 		public function matchesElementSelectorChain(chain:ElementSelectorChain):Boolean
 		{
-			var collection:Vector.<ElementSelector> = chain.elementSelectors.reverse();
+			var collection:Vector.<ElementSelector> = chain.elementSelectors.concat();
+			collection.reverse();
+			
 			var parent:UIElement = this;
 			
 			for (var i:int = 0; i < collection.length; i++)
@@ -1563,16 +1576,19 @@ package org.stylekit.ui.element
 		protected function onMouseOut(e:MouseEvent):void
 		{
 			this.removeElementPseudoClass("hover");
+			this.removeElementPseudoClass("active");
 		}
 		
 		protected function onMouseClick(e:MouseEvent):void
 		{
+			e.stopImmediatePropagation();
 			
+			StyleKit.logger.debug("MouseClick", this);
 		}
 		
 		protected function onMouseDoubleClick(e:MouseEvent):void
 		{
-			
+			StyleKit.logger.debug("MouseDoubleClick", this);
 		}
 		
 		protected function onMouseDown(e:MouseEvent):void
