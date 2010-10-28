@@ -45,6 +45,11 @@ package org.stylekit.css.value
 			return this._properties;
 		}
 		
+		public function get all():Boolean
+		{
+			return this._all;
+		}
+		
 		public function set properties(p:Vector.<String>):void
 		{
 			this._properties = p;
@@ -148,7 +153,7 @@ package org.stylekit.css.value
 		{
 			if (other is PropertyListValue)
 			{
-				return false;
+				return ((this.all && (other as PropertyListValue).all) || (this.properties.length == 0 && (other as PropertyListValue).properties.length == 0));
 			}
 			
 			return super.isEquivalent(other);
