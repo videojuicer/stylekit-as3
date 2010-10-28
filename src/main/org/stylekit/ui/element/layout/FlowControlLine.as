@@ -343,7 +343,7 @@ package org.stylekit.ui.element.layout
 					// 
 					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (lineX + e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH));
+						e.x = (e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH));
 					}
 					
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
@@ -353,7 +353,7 @@ package org.stylekit.ui.element.layout
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = lineY + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
+						e.y = e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
