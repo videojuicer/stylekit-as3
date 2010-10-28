@@ -68,6 +68,7 @@ package org.stylekit.ui.element
 	{
 		
 		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = ["width", "height", "max-width", "max-height", "min-width", "min-height", "display"];
+		protected static var LAYOUT_CSS_PROPERTIES:Array = ["float", "position", "display", "top", "left", "bottom", "right"];
 		
 		/**
 		* The child UIElement objects contained by the UIElement.
@@ -615,23 +616,27 @@ package org.stylekit.ui.element
 		protected function onStylePropertyValuesChanged(alteredKeys:Vector.<String>):void
 		{
 			var effectiveContentDimensionsRecalcNeeded:Boolean = false;
-						
+			var parentLayoutNeeded:Boolean = false;
+			
 			for(var i:uint=0; i < alteredKeys.length; i++)
 			{
 				var k:String = alteredKeys[i];
 				if(UIElement.EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES.indexOf(k) > -1)
 				{
 					effectiveContentDimensionsRecalcNeeded = true;
-					break;
+				}
+				else if(UIElement.LAYOUT_CSS_PROPERTIES.indexOf(k) > -1)
+				{
+					parentLayoutNeeded = true;
 				}
 			}
 			
+
 			if(effectiveContentDimensionsRecalcNeeded) this.recalculateEffectiveContentDimensions();
+			if(parentLayoutNeeded && this.parentElement != null) this.parentElement.layoutChildren();
 			
 			// TODO react to changes that require a redraw (border, width, etc.)
-			// TODO react to changes that require a re-layout of the parent's children (change to float, position)
 			// TODO react to changes in animation and transition (change to transition-property, animation)
-				// sub-TODO: this requires the implementation of local styles
 		}
 		
 		/**
