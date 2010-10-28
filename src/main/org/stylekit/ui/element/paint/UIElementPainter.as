@@ -82,6 +82,11 @@ package org.stylekit.ui.element.paint
 			var borderRightSize:int = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderRight.sizeValue.evaluateSize(uiElement));
 			var borderBottomSize:int = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderBottom.sizeValue.evaluateSize(uiElement));
 
+			var borderTopAlpha:Number = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
+			var borderLeftAlpha:Number = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
+			var borderRightAlpha:Number = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
+			var borderBottomAlpha:Number = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
+			
 			var topRightRadius:SizeValue = (radiusCompound.topRightValue as SizeValue);
 			var bottomRightRadius:SizeValue = (radiusCompound.bottomRightValue as SizeValue);
 			var bottomLeftRadius:SizeValue = (radiusCompound.bottomLeftValue as SizeValue);
@@ -100,7 +105,7 @@ package org.stylekit.ui.element.paint
 			
 			graphics.moveTo(marginLeft + topLeftR / 2, marginTop);
 		
-			if (backgroundColor != 0)
+			if (uiElement.getStyleValue("background-color").rawValue == "transparent")
 			{
 				backgroundAlpha = 0;
 			}
@@ -145,7 +150,7 @@ package org.stylekit.ui.element.paint
 			
 			if (borderTop != null)
 			{
-				graphics.lineStyle(borderTopSize, borderTopColor, 1);
+				graphics.lineStyle(borderTopSize, borderTopColor, borderTopAlpha);
 
 				graphics.lineTo(uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
 			}
@@ -157,7 +162,7 @@ package org.stylekit.ui.element.paint
 			
 			if (borderRight != null)
 			{
-				graphics.lineStyle(borderRightSize, borderRightColor, 1);
+				graphics.lineStyle(borderRightSize, borderRightColor, borderRightAlpha);
 				
 				graphics.lineTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) - marginBottom);
 			}
@@ -169,7 +174,7 @@ package org.stylekit.ui.element.paint
 			
 			if (borderBottom != null)
 			{
-				graphics.lineStyle(borderBottomSize, borderBottomColor, 1);
+				graphics.lineStyle(borderBottomSize, borderBottomColor, borderBottomAlpha);
 				
 				graphics.lineTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight - marginBottom);
 			}
@@ -181,7 +186,7 @@ package org.stylekit.ui.element.paint
 			
 			if (borderLeft != null)
 			{ 
-				graphics.lineStyle(borderLeftSize, borderLeftColor, 1);
+				graphics.lineStyle(borderLeftSize, borderLeftColor, borderLeftAlpha);
 			
 				graphics.lineTo(marginLeft, (topLeftR / 2) + marginTop);
 			}
