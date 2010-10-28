@@ -11,6 +11,7 @@ package org.stylekit.ui.element.paint
 	import flash.utils.ByteArray;
 	
 	import mx.controls.SWFLoader;
+	import mx.effects.easing.Back;
 	
 	import org.stylekit.StyleKit;
 	import org.stylekit.css.value.BorderCompoundValue;
@@ -33,6 +34,8 @@ package org.stylekit.ui.element.paint
 		protected var _backgroundLoader:Loader;
 		protected var _backgroundBytes:ByteArray;
 		protected var _backgroundBitmapData:BitmapData;
+		
+		protected var _previousBackgroundImageValue:URLValue;
 		
 		protected var _uiElement:UIElement;
 		
@@ -114,8 +117,10 @@ package org.stylekit.ui.element.paint
 			
 			if (backgroundImage != null)
 			{
-				if (this._backgroundLoader == null)
+				if (this._backgroundLoader == null || this._previousBackgroundImageValue != backgroundImage)
 				{
+					this._previousBackgroundImageValue = backgroundImage;
+					
 					this._backgroundLoader = new Loader();
 					
 					this._backgroundLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onBackgroundLoaderComplete);
@@ -208,13 +213,16 @@ package org.stylekit.ui.element.paint
 			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
 			
 			var tempBitmapData:BitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
-			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveWidth, this.uiElement.effectiveHeight, true, backgroundColor);
+			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveContentWidth, this.uiElement.effectiveContentHeight, true, backgroundColor);
 			
 			// need to draw the image repeated and positioned like the rules above in the bitmapData object
 			var xRepeat:int = Math.ceil(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 1);
 			var yRepeat:int = Math.ceil(backgroundRepeat.verticalRepeat ? (bitmapData.height / tempBitmapData.height) : 1);
 
 			//var bitmapBytes:ByteArray = tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height));
+			
+			var contentX:Number = this.uiElement.calculateContentPoint().x;
+			var contentY:Number = this.uiElement.calculateContentPoint().y;
 			
 			for (var y:int = 0; y < yRepeat; y++)
 			{
@@ -230,8 +238,8 @@ package org.stylekit.ui.element.paint
 					//bitmapData.setPixels(rect, bitmapBytes);
 					
 					// starting position
-					var startX:int = tempBitmapData.width * x;
-					var startY:int = tempBitmapData.height * y;
+					var startX:int = contentX + tempBitmapData.width * x;
+					var startY:int = contentY + tempBitmapData.height * y;
 					
 					trace("Drawing from: "+startX+"/"+startY+" -> "+xRepeat+"/"+yRepeat);
 					

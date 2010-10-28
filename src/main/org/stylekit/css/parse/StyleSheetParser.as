@@ -43,6 +43,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.OverflowValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.PropertyListValue;
+	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.TextDecorationValue;
@@ -666,6 +667,9 @@ package org.stylekit.css.parse
 						break;
 					case "background-image":
 						property.value = URLValue.parse(unparsedPropertyValue);
+						break;
+					case "background-repeat":
+						property.value = RepeatValue.parse(unparsedPropertyValue);
 						break;
 					case "padding": case "margin": case "border-width": case "border-radius":
 						property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);
