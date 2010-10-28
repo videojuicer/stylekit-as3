@@ -560,7 +560,7 @@ package org.stylekit.ui.element
 			{
 				for(var prevKey:String in previousEvaluatedStyles)
 				{
-					if(newEvaluatedStyles[prevKey] == null)
+					if(newEvaluatedStyles[prevKey] == null && previousEvaluatedStyles[prevKey] != null)
 					{
 						changeFound = true;
 						alteredKeys.push(prevKey);
@@ -633,7 +633,11 @@ package org.stylekit.ui.element
 			
 
 			if(effectiveContentDimensionsRecalcNeeded) this.recalculateEffectiveContentDimensions();
-			if(parentLayoutNeeded && this.parentElement != null) this.parentElement.layoutChildren();
+			if(parentLayoutNeeded && (this.parentElement != null)) 
+			{
+				StyleKit.logger.debug("A layout property was modified ("+alteredKeys.join(", ")+") calling to the parent's layoutChildren method", this);
+				this.parentElement.layoutChildren();
+			}
 			
 			// TODO react to changes that require a redraw (border, width, etc.)
 			// TODO react to changes in animation and transition (change to transition-property, animation)
