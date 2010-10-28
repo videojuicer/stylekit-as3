@@ -227,6 +227,7 @@ package org.stylekit.css.parse
 							i++; // We don't need to scan the next character so let's just skip it
 							StyleKit.logger.debug("Encountered comment end", this);
 							this.exitState();
+							continue;
 						}
 						break;
 					// During a string block
