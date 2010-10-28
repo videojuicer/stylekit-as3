@@ -549,7 +549,7 @@ package org.stylekit.ui.element
 			// Find new and modified keys
 			for(var newKey:String in newEvaluatedStyles)
 			{
-				if(previousEvaluatedStyles[newKey] == null || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
+				if((previousEvaluatedStyles[newKey] == null && newEvaluatedStyles[newKey] != null) || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
 				{
 					changeFound = true;
 					alteredKeys.push(newKey);
