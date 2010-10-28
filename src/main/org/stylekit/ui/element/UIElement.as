@@ -551,6 +551,7 @@ package org.stylekit.ui.element
 			{
 				if((previousEvaluatedStyles[newKey] == null && newEvaluatedStyles[newKey] != null) || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
 				{
+					StyleKit.logger.debug("Found new or modified style prop for "+newKey+" ("+previousEvaluatedStyles[newKey]+" > "+newEvaluatedStyles[newKey]+")", this)
 					changeFound = true;
 					alteredKeys.push(newKey);
 				}
@@ -562,6 +563,7 @@ package org.stylekit.ui.element
 				{
 					if(newEvaluatedStyles[prevKey] == null && previousEvaluatedStyles[prevKey] != null)
 					{
+						StyleKit.logger.debug("Found deleted style prop for "+prevKey+" ("+previousEvaluatedStyles[prevKey]+" > "+newEvaluatedStyles[prevKey]+")", this)
 						changeFound = true;
 						alteredKeys.push(prevKey);
 					}
