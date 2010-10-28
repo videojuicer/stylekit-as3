@@ -1279,11 +1279,6 @@ package org.stylekit.ui.element
 						{
 							var chain:ElementSelectorChain = style.elementSelectorChains[k];
 							
-							if (chain.elementSelectors.length == 2)
-							{
-								trace("mmm");
-							}
-							
 							if (this.matchesElementSelectorChain(chain))
 							{
 								if (this._styles.indexOf(style) == -1)
