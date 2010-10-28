@@ -664,6 +664,9 @@ package org.stylekit.css.parse
 					case "visibility":
 						property.value = VisibilityValue.parse(unparsedPropertyValue);
 						break;
+					case "background-image":
+						property.value = URLValue.parse(unparsedPropertyValue);
+						break;
 					case "padding": case "margin": case "border-width": case "border-radius":
 						property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);
 						break;

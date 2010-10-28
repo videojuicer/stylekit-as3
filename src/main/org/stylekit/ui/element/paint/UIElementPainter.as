@@ -55,10 +55,10 @@ package org.stylekit.ui.element.paint
 			// we skip some null checks because most properties should be set by default
 			// 
 			
+			var backgroundAlpha:Number = 1.0;
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
 			  
-			
 			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize();
 			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize();
 			var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize();
@@ -102,8 +102,10 @@ package org.stylekit.ui.element.paint
 		
 			if (backgroundColor != 0)
 			{
-				graphics.beginFill(backgroundColor);
+				backgroundAlpha = 0;
 			}
+			
+			graphics.beginFill(backgroundColor, backgroundAlpha);
 			
 			if (backgroundImage != null)
 			{
@@ -116,8 +118,10 @@ package org.stylekit.ui.element.paint
 					if (backgroundImage.url.indexOf("data:") == 0)
 					{
 						var dataURI:DataURIParser = new DataURIParser(backgroundImage.url);
-				
-						this._backgroundLoader.loadBytes(Base64.decodeToByteArray(dataURI.data));
+						var bytes:ByteArray = Base64.decodeToByteArray(dataURI.rawData);
+						bytes.position = 0;
+						
+						this._backgroundLoader.loadBytes(bytes);
 					}
 					else
 					{
@@ -205,13 +209,13 @@ package org.stylekit.ui.element.paint
 			var xRepeat:int = Math.ceil(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 1);
 			var yRepeat:int = Math.ceil(backgroundRepeat.verticalRepeat ? (bitmapData.height / tempBitmapData.height) : 1);
 
-			var bitmapBytes:ByteArray = tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height));
+			//var bitmapBytes:ByteArray = tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height));
 			
 			for (var y:int = 0; y < yRepeat; y++)
 			{
 				for (var x:int = 0; x < xRepeat; x++)
 				{
-					bitmapBytes.position = 0;
+					//bitmapBytes.position = 0;
 					
 					var width:int = ((xRepeat - 1) == x ? bitmapData.width - (tempBitmapData.width * (xRepeat - 1)) : tempBitmapData.width);
 					var height:int = ((yRepeat - 1) == y ? bitmapData.height - (tempBitmapData.height * (yRepeat - 1)) : tempBitmapData.height);
