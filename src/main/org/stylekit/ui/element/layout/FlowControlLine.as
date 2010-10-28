@@ -183,7 +183,12 @@ package org.stylekit.ui.element.layout
 			if (added)
 			{
 				this._elements.push(e);
-				this._elementTotalEffectiveWidth += e.effectiveWidth;
+				
+				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
+				{
+					this._elementTotalEffectiveWidth += e.effectiveWidth;
+				}
+				
 				//this.layoutElements();
 			}
 
