@@ -25,6 +25,7 @@ package org.stylekit.css.value
 			"xx-small": "0.3em",
 			"x-small": "0.4em",
 			"small": "0.6em",
+			"normal": "1em",
 			"medium": "1em",
 			"large": "1.3em",
 			"x-large": "1.6em",
