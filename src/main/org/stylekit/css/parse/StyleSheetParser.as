@@ -224,10 +224,9 @@ package org.stylekit.css.parse
 						// During a comment block, all content is ignored until we encounter the */ signal.
 						if(css.substr(i,2) == "*/")
 						{
-							i++; // We don't need to scan the next character so let's just skip it
+							i += 2; // We don't need to scan the next character so let's just skip it
 							StyleKit.logger.debug("Encountered comment end", this);
 							this.exitState();
-							continue;
 						}
 						break;
 					// During a string block
