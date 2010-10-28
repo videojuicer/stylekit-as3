@@ -292,8 +292,15 @@ package org.stylekit.ui.element.layout
 				var floatValue:FloatValue = (e.getStyleValue("float") as FloatValue);
 				var positionValue:PositionValue = (e.getStyleValue("position") as PositionValue);
 				
-				StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
+				if (displayValue.display == DisplayValue.DISPLAY_NONE)
+				{
+					StyleKit.logger.debug("FlowControlLine - skipping UIElement due to display being set to none", e);
 					
+					continue;
+				}
+				
+				StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
+				
 				super.addChild(e);
 				
 				e.x = 0;
