@@ -68,6 +68,7 @@ package org.stylekit.ui.element
 	{
 		
 		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = ["width", "height", "max-width", "max-height", "min-width", "min-height", "display"];
+		protected static var LAYOUT_CSS_PROPERTIES:Array = ["float", "position", "display", "top", "left", "bottom", "right"];
 		
 		/**
 		* The child UIElement objects contained by the UIElement.
@@ -548,7 +549,7 @@ package org.stylekit.ui.element
 			// Find new and modified keys
 			for(var newKey:String in newEvaluatedStyles)
 			{
-				if(previousEvaluatedStyles[newKey] == null || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
+				if((previousEvaluatedStyles[newKey] == null && newEvaluatedStyles[newKey] != null) || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
 				{
 					changeFound = true;
 					alteredKeys.push(newKey);
@@ -559,7 +560,7 @@ package org.stylekit.ui.element
 			{
 				for(var prevKey:String in previousEvaluatedStyles)
 				{
-					if(newEvaluatedStyles[prevKey] == null)
+					if(newEvaluatedStyles[prevKey] == null && previousEvaluatedStyles[prevKey] != null)
 					{
 						changeFound = true;
 						alteredKeys.push(prevKey);
@@ -615,23 +616,31 @@ package org.stylekit.ui.element
 		protected function onStylePropertyValuesChanged(alteredKeys:Vector.<String>):void
 		{
 			var effectiveContentDimensionsRecalcNeeded:Boolean = false;
-						
+			var parentLayoutNeeded:Boolean = false;
+			
 			for(var i:uint=0; i < alteredKeys.length; i++)
 			{
 				var k:String = alteredKeys[i];
 				if(UIElement.EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES.indexOf(k) > -1)
 				{
 					effectiveContentDimensionsRecalcNeeded = true;
-					break;
+				}
+				else if(UIElement.LAYOUT_CSS_PROPERTIES.indexOf(k) > -1)
+				{
+					parentLayoutNeeded = true;
 				}
 			}
 			
+
 			if(effectiveContentDimensionsRecalcNeeded) this.recalculateEffectiveContentDimensions();
+			if(parentLayoutNeeded && (this.parentElement != null)) 
+			{
+				StyleKit.logger.debug("A layout property was modified ("+alteredKeys.join(", ")+") calling to the parent's layoutChildren method", this);
+				this.parentElement.layoutChildren();
+			}
 			
 			// TODO react to changes that require a redraw (border, width, etc.)
-			// TODO react to changes that require a re-layout of the parent's children (change to float, position)
 			// TODO react to changes in animation and transition (change to transition-property, animation)
-				// sub-TODO: this requires the implementation of local styles
 		}
 		
 		/**
