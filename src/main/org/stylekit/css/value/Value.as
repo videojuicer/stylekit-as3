@@ -60,9 +60,9 @@ package org.stylekit.css.value {
 		public function isEquivalent(other:Value):Boolean
 		{
 			// type matches
-			if (this === other)
+			if (other is Value)
 			{
-				return (this._rawValue == other._rawValue);
+				return (this._rawValue == other._rawValue || this._stringValue == other._stringValue);
 			}
 			
 			return false;

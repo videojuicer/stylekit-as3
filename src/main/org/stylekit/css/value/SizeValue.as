@@ -33,6 +33,7 @@ package org.stylekit.css.value
 		
 		protected var _units:String = "px";
 		protected var _value:Number = 0;
+		protected var _auto:Boolean = false;
 		
 		public function SizeValue()
 		{
@@ -49,6 +50,10 @@ package org.stylekit.css.value
 			if(SizeValue.WORD_VALUE_MAP[str])
 			{
 				str = SizeValue.WORD_VALUE_MAP[str];
+			}
+			else if(str == "auto")
+			{
+				sVal.auto = true;
 			}
 			
 			var unitPattern:RegExp = new RegExp("[%a-zA-Z]+");
@@ -85,6 +90,16 @@ package org.stylekit.css.value
 			this._units = u;
 			
 			this.modified();
+		}
+		
+		public function get auto():Boolean
+		{
+			return this._auto;
+		}
+		
+		public function set auto(b:Boolean):void
+		{
+			this._auto = b;
 		}
 		
 		public function get value():Number
@@ -152,7 +167,7 @@ package org.stylekit.css.value
 			// type matches
 			if (other is SizeValue)
 			{
-				return (this.units == (other as SizeValue).units && this.value == (other as SizeValue).value);
+				return ((this.auto && (other as SizeValue).auto) || (this.units == (other as SizeValue).units && this.value == (other as SizeValue).value));
 			}
 			
 			return super.isEquivalent(other);
