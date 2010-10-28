@@ -599,7 +599,7 @@ package org.stylekit.ui.element
 			this._runTransitions = true;
 		}
 		
-		protected function overwriteEvaluatedStyle(propertyName:String, value:Value):void
+		public function overwriteEvaluatedStyle(propertyName:String, value:Value):void
 		{
 			this.evaluatedStyles[propertyName] = value;
 			var v:Vector.<String> = new Vector.<String>();
