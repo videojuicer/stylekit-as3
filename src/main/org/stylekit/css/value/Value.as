@@ -46,6 +46,11 @@ package org.stylekit.css.value {
 		{
 			this._stringValue = s;
 		}
+		
+		public function get rawValue():String
+		{
+			return this._rawValue;
+		}
 
 		public function set rawValue(s:String):void
 		{
