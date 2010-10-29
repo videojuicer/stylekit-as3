@@ -11,6 +11,7 @@ package org.stylekit.ui.element
 	
 	import flashx.textLayout.formats.Float;
 	
+	import mx.controls.Text;
 	import mx.skins.Border;
 	
 	import org.stylekit.StyleKit;
@@ -1101,9 +1102,9 @@ package org.stylekit.ui.element
 				this._contentContainer.x = this.calculateContentPoint().x;
 				this._contentContainer.y = this.calculateContentPoint().y;
 				
-				this._contentContainer.graphics.beginFill(0x000000, 0);
-				this._contentContainer.graphics.drawRect(0, 0, this.effectiveContentWidth, this.effectiveContentHeight);
-				this._contentContainer.graphics.endFill();
+				//this._contentContainer.graphics.beginFill(0x000000, 0.8);
+				//this._contentContainer.graphics.drawRect(0, 0, this.effectiveContentWidth, this.effectiveContentHeight);
+				//this._contentContainer.graphics.endFill();
 				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
