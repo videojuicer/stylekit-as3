@@ -184,7 +184,7 @@ package org.stylekit.ui.element.layout
 			{
 				this._elements.push(e);
 				
-				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
+				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)
 				{
 					this._elementTotalEffectiveWidth += e.effectiveWidth;
 				}

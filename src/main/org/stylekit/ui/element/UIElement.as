@@ -191,6 +191,9 @@ package org.stylekit.ui.element
 		*/ 
 		protected var _localStyle:Style;
 		
+		protected var _contentContainer:Sprite;
+		protected var _contentSprites:Vector.<DisplayObject>;
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
@@ -207,6 +210,8 @@ package org.stylekit.ui.element
 			
 			this._transitionWorkers = new Vector.<TransitionWorker>();
 			this._transitionWorkerProperties = new Vector.<String>();
+			
+			this._contentSprites = new Vector.<DisplayObject>();
 			
 			this._painter = new UIElementPainter(this);
 			
@@ -937,9 +942,7 @@ package org.stylekit.ui.element
 			}
 			
 			this._elementPseudoClasses.push(pseudoClass);
-			
-			StyleKit.logger.debug("Added "+pseudoClass, this);
-			
+
 			this.updateStyles();
 			this.redraw();
 			
@@ -951,8 +954,6 @@ package org.stylekit.ui.element
 			if (this.hasElementPseudoClass(pseudoClass))
 			{
 				this._elementPseudoClasses.splice(this._elementClassNames.indexOf(pseudoClass), 1);
-				
-				StyleKit.logger.debug("Removed "+pseudoClass, this);
 				
 				this.updateStyles();
 				this.redraw();
@@ -1033,31 +1034,47 @@ package org.stylekit.ui.element
 			this.refreshControlLines();
 			
 			if (this.controlLines != null)
-			{
+			{				
 				// only we do now is stack the FlowControlLines onto the UIElements content space
 				// the FlowControlLines take care of laying out the indiviual UIElement children.
 				
 				// as were only dealing with lines all we need to do is stack the lines one by one
 				// with each line taking up the entire width, so we only need to think about stacking
 				// the lines with there height.
-				var y:Number = this.calculateContentPoint().y;
-				var x:Number = this.calculateContentPoint().x;
+				var y:Number = 0;
+				
+				// position the content container
+				this._contentContainer = new Sprite();
+				this._contentContainer.x = this.calculateContentPoint().x;
+				this._contentContainer.y = this.calculateContentPoint().y;
+				
+				this._contentContainer.graphics.beginFill(0x000000, 0);
+				this._contentContainer.graphics.drawRect(0, 0, this.effectiveContentWidth, this.effectiveContentHeight);
+				this._contentContainer.graphics.endFill();
 				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
 					var line:FlowControlLine = this.controlLines[i];
 					
-					line.x = x;
 					line.y = y;
 					
 					line.layoutElements();
 					
-					trace("Adding FlowControlLine at "+x+"/"+y);
+					StyleKit.logger.debug("Adding FlowControlLine at "+y);
 					
 					y += line.lineHeight;
 					
-					
-					super.addChild(line);
+					this._contentContainer.addChild(line);
+				}
+				
+				super.addChild(this._contentContainer);
+			}
+			
+			if (this._contentSprites != null)
+			{
+				for (var j:int = 0; j < this._contentSprites.length; j++)
+				{
+					this._contentContainer.addChild(this._contentSprites[j]);
 				}
 			}
 			
