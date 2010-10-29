@@ -1470,18 +1470,21 @@ package org.stylekit.ui.element
 			var selector:ElementSelector;
 			var elem:UIElement = this.styleParent;
 			
-			while(collection.length > 1 && selectorIndex <= collection.length-1 && elem != null)
+			if(collection.length > 1)
 			{
-				selector = collection[selectorIndex];
-				
-				if(elem.matchesElementSelector(selector))
+				while(selectorIndex < collection.length && elem != null)
 				{
-					// If it matches, log the match and move us to the next selector
-					matchedSelectorCount++;
-					selectorIndex++;
+					selector = collection[selectorIndex];
+
+					if(elem.matchesElementSelector(selector))
+					{
+						// If it matches, log the match and move us to the next selector
+						matchedSelectorCount++;
+						selectorIndex++;
+					}
+
+					elem = elem.styleParent;
 				}
-				
-				elem = elem.styleParent;
 			}
 			
 			return (matchedSelectorCount == collection.length);
