@@ -32,6 +32,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.LineStyleValue;
+	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.SizeValue;
@@ -644,6 +645,7 @@ package org.stylekit.ui.element
 			var effectiveDimensionsRecalcKeys:Array = [];
 			var parentLayoutKeys:Array = [];
 			var redrawKeys:Array = [];
+			var setOpacity:Boolean = false;
 
 			
 			for(var i:uint=0; i < alteredKeys.length; i++)
@@ -665,9 +667,18 @@ package org.stylekit.ui.element
 				{
 					redrawKeys.push(k);
 				}
+				else if(k == "opacity")
+				{
+					setOpacity = true;
+				}
 			}
 			
+			// Handle easy properties
 
+			if(setOpacity)
+			{
+				this.alpha = (this.getStyleValue("opacity") as NumericValue).value
+			}
 			if(effectiveContentDimensionsRecalcKeys.length > 0) 
 			{
 				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveContentDimensionsRecalcKeys.join(", ")+")", this);
