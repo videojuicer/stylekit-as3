@@ -1470,7 +1470,7 @@ package org.stylekit.ui.element
 			var selector:ElementSelector;
 			var elem:UIElement = this.styleParent;
 			
-			while(collection.length > 1 && elem != null)
+			while(collection.length > 1 && selectorIndex <= collection.length-1 && elem != null)
 			{
 				selector = collection[selectorIndex];
 				
