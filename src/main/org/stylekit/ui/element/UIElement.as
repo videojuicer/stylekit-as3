@@ -1338,10 +1338,13 @@ package org.stylekit.ui.element
 			return value;
 		}
 		
-		public function updateStyles():void
+		public function updateStyles(parentChanged:Boolean = false):void
 		{
 			// TODO remove listeners
 			// BUG: somewhere here the evalulatedStyles on the UIElement are reset to the defaults
+			
+			var prevStyles:Vector.<Style> = this._styles;
+			var changed:Boolean = parentChanged;
 			
 			this._styles = new Vector.<Style>();
 			this._styleSelectors = new Vector.<ElementSelectorChain>();
@@ -1367,6 +1370,10 @@ package org.stylekit.ui.element
 									// TODO add listener
 									this._styles.push(style);
 									this._styleSelectors.push(chain);
+									if(prevStyles.indexOf(style) > -1)
+									{
+										changed = true;
+									}
 								}
 								
 								break;
@@ -1379,10 +1386,13 @@ package org.stylekit.ui.element
 			// Evaluate the new styles
 			this.evaluateStyles();
 			
-			// Now have the children update
-			for(i = 0; i < this._children.length; i++)
+			// Now have the children update if there was an update
+			if(changed)
 			{
-				this._children[i].updateStyles();
+				for(i = 0; i < this._children.length; i++)
+				{
+					this._children[i].updateStyles(true);
+				}
 			}
 		}
 		
