@@ -1468,11 +1468,12 @@ package org.stylekit.ui.element
 			var selectorIndex:int = 1; // We already did the first one
 			var matchedSelectorCount:int = 1; // We already did the first one
 			var selector:ElementSelector;
+			var prevElem:UIElement;
 			var elem:UIElement = this.styleParent;
 			
 			if(collection.length > 1)
 			{
-				while(selectorIndex < collection.length && elem != null)
+				while(selectorIndex < collection.length && elem != null && (prevElem != elem))
 				{
 					selector = collection[selectorIndex];
 
@@ -1483,6 +1484,7 @@ package org.stylekit.ui.element
 						selectorIndex++;
 					}
 
+					prevElem = elem;
 					elem = elem.styleParent;
 				}
 			}
