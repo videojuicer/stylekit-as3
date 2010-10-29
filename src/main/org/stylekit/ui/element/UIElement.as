@@ -1378,6 +1378,12 @@ package org.stylekit.ui.element
 			
 			// Evaluate the new styles
 			this.evaluateStyles();
+			
+			// Now have the children update
+			for(i = 0; i < this._children.length; i++)
+			{
+				this._children[i].updateStyles();
+			}
 		}
 		
 		protected function evaluateStyles():void
