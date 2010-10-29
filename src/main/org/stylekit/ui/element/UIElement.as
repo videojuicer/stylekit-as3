@@ -1370,7 +1370,7 @@ package org.stylekit.ui.element
 									// TODO add listener
 									this._styles.push(style);
 									this._styleSelectors.push(chain);
-									if(prevStyles.indexOf(style) > -1)
+									if(prevStyles == null || prevStyles.indexOf(style) > -1)
 									{
 										changed = true;
 									}
