@@ -1428,7 +1428,7 @@ package org.stylekit.ui.element
 			
 			if(selector.parentSelector != null)
 			{
-				if(this.styleParent == null || !this.styleParent.matchesElementSelector(selector))
+				if(this.styleParent == null || !this.styleParent.matchesElementSelector(selector.parentSelector))
 				{
 					return false;
 				}
@@ -1444,15 +1444,16 @@ package org.stylekit.ui.element
 			
 			// This element must match the first selector
 			var firstSelectorMatched:Boolean = this.matchesElementSelector(collection[0]);
+			if(!firstSelectorMatched) return false;
 			
 			// With that sorted, let's take the parent selectors into account
 			
 			var selectorIndex:int = 1; // We already did the first one
-			var matchedSelectorCount:int = 0;
+			var matchedSelectorCount:int = 1; // We already did the first one
 			var selector:ElementSelector;
 			var elem:UIElement = this.styleParent;
 			
-			while(elem != null)
+			while(collection.length > 1 && elem != null)
 			{
 				selector = collection[selectorIndex];
 				
@@ -1466,7 +1467,7 @@ package org.stylekit.ui.element
 				elem = elem.styleParent;
 			}
 			
-			return firstSelectorMatched && (matchedSelectorCount == collection.length-1);
+			return (matchedSelectorCount == collection.length);
 		}
 		
 		public function beginPropertyTransition(propertyName:String, initialValue:Value, endValue:Value):void
