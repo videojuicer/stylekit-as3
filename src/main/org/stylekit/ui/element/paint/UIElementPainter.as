@@ -121,6 +121,10 @@ package org.stylekit.ui.element.paint
 				{
 					this._previousBackgroundImageValue = backgroundImage;
 					
+					this._backgroundBitmapData = null;
+					this._backgroundBytes = null;
+					this._backgroundLoader = null;
+					
 					this._backgroundLoader = new Loader();
 					
 					this._backgroundLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onBackgroundLoaderComplete);
@@ -230,10 +234,10 @@ package org.stylekit.ui.element.paint
 				{
 					//bitmapBytes.position = 0;
 					
-					var width:int = ((xRepeat - 1) == x ? bitmapData.width - (tempBitmapData.width * (xRepeat - 1)) : tempBitmapData.width);
-					var height:int = ((yRepeat - 1) == y ? bitmapData.height - (tempBitmapData.height * (yRepeat - 1)) : tempBitmapData.height);
+					var width:int = (xRepeat == 1) ? tempBitmapData.width : ((xRepeat - 1) == x ? bitmapData.width - (tempBitmapData.width * (xRepeat - 1)) : tempBitmapData.width);
+					var height:int = (yRepeat == 1) ? tempBitmapData.height : ((yRepeat - 1) == y ? bitmapData.height - (tempBitmapData.height * (yRepeat - 1)) : tempBitmapData.height);
 					
-					var rect:Rectangle = new Rectangle((x * tempBitmapData.width), (y * tempBitmapData.height), width, height);
+					//var rect:Rectangle = new Rectangle((x * tempBitmapData.width), (y * tempBitmapData.height), width, height);
 					
 					//bitmapData.setPixels(rect, bitmapBytes);
 					
