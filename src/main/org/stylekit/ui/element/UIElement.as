@@ -67,8 +67,26 @@ package org.stylekit.ui.element
 	public class UIElement extends Sprite
 	{
 		
-		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = ["width", "height", "max-width", "max-height", "min-width", "min-height", "display"];
-		protected static var LAYOUT_CSS_PROPERTIES:Array = ["float", "position", "display", "top", "left", "bottom", "right"];
+		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = [
+			"width", "height", 
+			"max-width", "max-height", "min-width", "min-height", 
+			"display"
+		];
+		protected static var EFFECTIVE_DIMENSION_CSS_PROPERTIES:Array = [
+			"padding-left", "padding-right", "padding-top", "padding-bottom", 
+			"margin-top", "margin-bottom", "margin-left", "margin-right",
+			"border-top-style", "border-left-style", "border-right-style", "border-bottom-style",
+			"border-top-width", "border-left-width", "border-right-width", "border-bottom-width"
+		];
+		protected static var REDRAW_CSS_PROPERTIES:Array = [
+			"border-top-color", "border-left-color", "border-right-color", "border-bottom-color",
+			"border-top-style", "border-left-style", "border-right-style", "border-bottom-style",
+			"background-color", "background-image"
+		];
+		protected static var LAYOUT_CSS_PROPERTIES:Array = [
+			"float", "position", "display", 
+			"top", "left", "bottom", "right"
+		];
 		
 		/**
 		* The child UIElement objects contained by the UIElement.
@@ -622,31 +640,55 @@ package org.stylekit.ui.element
 		*/
 		protected function onStylePropertyValuesChanged(alteredKeys:Vector.<String>):void
 		{
-			var effectiveContentDimensionsRecalcNeeded:Boolean = false;
-			var parentLayoutNeeded:Boolean = false;
+			var effectiveContentDimensionsRecalcKeys:Array = [];
+			var effectiveDimensionsRecalcKeys:Array = [];
+			var parentLayoutKeys:Array = [];
+			var redrawKeys:Array = [];
+
 			
 			for(var i:uint=0; i < alteredKeys.length; i++)
 			{
 				var k:String = alteredKeys[i];
 				if(UIElement.EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES.indexOf(k) > -1)
 				{
-					effectiveContentDimensionsRecalcNeeded = true;
+					effectiveContentDimensionsRecalcKeys.push(k);
 				}
 				else if(UIElement.LAYOUT_CSS_PROPERTIES.indexOf(k) > -1)
 				{
-					parentLayoutNeeded = true;
+					parentLayoutKeys.push(k);
+				}
+				else if(UIElement.EFFECTIVE_DIMENSION_CSS_PROPERTIES.indexOf(k) > -1)
+				{
+					effectiveDimensionsRecalcKeys.push(k);
+				}
+				else if(UIElement.REDRAW_CSS_PROPERTIES.indexOf(k) > -1)
+				{
+					redrawKeys.push(k);
 				}
 			}
 			
 
-			if(effectiveContentDimensionsRecalcNeeded) this.recalculateEffectiveContentDimensions();
-			if(parentLayoutNeeded && (this.parentElement != null)) 
+			if(effectiveContentDimensionsRecalcKeys.length > 0) 
 			{
-				StyleKit.logger.debug("A layout property was modified ("+alteredKeys.join(", ")+") calling to the parent's layoutChildren method", this);
+				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveContentDimensionsRecalcKeys.join(", ")+")", this);
+				this.recalculateEffectiveContentDimensions();
+			}
+			if(parentLayoutKeys.length > 0 && (this.parentElement != null)) 
+			{
+				StyleKit.logger.debug("A layout property was modified ("+parentLayoutKeys.join(", ")+") calling to the parent's layoutChildren method", this);
 				this.parentElement.layoutChildren();
 			}
+			if(effectiveDimensionsRecalcKeys.length > 0)
+			{
+				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveDimensionsRecalcKeys.join(", ")+")", this);
+				this.recalculateEffectiveDimensions();
+			}
+			if(redrawKeys.length > 0)
+			{
+				StyleKit.logger.debug("A property was modified that requires a redraw. ("+redrawKeys.join(", ")+")", this);
+				this.redraw();
+			}
 			
-			// TODO react to changes that require a redraw (border, width, etc.)
 			// TODO react to changes in animation and transition (change to transition-property, animation)
 		}
 		
