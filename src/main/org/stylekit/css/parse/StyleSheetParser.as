@@ -632,6 +632,12 @@ package org.stylekit.css.parse
 					case "font":
 						property.value = FontCompoundValue.parse(unparsedPropertyValue);
 						break;
+					case "font-family":
+						property.value = Value.parse(unparsedPropertyValue);
+						break;
+					case "font-size":
+						property.value = SizeValue.parse(unparsedPropertyValue);
+						break;
 					case "font-style":
 						property.value = FontStyleValue.parse(unparsedPropertyValue);
 						break;

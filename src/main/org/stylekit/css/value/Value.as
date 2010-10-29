@@ -2,6 +2,7 @@ package org.stylekit.css.value {
 	import flash.events.EventDispatcher;
 	
 	import org.stylekit.events.ValueEvent;
+	import org.utilkit.util.StringUtil;
 	
 	/**
 	* The Value class represents any value attached to a CSS property. There are several specialised value types such as ColorValue and URLValue,
@@ -21,7 +22,7 @@ package org.stylekit.css.value {
 		public static function parse(str:String):Value
 		{
 			var val:Value = new Value();
-				val.stringValue = str;
+				val.stringValue = StringUtil.trim(str);
 			return val;
 		}
 		
