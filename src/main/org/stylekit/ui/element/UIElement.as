@@ -1443,6 +1443,14 @@ package org.stylekit.ui.element
 				}
 			}
 			
+			if(selector.parentSelector != null)
+			{
+				if(this.styleParent == null || !this.styleParent.matchesElementSelector(selector.parentSelector))
+				{
+					return false;
+				}
+			}
+			
 			return true;
 		}
 		
@@ -1451,23 +1459,32 @@ package org.stylekit.ui.element
 			var collection:Vector.<ElementSelector> = chain.elementSelectors.concat();
 			collection.reverse();
 			
-			var parent:UIElement = this;
+			// This element must match the first selector
+			var firstSelectorMatched:Boolean = this.matchesElementSelector(collection[0]);
+			if(!firstSelectorMatched) return false;
 			
-			for (var i:int = 0; i < collection.length; i++)
+			// With that sorted, let's take the parent selectors into account
+			
+			var selectorIndex:int = 1; // We already did the first one
+			var matchedSelectorCount:int = 1; // We already did the first one
+			var selector:ElementSelector;
+			var elem:UIElement = this.styleParent;
+			
+			while(collection.length > 1 && elem != null)
 			{
-				var selector:ElementSelector = collection[i];
+				selector = collection[selectorIndex];
 				
-				if (parent != null && parent.matchesElementSelector(selector))
+				if(elem.matchesElementSelector(selector))
 				{
-					parent = parent.styleParent;
+					// If it matches, log the match and move us to the next selector
+					matchedSelectorCount++;
+					selectorIndex++;
 				}
-				else
-				{
-					return false;
-				}
+				
+				elem = elem.styleParent;
 			}
 			
-			return true;
+			return (matchedSelectorCount == collection.length);
 		}
 		
 		public function beginPropertyTransition(propertyName:String, initialValue:Value, endValue:Value):void
