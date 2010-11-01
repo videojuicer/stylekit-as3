@@ -217,7 +217,7 @@ package org.stylekit.ui.element.paint
 			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
 			
 			var tempBitmapData:BitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
-			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveContentWidth, this.uiElement.effectiveContentHeight, true, backgroundColor);
+			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveWidth, this.uiElement.effectiveHeight, true, backgroundColor);
 			
 			// need to draw the image repeated and positioned like the rules above in the bitmapData object
 			var xRepeat:int = Math.ceil(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 1);
@@ -247,15 +247,17 @@ package org.stylekit.ui.element.paint
 					
 					trace("Drawing from: "+startX+"/"+startY+" -> "+xRepeat+"/"+yRepeat);
 					
-					for (var h:int = 0; h < height; h++)
+					for (var h:int = height; h >= 0; h--)
 					{
-						for (var w:int = 0; w < width; w++)
+						for (var w:int = width; w >= 0; w--)
 						{
 							bitmapData.setPixel32(w + startX, h + startY, tempBitmapData.getPixel32(w, h));
 						}
 					}
 				}
 			}
+			
+			
 			
 			this._backgroundBitmapData = bitmapData;
 			
