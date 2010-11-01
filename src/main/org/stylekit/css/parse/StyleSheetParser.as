@@ -629,6 +629,18 @@ package org.stylekit.css.parse
 					case "float":
 						property.value = FloatValue.parse(unparsedPropertyValue);
 						break;
+					case "box-flex":
+						property.value = NumericValue.parse(unparsedPropertyValue);
+						break;
+					case "box-flex-group":
+						property.value = NumericValue.parse(unparsedPropertyValue);
+						break;
+					case "box-align":
+					//case "box-ordinal-group":
+					//case "box-direction":
+					//case "box-orient":
+					case "box-pack":
+					case "box-lines":
 					case "font":
 						property.value = FontCompoundValue.parse(unparsedPropertyValue);
 						break;
@@ -714,7 +726,7 @@ package org.stylekit.css.parse
 						property.value = ValueArray.parse(unparsedPropertyValue, AnimationDirectionValue)
 						break;
 					case "transition":
-						property.value = TransitionCompoundValue(unparsedPropertyValue);
+						property.value = TransitionCompoundValue.parse(unparsedPropertyValue);
 						break;
 					case "transition-property":
 						property.value = PropertyListValue.parse(unparsedPropertyValue);

@@ -176,6 +176,9 @@ package org.stylekit.css.property
 				"visibility": VisibilityValue.parse("visible"),
 				"opacity": NumericValue.parse("1.0"),
 				
+				// box-flex
+				"box-flex": NumericValue.parse("0.0"),
+				
 				// font
 				"font-family": Value.parse("sans-serif"),
 				"font-size": SizeValue.parse("medium"),

@@ -809,6 +809,70 @@ package org.stylekit.ui.element
 			
 			this.setContentDimensions(w, h);
 		}
+
+		/**
+		 * Calculates the flex size for the specified child (the child should exist on the UIElement).
+		 * 
+		 * The flex size is calculated by adding up the children that exist without any flexibility, the number of flex's
+		 * across all the children is added up and the free space is split up between the flexable children.
+		 */
+		protected function calculateBoxFlexSize(child:UIElement):Number
+		{
+			var flexibles:Vector.<Object> = new Vector.<Object>();
+			var usedSpace:Number = 0;
+
+			// calculate how much space we have used on the non-flexi elements
+			for (var i:int = 0; i < this.children.length; i++)
+			{
+				var uiElement:UIElement = this.children[i];
+				var numericValue:NumericValue = (uiElement.getStyleValue("box-flex") as NumericValue);
+
+				if ((uiElement.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
+				{
+					if (uiElement.hasStyleProperty("box-flex") && numericValue.value > 0)
+					{
+						flexibles.push({ flex: numericValue.value, element: uiElement  });
+					}
+					else
+					{
+						usedSpace += uiElement.effectiveWidth;
+					}
+				}
+			}
+			
+			var availableSpace:Number = this.effectiveContentWidth - usedSpace;
+			var flexCounts:int = 0;
+			
+			// counts the number of flex's on all the found children, if a uielement has a flex value of 2, this counts as 
+			// 2 flexes, this allows us to split up the un-used space between the number of flexes. 
+			for (var j:int = 0; j < flexibles.length; j++)
+			{
+				var flex:Object = flexibles[j];
+				
+				var numeric:Number = flex.flex;
+				var element:UIElement = flex.element;
+				
+				flexCounts += numeric;
+			}
+			
+			var flexCost:Number = availableSpace / flexCounts;
+			
+			// find the flexible element that we want, then take the cost of 1 flex and find the cost
+			// the element requires
+			for (var k:int = 0; k < flexibles.length; k++)
+			{
+				var flux:Object = flexibles[k];
+				
+				var fluxCost:Number = flexCost * flux.flex;
+				
+				if ((flux.element as UIElement) == child)
+				{
+					return fluxCost;
+				}
+			}
+			
+			return 0;
+		}
 		
 		/**
 		* Called when the content of this element changes dimensions, by a new value being set in either direction
@@ -836,8 +900,36 @@ package org.stylekit.ui.element
 						subtract horizontal scrollbar if horizontal scrollbar required
 			*/
 			
-			// Width			
-			if(this.hasStyleProperty("width") && !isNaN((this.getStyleValue("width") as SizeValue).value)) 
+			// Width
+			/*if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_NONE)
+			{
+				w = 0;
+			}
+			else */ if (this.hasStyleProperty("box-flex") && (this.getStyleValue("box-flex") as NumericValue).value > 0)
+			{				
+				var flexCost:Number = this.parentElement.calculateBoxFlexSize(this);
+				
+				var borderLeft:SizeValue = (this.getStyleValue("border-left-width") as SizeValue);
+				var borderRight:SizeValue = (this.getStyleValue("border-right-width") as SizeValue);
+
+				var borderLeftStyle:LineStyleValue = (this.getStyleValue("border-left-style") as LineStyleValue);
+				var borderRightStyle:LineStyleValue = (this.getStyleValue("border-right-style") as LineStyleValue);
+				
+				var bLeft:int = (borderLeft != null && borderLeftStyle != null && borderLeftStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderLeft.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+				var bRight:int = (borderRight != null && borderRightStyle != null && borderRightStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderRight.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+				
+				// the flex cost is the amount 
+				
+				var extraEffectiveWidth:Number = 0;
+				
+				extraEffectiveWidth += (bLeft + bRight);
+				extraEffectiveWidth += (this.evalStyleSize("margin-left", SizeValue.DIMENSION_WIDTH) + this.evalStyleSize("margin-right", SizeValue.DIMENSION_WIDTH));
+				extraEffectiveWidth += (this.evalStyleSize("padding-left", SizeValue.DIMENSION_WIDTH) + this.evalStyleSize("padding-right", SizeValue.DIMENSION_WIDTH));
+				
+				// flexxxxxo
+				w = flexCost - extraEffectiveWidth;
+			}
+			else if(this.hasStyleProperty("width") && !isNaN((this.getStyleValue("width") as SizeValue).value)) 
 			{
 				w = this.evalStyleSize("width", SizeValue.DIMENSION_WIDTH);
 			}
@@ -849,6 +941,7 @@ package org.stylekit.ui.element
 			{
 				w = this.contentWidth;
 			}
+			
 			// Apply width constraints
 			if(this.hasStyleProperty("min-width")) w = Math.max(w, this.evalStyleSize("min-width", SizeValue.DIMENSION_WIDTH));
 			if(this.hasStyleProperty("max-width")) w = Math.min(w, this.evalStyleSize("max-width", SizeValue.DIMENSION_WIDTH));
@@ -863,7 +956,7 @@ package org.stylekit.ui.element
 			}
 			// Apply height constraints
 			if(this.hasStyleProperty("min-height")) h = Math.max(h, this.evalStyleSize("min-height", SizeValue.DIMENSION_HEIGHT));
-			if(this.hasStyleProperty("max-height")) h = Math.min(h, this.evalStyleSize("max-height", SizeValue.DIMENSION_HEIGHT));
+			if(this.hasStyleProperty("max-height")) h = Math.min(h, this.evalStyleSize("max-height", SizeValue.DIMENSION_HEIGHT));	
 			
 			this.setEffectiveContentDimensions(w, h);
 		}
@@ -1023,6 +1116,11 @@ package org.stylekit.ui.element
 			this._controlLines = new Vector.<FlowControlLine>();
 			
 			var textAlign:AlignmentValue = (this.getStyleValue("text-align") as AlignmentValue);
+			
+			if (this.hasElementClassName("_timeline") && this.children.length == 3)
+			{
+				StyleKit.logger.debug("Timeline found!");
+			}
 			
 			// create a new line
 			this.newControlLine(textAlign);
@@ -1592,6 +1690,8 @@ package org.stylekit.ui.element
 				
 				// Kick it
 				worker.start();
+				
+				this.dispatchEvent(new UIElementEvent(UIElementEvent.TRANSITION_STARTED, this));
 			}
 		}
 		
@@ -1656,6 +1756,8 @@ package org.stylekit.ui.element
 			
 			this.onTransitionIntermediateValueGenerated(e);
 			this.cancelPropertyTransition(pName);
+			
+			this.dispatchEvent(new UIElementEvent(UIElementEvent.TRANSITION_FINISHED, this));
 		}
 		
 		protected function onParentElementEvaluatedStylesModified(e:UIElementEvent):void
