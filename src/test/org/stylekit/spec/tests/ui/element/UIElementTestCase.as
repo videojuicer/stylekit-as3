@@ -401,6 +401,21 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertTrue(el.hasStyleProperty("value-not-present-in-defaults"));
 		}
 		
+		[Test(description="Generates a key for the local styling state vector")]
+		public function stateVectorsGenerated():void
+		{
+			var el:UIElement = new UIElement();
+			el.elementName = "foo";
+			el.elementId = "bar";
+			el.addElementClassName("class1");
+			el.addElementClassName("class2");
+			el.addElementPseudoClass("pseudo1");
+			el.addElementPseudoClass("pseudo2");
+			
+			Assert.assertEquals("bar/foo/class1,class2/pseudo1,pseudo2/0", el.generateStateVectorKey());
+		}
+		
+		
 		[Test(async, description="Ensures that properties with a defined transition and non-zero duration are not altered immediately")]
 		public function transitionsWithDurationsAreAnimated():void
 		{

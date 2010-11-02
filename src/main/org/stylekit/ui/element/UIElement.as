@@ -1437,6 +1437,35 @@ package org.stylekit.ui.element
 			return value;
 		}
 		
+		/**
+		* Returns a local state vector for this element.
+		*/
+		public function generateStateVector():Array
+		{
+			return [this.elementId, this.elementName, this._elementClassNames.join(","), this._elementPseudoClasses.join(","), this._parentIndex];
+		}
+		
+		/**
+		* Returns a state vector for this element, to be used as a cache key.
+		*/
+		public function generateStateVectorKey():String
+		{
+			return this.generateStateVector().join("/");
+		}
+		
+		/**
+		* Triggered when any component of the local state (id, name, classes, pseudoclasses, parent index) is altered.
+		*/
+		public function localStateVectorModified():void
+		{
+			
+		}
+		
+		public function networkStateVectorModified():void
+		{
+			
+		}
+				
 		public function updateStyles(parentChanged:Boolean = false):void
 		{
 			// TODO remove listeners
