@@ -8,6 +8,7 @@ package org.stylekit.ui.element.paint
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
+	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
 	
 	import mx.controls.SWFLoader;
@@ -141,7 +142,7 @@ package org.stylekit.ui.element.paint
 					{
 						var uriParser:URLParser = new URLParser(backgroundImage.url);
 						
-						this._backgroundLoader.load(new URLRequest(uriParser.url));
+						this._backgroundLoader.load(new URLRequest(uriParser.url), new LoaderContext(true));
 					}
 				}
 				else
