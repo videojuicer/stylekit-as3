@@ -214,6 +214,13 @@ package org.stylekit.ui.element
 		protected var _contentContainer:Sprite;
 		protected var _contentSprites:Vector.<DisplayObject>;
 		
+		// Element state caches
+		protected var _descendants:Vector.<UIElement>; // All descendants. Updated when elements are added/removed to/from this tree.
+		protected var _descendantsByClass:Object; // All descendants mapped by classname.
+		protected var _descendantsById:Object; // All descendants mapped by element ID
+		protected var _descendantsByName:Object; // All descendants mapped by element name
+		protected var _descendantsByPseudoClass:Object; // All descendants mapped by pseudo
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
@@ -234,6 +241,8 @@ package org.stylekit.ui.element
 			this._contentSprites = new Vector.<DisplayObject>();
 			
 			this._painter = new UIElementPainter(this);
+			
+			this.resetDescendantRegistry();
 			
 			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
 			{
@@ -260,12 +269,14 @@ package org.stylekit.ui.element
 		
 		public function set parentElement(parent:UIElement):void
 		{
-			if(this._parentElement != null)
+			var prev:UIElement = this._parentElement;
+			if(prev != null)
 			{
 				this._parentElement.removeEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
 			}
 			this._parentElement = parent;
 			this._parentElement.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
+			this.movedToNewAncestorTree(prev, this._parentElement);
 		}
 		
 		public function get baseUI():BaseUI
@@ -298,6 +309,41 @@ package org.stylekit.ui.element
 		public function set styleEligible(styleEligible:Boolean):void
 		{
 			this._styleEligible = styleEligible;
+		}
+		
+		public function get elementClassNames():Vector.<String>
+		{
+			return this._elementClassNames;
+		}
+		
+		public function get elementPseudoClasses():Vector.<String>
+		{
+			return this._elementPseudoClasses;
+		}
+		
+		public function get descendants():Vector.<UIElement>
+		{
+			return this._descendants;
+		}
+		
+		public function get descendantsByClass():Object
+		{
+			return this._descendantsByClass;
+		}
+		
+		public function get descendantsById():Object
+		{
+			return this._descendantsById;
+		}
+		
+		public function get descendantsByName():Object
+		{
+			return this._descendantsByName;
+		}
+		
+		public function get descendantsByPseudoClass():Object
+		{
+			return this._descendantsByPseudoClass;
 		}
 		
 		public function get effectiveWidth():int
@@ -515,9 +561,13 @@ package org.stylekit.ui.element
 		
 		public function set elementName(elementName:String):void
 		{
+			var prev:String = this._elementName;
 			this._elementName = elementName;
 			
-			this.updateStyles();
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantNameModified(elementName, prev, this);
+			}
 		}
 		
 		public function get elementId():String
@@ -527,8 +577,12 @@ package org.stylekit.ui.element
 		
 		public function set elementId(s:String):void
 		{
+			var prev:String = this._elementId;
 			this._elementId = s;
-			this.updateStyles();
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantIdModified(s, prev, this);
+			}
 		}
 		
 		public function get isFirstChild():Boolean
@@ -1057,7 +1111,10 @@ package org.stylekit.ui.element
 			
 			this._elementClassNames.push(className);
 			
-			this.updateStyles();
+			if(this.parentElement != null)
+			{
+				this.parentElement.registerDescendantClassName(className, this);
+			}
 			
 			return true;
 		}
@@ -1068,7 +1125,10 @@ package org.stylekit.ui.element
 			{
 				this._elementClassNames.splice(this._elementClassNames.indexOf(className), 1);
 				
-				this.updateStyles();
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantClassName(className, this);
+				}
 				
 				return true;
 			}
@@ -1090,8 +1150,10 @@ package org.stylekit.ui.element
 			
 			this._elementPseudoClasses.push(pseudoClass);
 
-			this.updateStyles();
-			this.redraw();
+			if(this.parentElement != null)
+			{
+				this.parentElement.registerDescendantPseudoClass(pseudoClass, this);
+			}
 			
 			return true;
 		}
@@ -1102,8 +1164,10 @@ package org.stylekit.ui.element
 			{
 				this._elementPseudoClasses.splice(this._elementClassNames.indexOf(pseudoClass), 1);
 				
-				this.updateStyles();
-				this.redraw();
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantPseudoClass(pseudoClass, this);
+				}
 				
 				return true;
 			}
@@ -1454,17 +1518,265 @@ package org.stylekit.ui.element
 		}
 		
 		/**
-		* Triggered when any component of the local state (id, name, classes, pseudoclasses, parent index) is altered.
+		* Resets the descendant registry to a fresh state.
 		*/
-		public function localStateVectorModified():void
+		public function resetDescendantRegistry():void
 		{
-			
+			this._descendants = new Vector.<UIElement>(); // All descendants. Updated when elements are added/removed to/from this tree.
+			this._descendantsByClass = {} // All descendants mapped by classname.
+			this._descendantsById = {}; // All descendants mapped by element ID
+			this._descendantsByName = {}; // All descendants mapped by element name
+			this._descendantsByPseudoClass = {}; // All descendants mapped by pseudo
 		}
 		
-		public function networkStateVectorModified():void
+		public function registerDescendantClassName(name:String, originatingElement:UIElement):void
 		{
+			if(name != null)
+			{
+				if(this._descendantsByClass[name] == null)
+				{
+					this._descendantsByClass[name] = new Vector.<UIElement>();
+				}
 			
+				var desc:Vector.<UIElement> = this._descendantsByClass[name] as Vector.<UIElement>;
+				if(desc.indexOf(originatingElement) < 0)
+				{
+					desc.push(originatingElement);
+				}
+				this._descendantsByClass[name] = desc;
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.registerDescendantClassName(name, originatingElement);
+				}
+			}
 		}
+		
+		public function unregisterDescendantClassName(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
+			{
+				var desc:Vector.<UIElement> = this._descendantsByClass[name] as Vector.<UIElement>;
+				var i:int = desc.indexOf(originatingElement);
+				if(i < 0)
+				{
+					throw new Error("Unregistering descendant class name, but descendant was never registered. The descendant cache has lost sync.");
+				}
+				else
+				{
+					desc.splice(i, 1);
+					this._descendantsByClass[name] = desc;
+				}
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantClassName(name, originatingElement);
+				}
+			}
+		}
+		
+		public function registerDescendantPseudoClass(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
+			{
+				if(this._descendantsByPseudoClass[name] == null)
+				{
+					this._descendantsByPseudoClass[name] = new Vector.<UIElement>();
+				}
+				
+				var desc:Vector.<UIElement> = this._descendantsByPseudoClass[name] as Vector.<UIElement>;
+				if(desc.indexOf(originatingElement) < 0)
+				{
+					desc.push(originatingElement);
+				}
+				this._descendantsByPseudoClass[name] = desc;
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.registerDescendantPseudoClass(name, originatingElement);
+				}
+			}
+		}
+		
+		public function unregisterDescendantPseudoClass(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
+			{
+				var desc:Vector.<UIElement> = this._descendantsByPseudoClass[name] as Vector.<UIElement>;
+				var i:int = desc.indexOf(originatingElement);
+				if(i < 0)
+				{
+					throw new Error("Unregistering descendant pseudoclass, but descendant was never registered. The descendant cache has lost sync.");
+				}
+				else
+				{
+					desc.splice(i, 1);
+					this._descendantsByPseudoClass[name] = desc;
+				}
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantPseudoClass(name, originatingElement);
+				}
+			}
+		}
+		
+		public function descendantNameModified(newName:String, previousName:String, originatingElement:UIElement):void
+		{
+			// Register new name
+			if(newName != null)
+			{
+				if(this._descendantsByName[newName] == null)
+				{
+					this._descendantsByName[newName] = new Vector.<UIElement>();
+				}
+				
+				var n:Vector.<UIElement> = this._descendantsByName[newName] as Vector.<UIElement>;
+				if(n.indexOf(originatingElement) < 0)
+				{
+					n.push(originatingElement);
+				}
+			}
+			
+			// Unregister previous name
+			if(previousName != null)
+			{
+				var d:Vector.<UIElement> = this._descendantsByName[previousName] as Vector.<UIElement>;
+				if(d != null)
+				{
+					var i:int = d.indexOf(originatingElement);
+					if(i >= 0)
+					{
+						d.splice(i, 1);
+						this._descendantsByName[previousName] = d;
+					}
+				}
+			}
+			
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantNameModified(newName, previousName, originatingElement);
+			}
+		}
+		
+		public function descendantIdModified(newId:String, previousId:String, originatingElement:UIElement):void
+		{
+			// Register new name
+			if(newId != null)
+			{
+				if(this._descendantsById[newId] == null)
+				{
+					this._descendantsById[newId] = new Vector.<UIElement>();
+				}
+				
+				var n:Vector.<UIElement> = this._descendantsById[newId] as Vector.<UIElement>;
+				if(n.indexOf(originatingElement) < 0)
+				{
+					n.push(originatingElement);
+				}
+			}
+			
+			// Unregister previous name
+			if(previousId != null)
+			{
+				var d:Vector.<UIElement> = this._descendantsById[previousId] as Vector.<UIElement>;
+				if(d != null)
+				{
+					var i:int = d.indexOf(originatingElement);
+					if(i >= 0)
+					{
+						d.splice(i, 1);
+						this._descendantsById[previousId] = d;
+					}
+				}
+			}
+			
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantIdModified(newId, previousId, originatingElement);
+			}
+		}
+		
+		/**
+		* Registers a descendant to this element and all elements above it.
+		*/
+		public function descendantAdded(descendant:UIElement):void
+		{
+			// Add to main descendant list
+			if(this._descendants.indexOf(descendant) < 0)
+			{
+				this._descendants.push(descendant);
+			
+				// Add to ID hash
+				this.descendantIdModified(descendant.elementId, null, descendant);
+				// Add to name hash
+				this.descendantNameModified(descendant.elementName, null, descendant);
+				// Register classes
+				for(var i:uint=0; i < descendant.elementClassNames.length; i++)
+				{
+					this.registerDescendantClassName(descendant.elementClassNames[i], descendant);
+				}
+				// Register pseudoclasses
+				for(i=0; i < descendant.elementPseudoClasses.length; i++)
+				{
+					this.registerDescendantPseudoClass(descendant.elementPseudoClasses[i], descendant);
+				}
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.descendantAdded(descendant);
+				}
+			}
+		}
+		
+		/**
+		* Unregisters a descendant from this element and all elements above it.
+		*/
+		public function descendantRemoved(descendant:UIElement):void
+		{
+			// Add to main descendant list
+			this._descendants.splice(this._descendants.indexOf(descendant), 1);
+			
+			// Strip from ID hash
+			this.descendantIdModified(null, descendant.elementId, descendant);
+			// Strip from name hash
+			this.descendantNameModified(null, descendant.elementName, descendant);
+			// DE-register classes
+			for(var i:uint=0; i < descendant.elementClassNames.length; i++)
+			{
+				this.unregisterDescendantClassName(descendant.elementClassNames[i], descendant);
+			}
+			// DE-register pseudoclasses
+			for(i=0; i < descendant.elementPseudoClasses.length; i++)
+			{
+				this.unregisterDescendantPseudoClass(descendant.elementPseudoClasses[i], descendant);
+			}
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantRemoved(descendant);
+			}
+		}
+		
+		/**
+		* Called when this element is removed from an ancestor and added to a new one. Descends the tree and unregisters all descendants of this node.
+		*/
+		public function movedToNewAncestorTree(removedFrom:UIElement, addedTo:UIElement):void
+		{
+			if(removedFrom != null)
+			{
+				removedFrom.descendantRemoved(this);
+			}
+			if(addedTo != null)
+			{
+				addedTo.descendantAdded(this);
+			}
+			
+			for(var i:uint=0; i < this._children.length; i++)
+			{
+				this._children[i].movedToNewAncestorTree(removedFrom, addedTo);
+			}
+		}
+		
 				
 		public function updateStyles(parentChanged:Boolean = false):void
 		{

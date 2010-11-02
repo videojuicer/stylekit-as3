@@ -415,6 +415,146 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals("bar/foo/class1,class2/pseudo1,pseudo2/0", el.generateStateVectorKey());
 		}
 		
+		[Test(description="Registers descendants being moved between trees")]
+		public function descendantCacheUpdatedOnElementParentChange():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+				middle.addElementClassName("m");
+			var child:UIElement = new UIElement();
+				child.addElementClassName("c");
+			var other:UIElement = new UIElement();
+			
+			
+			// Add middle+child to root and assert indexes
+			root.addElement(middle);
+			root.addElement(child);
+			
+			Assert.assertEquals(2, root.descendants.length);
+			Assert.assertEquals(0, root.descendants.indexOf(middle));
+			Assert.assertEquals(1, root.descendants.indexOf(child));
+			
+			Assert.assertEquals(0, middle.descendants.length);
+			Assert.assertEquals(0, child.descendants.length);
+			
+			Assert.assertEquals(1, (root.descendantsByClass["m"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["m"] as Vector.<UIElement>).indexOf(middle));
+			Assert.assertEquals(1, (root.descendantsByClass["c"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["c"] as Vector.<UIElement>).indexOf(child));
+
+			// Move child to leaf and assert indexes
+			middle.addElement(child);
+			
+			Assert.assertEquals(2, root.descendants.length);
+			Assert.assertEquals(0, root.descendants.indexOf(middle));
+			Assert.assertEquals(1, root.descendants.indexOf(child));
+			
+			Assert.assertEquals(1, middle.descendants.length);
+			Assert.assertEquals(0, middle.descendants.indexOf(child));
+			Assert.assertEquals(0, child.descendants.length);
+			
+			Assert.assertEquals(1, (root.descendantsByClass["m"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["m"] as Vector.<UIElement>).indexOf(middle));
+			Assert.assertEquals(1, (root.descendantsByClass["c"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["c"] as Vector.<UIElement>).indexOf(child));
+
+			Assert.assertNull(middle.descendantsByClass["m"]);
+			Assert.assertEquals(1, (middle.descendantsByClass["c"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByClass["c"] as Vector.<UIElement>).indexOf(child));
+			
+		}
+		
+		[Test(description="Registers descendants switching classnames")]
+		public function descendantCacheUpdateOnClassNameAddedOrRemoved():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.addElementClassName("foo");
+			
+			Assert.assertEquals(1, (root.descendantsByClass["foo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByClass["foo"] as Vector.<UIElement>).length);
+			
+			child.removeElementClassName("foo");
+			
+			Assert.assertEquals(0, (root.descendantsByClass["foo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByClass["foo"] as Vector.<UIElement>).length);
+		}
+		
+		[Test(description="Registers descendants switching pseudoclasses")]
+		public function descendantCacheUpdateOnPseudoClassAddedOrRemoved():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.addElementPseudoClass("pseudo");
+			
+			Assert.assertEquals(1, (root.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+			
+			child.removeElementPseudoClass("pseudo");
+			
+			Assert.assertEquals(0, (root.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+		}
+		
+		[Test(description="Registers descendants modifying their element names")]
+		public function descendantCacheUpdateOnElementNameModified():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.elementName = "div";
+			
+			Assert.assertEquals(1, (root.descendantsByName["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByName["div"] as Vector.<UIElement>).length);
+			
+			child.elementName = "ul";
+			
+			Assert.assertEquals(0, (root.descendantsByName["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByName["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (root.descendantsByName["ul"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByName["ul"] as Vector.<UIElement>).length);
+			
+			middle.elementName = "span";
+			
+			Assert.assertNull(child.descendantsByName["span"]);
+			Assert.assertNull(middle.descendantsByName["span"]);
+			Assert.assertEquals(1, (root.descendantsByName["span"] as Vector.<UIElement>).length);
+		}
+		
+		[Test(description="Registers descendants modifying their element ID's")]
+		public function descendantCacheUpdateOnElementIdModified():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.elementId = "div";
+			
+			Assert.assertEquals(1, (root.descendantsById["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsById["div"] as Vector.<UIElement>).length);
+			
+			child.elementId = "ul";
+			
+			Assert.assertEquals(0, (root.descendantsById["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsById["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (root.descendantsById["ul"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsById["ul"] as Vector.<UIElement>).length);
+			
+			middle.elementId = "span";
+			
+			Assert.assertNull(child.descendantsById["span"]);
+			Assert.assertNull(middle.descendantsById["span"]);
+			Assert.assertEquals(1, (root.descendantsById["span"] as Vector.<UIElement>).length);
+		}
 		
 		[Test(async, description="Ensures that properties with a defined transition and non-zero duration are not altered immediately")]
 		public function transitionsWithDurationsAreAnimated():void
