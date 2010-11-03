@@ -199,11 +199,10 @@ package org.stylekit.ui
 								// Else, just append the selector to the newChain
 								newChain.addElementSelector(sel);
 							}
-							
-							if(newChain.elementSelectors.length > 0)
-							{
-								this._hoverSelectorChains.push(newChain);
-							}
+						}
+						if(newChain.elementSelectors.length > 0)
+						{
+							this._hoverSelectorChains.push(newChain);
 						}
 					}
 				}
