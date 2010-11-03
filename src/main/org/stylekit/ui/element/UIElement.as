@@ -835,7 +835,7 @@ package org.stylekit.ui.element
 		protected function onEffectiveDimensionsModified():void
 		{
 			this.redraw();
-			
+			StyleKit.logger.debug("effective dimensions modified: "+this.effectiveWidth+","+this.effectiveHeight, this);
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this));
 		}
 		
@@ -948,6 +948,7 @@ package org.stylekit.ui.element
 		protected function onContentDimensionsModified():void
 		{
 			// TODO update scrollbars
+			StyleKit.logger.debug("content dimensions modified: "+this.contentWidth+","+this.contentHeight, this);
 			this.recalculateEffectiveContentDimensions();
 		}
 		
@@ -1035,7 +1036,7 @@ package org.stylekit.ui.element
 		protected function onEffectiveContentDimensionsModified():void
 		{
 			this._controlLines = null;
-			
+			StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
 			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
