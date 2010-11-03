@@ -16,6 +16,7 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.parse.StyleSheetParser;
 	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
@@ -229,8 +230,76 @@ package org.stylekit.spec.tests.ui.element
 			
 			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
 			Assert.assertEquals(middle, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
+		}
+		
+		[Test(description="Tests a complete style distribution cycle using a BaseUI and a set of child elements.")]
+		public function styleAllocationEvaluatesStylesPostHoc():void
+		{
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".foo { width: 10px; } .foo .bar { height: 50px; } .foo > .bar { max-height: 100px; } .foo:hover > .bar { max-width: 200px; }");
 			
-
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo:UIElement = new UIElement(baseUI);
+			var barChild:UIElement = new UIElement(baseUI);
+			var barDesc:UIElement = new UIElement(baseUI);
+			
+			baseUI.addElement(foo);
+			foo.addElement(barChild);
+			barChild.addElement(barDesc);
+			
+			ssCol.addStyleSheet(ss); // MUTATE!
+			foo.addElementClassName("foo");
+			barChild.addElementClassName("bar"); barDesc.addElementClassName("bar");
+			
+			// Now inspect the styles
+			Assert.assertEquals(10, (foo.evaluatedStyles["width"] as SizeValue).value);
+			Assert.assertEquals(50, (barChild.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertEquals(50, (barDesc.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
+			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-width"] as SizeValue));
+			Assert.assertNull((barChild.evaluatedStyles["max-width"] as SizeValue));
+			
+			// Modify the state on an element
+			foo.addElementPseudoClass("hover");
+			Assert.assertEquals(10, (foo.evaluatedStyles["width"] as SizeValue).value);
+			Assert.assertEquals(50, (barChild.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertEquals(50, (barDesc.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
+			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-width"] as SizeValue));
+			Assert.assertEquals(200, (barChild.evaluatedStyles["max-width"] as SizeValue).value);
+		}
+		
+		[Test(description="Tests a complete style distribution cycle using a BaseUI and a set of child elements.")]
+		public function styleAllocationEvaluatesStylesPreHoc():void
+		{
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".foo { width: 10px; } .foo .bar { height: 50px; } .foo > .bar { max-height: 100px; }");
+			ssCol.addStyleSheet(ss); // MUTATE!
+			
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo:UIElement = new UIElement(baseUI);
+			var barChild:UIElement = new UIElement(baseUI);
+			var barDesc:UIElement = new UIElement(baseUI);
+			
+			foo.addElementClassName("foo");
+			barChild.addElementClassName("bar"); barDesc.addElementClassName("bar");
+			
+			baseUI.addElement(foo);
+			foo.addElement(barChild);
+			barChild.addElement(barDesc);
+			
+			// Now inspect the styles
+			Assert.assertEquals(10, (foo.evaluatedStyles["width"] as SizeValue).value);
+			Assert.assertEquals(50, (barChild.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertEquals(50, (barDesc.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
+			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
 		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]
