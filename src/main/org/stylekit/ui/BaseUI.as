@@ -157,15 +157,19 @@ package org.stylekit.ui
 						for(var k:int = 0; k < matched.length; k++)
 						{
 							var thisMatch:UIElement = matched[k];
-							// If they're not in the encounteredElement list, flush the styles and put them there.
-							if(encounteredElements.indexOf(thisMatch) < 0)
+							if(rootElement.descendants.indexOf(thisMatch) > -1)
 							{
-								thisMatch.flushStyles();
-								encounteredElements.push(thisMatch);
-							}
+								// If they're not in the encounteredElement list, flush the styles and put them there.
+								if(encounteredElements.indexOf(thisMatch) < 0)
+								{
+									thisMatch.flushStyles();
+									encounteredElements.push(thisMatch);
+								}
 							
-							// Push the style and the matching selector chain to the element
-							thisMatch.pushStyle(style, selectorChain);
+								// Push the style and the matching selector chain to the element
+								thisMatch.pushStyle(style, selectorChain);
+							}
+
 						}
 					}
 				}
