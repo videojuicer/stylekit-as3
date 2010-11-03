@@ -3,17 +3,35 @@ package org.stylekit.ui
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	
+	import org.stylekit.StyleKit;
 	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.style.Style;
+	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.ui.element.UIElement;
+	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.selector.ElementSelector;
 	
 	public class BaseUI extends UIElement
 	{
 		protected var _styleSheetCollection:StyleSheetCollection;
 		protected var _root:DisplayObject;
 		
+		/**
+		* A flattened vector of styles present on the StyleSheetCollection
+		*/
+		protected var _collapsedStyles:Vector.<Style>;
+		
 		public function BaseUI(styleSheetCollection:StyleSheetCollection = null, root:DisplayObject = null)
 		{
 			this._styleSheetCollection = styleSheetCollection;
+			if(this._styleSheetCollection != null)
+			{
+				this._styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);				
+			}
+
+			this.collapseStyles();
+			
 			this._root = root;
 			
 			super();
@@ -52,6 +70,114 @@ package org.stylekit.ui
 		public function createUIElement():UIElement
 		{
 			return new UIElement(this);
+		}
+		
+		protected function onStyleSheetModified(e:StyleSheetEvent):void
+		{
+			// Update styles flatlist
+			StyleKit.logger.debug("BaseUI caught stylesheet modification, recollapsing styles into flattened list.", this);
+			this.collapseStyles();
+			this.allocateStyles(this);
+		}
+		
+		/**
+		* Retrieves all the styles from the current StyleSheetCollection and flattens them into an ordered list
+		*/
+		public function collapseStyles():void
+		{
+			this._collapsedStyles = new Vector.<Style>();
+			
+			// Flatten
+			if(this.styleSheetCollection != null)
+			{
+				for(var i:uint = 0; i < this.styleSheetCollection.length; i++)
+				{
+					var sheet:StyleSheet = this.styleSheetCollection.styleSheets[i];
+					
+					for(var j:uint = 0; j < sheet.styles.length; j++)
+					{
+						var style:Style = sheet.styles[j];
+						this._collapsedStyles.push(style);
+					}
+				}	
+			}
+			
+			// Sort
+		}
+		
+		public override function registerDescendantClassName(name:String, originatingElement:UIElement):void
+		{
+			super.registerDescendantClassName(name, originatingElement);
+			this.allocateStyles(originatingElement);
+		}
+		public override function unregisterDescendantClassName(name:String, originatingElement:UIElement):void
+		{
+			super.unregisterDescendantClassName(name, originatingElement);
+			this.allocateStyles(originatingElement);
+		}
+		public override function registerDescendantPseudoClass(name:String, originatingElement:UIElement):void
+		{
+			super.registerDescendantPseudoClass(name, originatingElement);
+			this.allocateStyles(originatingElement);
+		}
+		public override function unregisterDescendantPseudoClass(name:String, originatingElement:UIElement):void
+		{
+			super.unregisterDescendantPseudoClass(name, originatingElement);
+			this.allocateStyles(originatingElement);
+		}
+		public override function descendantNameModified(newName:String, previousName:String, originatingElement:UIElement):void
+		{
+			super.descendantNameModified(newName, previousName, originatingElement);
+			this.allocateStyles(originatingElement);
+		}
+		public override function descendantIdModified(newId:String, previousId:String, originatingElement:UIElement):void
+		{
+			super.descendantIdModified(newId, previousId, originatingElement);
+			this.allocateStyles(originatingElement);
+		}
+		
+		public function allocateStyles(rootElement:UIElement):void
+		{
+			StyleKit.logger.debug("Allocating styles after a mutation on "+rootElement, this);
+			
+			var encounteredElements:Vector.<UIElement> = new Vector.<UIElement>();
+			
+			for(var i:uint = 0; i < this._collapsedStyles.length; i++)
+			{
+				var style:Style = this._collapsedStyles[i];
+				for(var j:uint = 0; j < style.elementSelectorChains.length; j++)
+				{
+					var selectorChain:ElementSelectorChain = style.elementSelectorChains[j];
+				
+					// Get all elements matching this selector
+					if(selectorChain.elementSelectors.length > 0)
+					{
+						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
+						StyleKit.logger.debug("Allocating style with selector '"+selectorChain.stringValue+"' - matched "+matched.length+" elements. Applying...", this);
+						for(var k:int = 0; k < matched.length; k++)
+						{
+							var thisMatch:UIElement = matched[k];
+							// If they're not in the encounteredElement list, flush the styles and put them there.
+							if(encounteredElements.indexOf(thisMatch) < 0)
+							{
+								thisMatch.flushStyles();
+								encounteredElements.push(thisMatch);
+							}
+							
+							// Push the style and the matching selector chain to the element
+							thisMatch.pushStyle(style, selectorChain);
+						}
+					}
+				}
+				
+				// Commit the styles on all encountered elements.
+				for(var l:int = 0; l < encounteredElements.length; l++)
+				{
+					encounteredElements[l].commitStyles();
+				}
+				StyleKit.logger.debug("Committed new styles on "+encounteredElements.length+" encountered elements.", this);
+				
+			}
 		}
 		
 		protected function onRootResized(e:Event):void

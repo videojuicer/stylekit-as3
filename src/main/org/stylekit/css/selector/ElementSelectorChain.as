@@ -15,6 +15,7 @@ package org.stylekit.css.selector
 	{
 		
 		protected var _elementSelectors:Vector.<ElementSelector>;
+		protected var _stringValue:String;
 		
 		public function ElementSelectorChain()
 		{
@@ -39,6 +40,16 @@ package org.stylekit.css.selector
 				score += this._elementSelectors[i];
 			}
 			return score;
+		}
+		
+		public function get stringValue():String
+		{
+			return this._stringValue;
+		}
+		
+		public function set stringValue(s:String):void
+		{
+			this._stringValue = s;
 		}
 		
 	}

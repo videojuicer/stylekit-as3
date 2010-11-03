@@ -16,6 +16,7 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.value.PropertyListValue;
@@ -171,139 +172,65 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(1, child3.parentIndex);
 		}
 		
-		[Test(description="Tests that a UIElement can be matched against a selector, and fail against a incorrect match")]
-		public function selectorsMatchAnElement():void
+		[Test(description="Ensures that descendants may be retrieved by chain selector")]
+		public function getElementsBySelectorSet():void
 		{
+			var base:UIElement = new UIElement();
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
 			var child:UIElement = new UIElement();
-			child.elementName = "h1";
-			child.addElementClassName("selected");
+
+			root.addElementClassName("r");
+			middle.addElementClassName("m");
+			child.addElementClassName("c");
+
+			base.addElement(root); root.addElement(middle); middle.addElement(child);
+
+			child.addElementClassName("x");
+			middle.addElementClassName("x");
 			
-			var selector:ElementSelector = new ElementSelector();
-			selector.elementName = "h1";
-			selector.addElementClassName("selected");
-			selector.addElementPseudoClass("hover");
+			var parser:ElementSelectorParser = new ElementSelectorParser();
+			var chain:ElementSelectorChain = parser.parseElementSelectorChain(".r .c");
 			
-			var invalidSelector:ElementSelector = new ElementSelector();
-			invalidSelector.elementName = "div";
-			invalidSelector.addElementClassName("unselected");
-			invalidSelector.addElementPseudoClass("mouseover");
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(child, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
 			
-			Assert.assertFalse(child.matchesElementSelector(selector));
-			Assert.assertFalse(child.matchesElementSelector(invalidSelector));
+			chain = parser.parseElementSelectorChain(".m .c");
 			
-			child.addElementPseudoClass("hover");
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(child, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
+
+			chain = parser.parseElementSelectorChain(".r");
 			
-			Assert.assertTrue(child.matchesElementSelector(selector));
-			Assert.assertFalse(child.matchesElementSelector(invalidSelector));
-		}
-		
-		[Test(description="Tests that a UIElement can be matched against a chain of selector elements")]
-		public function chainSelectorsMatchAnElement():void
-		{
-			var child1:ElementSelector = new ElementSelector();
-			child1.elementName = "p";
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(root, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
 			
-			var child2:ElementSelector = new ElementSelector();
-			child2.elementName = "div";
-			child2.addElementClassName("current");
+			chain = parser.parseElementSelectorChain(".x");
 			
-			var child3:ElementSelector = new ElementSelector();
-			child3.elementName = "body";
-			child3.addElementPseudoClass("hover");
+			Assert.assertEquals(2, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertTrue(base.getElementsBySelectorSet(chain.elementSelectors).indexOf(child) > -1);
+			Assert.assertTrue(base.getElementsBySelectorSet(chain.elementSelectors).indexOf(middle) > -1);
 			
-			var element1:UIElement = new UIElement();
-			element1.elementName = "p";
-			element1.styleEligible = true;
+			chain = parser.parseElementSelectorChain(".r > .x");
 			
-			var element2:UIElement = new UIElement();
-			element2.elementName = "d-iv";
-			element2.addElementClassName("current");
-			element2.styleEligible = true;
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(middle, base.getElementsBySelectorSet(chain.elementSelectors)[0]);			
+
+			chain = parser.parseElementSelectorChain(".r > .c");
 			
-			var element3:UIElement = new UIElement();
-			element3.elementName = "body";
-			element3.addElementPseudoClass("hover");
-			element3.styleEligible = true;
+			Assert.assertEquals(0, base.getElementsBySelectorSet(chain.elementSelectors).length);
 			
-			element1.parentElement = element2;
-			element2.parentElement = element3;
+			chain = parser.parseElementSelectorChain(".m > .c");
 			
-			var chain:ElementSelectorChain = new ElementSelectorChain();
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(child, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
 			
-			chain.addElementSelector(child1);
-			chain.addElementSelector(child2);
-			chain.addElementSelector(child3);	
+			chain = parser.parseElementSelectorChain(".r > .m");
 			
-			Assert.assertFalse(element1.matchesElementSelectorChain(chain));
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(middle, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
 			
-			element2.elementName = "div";
-			
-			Assert.assertTrue(element1.matchesElementSelectorChain(chain));
-		}
-		
-		public function elementCanCollectStyles():void
-		{
-			var collection:StyleSheetCollection = new StyleSheetCollection();
-			var styleSheet:StyleSheet = new StyleSheet();
-			var style:Style = new Style(styleSheet);
-			
-			style.mediaSelector = new MediaSelector();
-			style.mediaSelector.addMedia("div");
-			
-			styleSheet.addStyle(style);
-			
-			collection.addStyleSheet(styleSheet);
-			
-			var baseUI:BaseUI = new BaseUI(collection);
-			var uiElement:UIElement = baseUI.createUIElement();
-			uiElement.elementName = "div";
-			
-			uiElement.updateStyles();
-		
-			Assert.assertEquals(1, uiElement.styles.length);
-			
-			var newStyle:Style = uiElement.styles[0];
-			
-			Assert.assertEquals(style, newStyle);
-		}
-		
-		public function getElementsBySelector():void
-		{
-			var selector:ElementSelector = new ElementSelector();
-			selector.elementName = "div";
-			
-			var elements:Vector.<UIElement> = this._element.getElementsBySelector(selector);
-			
-			Assert.assertNotNull(elements);
-			Assert.assertEquals(2, elements.length);
-		}
-		
-		public function getElementsBySelectorString():void
-		{			
-			var elements:Vector.<UIElement> = this._element.getElementsBySelector("div");
-			
-			Assert.assertNotNull(elements);
-			Assert.assertEquals(1, elements.length);
-		}
-		
-		public function getElementsByChainSelector():void
-		{
-			var chainSelector:ElementSelectorChain = new ElementSelectorChain();
-			
-			var selector:ElementSelector = new ElementSelector();
-			selector.elementName = "p";
-			
-			chainSelector.addElementSelector(selector);
-			
-			selector = new ElementSelector();
-			selector.elementName = "div";
-			
-			chainSelector.addElementSelector(selector);
-			
-			var elements:Vector.<UIElement> = this._element.getElementsBySelector(chainSelector);
-			
-			Assert.assertNotNull(elements);
-			Assert.assertEquals(1, elements.length);
+
 		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]

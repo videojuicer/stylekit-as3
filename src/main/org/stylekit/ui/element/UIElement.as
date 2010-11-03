@@ -42,7 +42,6 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
-	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.TransitionWorkerEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
@@ -243,11 +242,6 @@ package org.stylekit.ui.element
 			this._painter = new UIElementPainter(this);
 			
 			this.resetDescendantRegistry();
-			
-			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
-			{
-				this.baseUI.styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
-			}
 			
 			this.addEventListener(FocusEvent.FOCUS_IN, this.onFocusIn);
 			this.addEventListener(FocusEvent.FOCUS_OUT, this.onFocusOut);
@@ -1050,53 +1044,6 @@ package org.stylekit.ui.element
 			return this.evalSize((this.getStyleValue(key) as SizeValue), dimension);
 		}
 		
-		public function getElementsBySelector(selector:*):Vector.<UIElement>
-		{
-			var elements:Vector.<UIElement> = new Vector.<UIElement>();
-			
-			var elementSelector:ElementSelector = null;
-			var chainSelector:ElementSelectorChain = null;
-			
-			if (selector is String)
-			{
-				var parser:ElementSelectorParser = new ElementSelectorParser();
-				
-				chainSelector = parser.parseElementSelectorChain(selector);
-			}
-			else if (selector is ElementSelector)
-			{
-				elementSelector = selector as ElementSelector;
-			}
-			else if (selector is ElementSelectorChain)
-			{
-				chainSelector = selector as ElementSelectorChain;
-			}
-			else
-			{
-				throw new IllegalOperationError("Illegal selector type defined as '"+selector.toString()+"' used when calling 'getElementsBySelector'");
-			}
-			
-			for (var i:int = 0; i < this.children.length; i++)
-			{
-				if (elementSelector != null && this.children[i].matchesElementSelector(elementSelector))
-				{
-					elements.push(this.children[i]);
-				}
-				
-				if (chainSelector != null && this.children[i].matchesElementSelectorChain(chainSelector))
-				{
-					elements.push(this.children[i]);
-				}
-			}
-			
-			if (elements.length > 0)
-			{
-				return elements;
-			}
-			
-			return null;
-		}
-		
 		public function hasElementClassName(className:String):Boolean
 		{
 			return (this._elementClassNames.indexOf(className) > -1);
@@ -1777,63 +1724,135 @@ package org.stylekit.ui.element
 			}
 		}
 		
-				
-		public function updateStyles(parentChanged:Boolean = false):void
+		/**
+		* Traverses the descendants of this element by selector chain and returns all the matches.
+		*/
+		public function getElementsBySelectorSet(selectors:Vector.<ElementSelector>):Vector.<UIElement>
 		{
-			// TODO remove listeners
-			// BUG: somewhere here the evalulatedStyles on the UIElement are reset to the defaults
+			var reducedSet:Vector.<UIElement> = new Vector.<UIElement>();
+			selectors = selectors.concat(); // clone the vector
+			var selector:ElementSelector = selectors.shift();
+			var elementSets:Array = [];
 			
-			var prevStyles:Vector.<Style> = this._styles;
-			var changed:Boolean = parentChanged;
-			
-			this._styles = new Vector.<Style>();
-			this._styleSelectors = new Vector.<ElementSelectorChain>();
-			
-			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
-			{
-				for (var i:int = 0; i < this.baseUI.styleSheetCollection.length; ++i)
+				// for each criterion specified by the selector (a class, an id, a pseudo, whatever)
+				// we'll grab the set of descendants for that set, and calculate the intersection.
+				if(selector.elementNameMatchRequired)
 				{
-					var sheet:StyleSheet = this.baseUI.styleSheetCollection.styleSheets[i];
-					
-					for (var j:int = 0; j < sheet.styles.length; ++j)
+					elementSets.push(this.descendantsByName[selector.elementName]);
+				}
+				if(selector.elementID != null)
+				{
+					elementSets.push(this.descendantsById[selector.elementID]);
+				}
+				if(selector.elementClassNames.length > 0)
+				{
+					for(var n:uint = 0; n < selector.elementClassNames.length; n++)
 					{
-						var style:Style = sheet.styles[j];
+						elementSets.push(this.descendantsByClass[selector.elementClassNames[n]]);
+					}
+				}
+				if(selector.elementPseudoClasses.length > 0)
+				{
+					for(var p:uint = 0; p < selector.elementPseudoClasses.length; p++)
+					{
+						elementSets.push(this.descendantsByPseudoClass[selector.elementPseudoClasses[p]]);
+					}
+				}
+			
+			// Calculate the intersection of elements in the elementSets
+			for(var es:uint = 0; es < elementSets.length; es++)
+			{
+				if(elementSets[es] != null)
+				{
+					var eSet:Vector.<UIElement> = elementSets[es] as Vector.<UIElement>;
+					// Loop set and add to the reducedSet only if it appears on all elementSets
+					for(var s:uint = 0; s < eSet.length; s++)
+					{
+						var elem:UIElement = eSet[s];
+						var foundCount:int = 0;
 						
-						for (var k:int = 0; k < style.elementSelectorChains.length; ++k)
+						for(var ss:uint = 0; ss < elementSets.length; ss++)
 						{
-							var chain:ElementSelectorChain = style.elementSelectorChains[k];
-							
-							if (this.matchesElementSelectorChain(chain))
+							if(elementSets[ss] != null && (elementSets[ss] as Vector.<UIElement>).indexOf(elem) >= 0)
 							{
-								if (this._styles.indexOf(style) == -1)
-								{
-									// TODO add listener
-									this._styles.push(style);
-									this._styleSelectors.push(chain);
-									if(prevStyles == null || prevStyles.indexOf(style) > -1)
-									{
-										changed = true;
-									}
-								}
-								
-								break;
+								foundCount++;
 							}
+						}
+						
+						if(foundCount >= elementSets.length)
+						{
+							reducedSet.push(elem);
 						}
 					}
 				}
 			}
 			
+			// If the selector was prefixed with the ">" character, it requires the reduced set to only contain direct parents of the 
+			// calling element.
+			var c_red:int = reducedSet.length;
+			
+			if(selector.parentSelector != null)
+			{
+				reducedSet = reducedSet.filter(function(elem:UIElement, index:int, set:Vector.<UIElement>):Boolean {
+					return (elem.parentElement == this);
+				}, this);
+				
+			}
+				
+			// Reduced set now contains the set of descendant elements matching the current candidate selector.
+			if(selectors.length == 0)
+			{
+				// If we've reached the end of the selector chain, there is no need to recurse further.
+				return reducedSet;
+			}
+			else
+			{
+				// If there are more selectors, we need to reduce the set again by recursing into this tier's reduced set.
+				var recursedSet:Vector.<UIElement> = new Vector.<UIElement>();
+				
+				for(var r:uint = 0; r < reducedSet.length; r++)
+				{
+					var subRec:Vector.<UIElement> = reducedSet[r].getElementsBySelectorSet(selectors);
+						for(var sr:uint = 0; sr < subRec.length; sr++)
+						{
+							if(recursedSet.indexOf(subRec[sr]) < 0)
+							{
+								recursedSet.push(subRec[sr]);
+							}
+						}
+				}
+				
+				return recursedSet;
+				
+			}
+			return null;
+		}
+		
+				
+		public function updateStyles(parentChanged:Boolean = false):void
+		{			
 			// Evaluate the new styles
 			this.evaluateStyles();
 			
-			// Now have the children update if there was an update
-			if(changed)
-			{
-				for(i = 0; i < this._children.length; i++)
-				{
-					this._children[i].updateStyles(true);
-				}
-			}
+		}
+		
+		public function flushStyles():void
+		{
+			StyleKit.logger.debug("Flushing styles ready for a fresh style push", this);
+			this._styles = new Vector.<Style>();
+			this._styleSelectors = new Vector.<ElementSelectorChain>();
+		}
+		
+		public function pushStyle(style:Style, matchedSelectorChain:ElementSelectorChain):void
+		{
+			this._styles.push(style);
+			this._styleSelectors.push(matchedSelectorChain);
+		}
+		
+		public function commitStyles():void
+		{
+			StyleKit.logger.debug("Committing all pushed styles, going to evaluation stage.", this);
+			this.evaluateStyles();
 		}
 		
 		protected function evaluateStyles():void
@@ -2109,11 +2128,6 @@ package org.stylekit.ui.element
 		protected function onChildDimensionsChanged(e:UIElementEvent):void
 		{
 			this.layoutChildren();
-		}
-		
-		protected function onStyleSheetModified(e:StyleSheetEvent):void
-		{
-			this.updateStyles();
 		}
 		
 		protected function onFocusIn(e:FocusEvent):void
