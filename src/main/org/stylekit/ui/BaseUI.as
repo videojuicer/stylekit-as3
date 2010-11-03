@@ -167,7 +167,7 @@ package org.stylekit.ui
 				{
 					var c:ElementSelectorChain = s.elementSelectorChains[j];
 					var hI:int = c.stringValue.indexOf(":hover")
-					
+					StyleKit.logger.debug("Found selector that requires the application of a :hover listener : "+c.stringValue, this);
 					if(hI > -1)
 					{
 						// Pick apart the chain
@@ -190,6 +190,7 @@ package org.stylekit.ui
 										newSel.elementName = sel.elementName;
 										newSel.elementClassNames = sel.elementClassNames;
 										newChain.addElementSelector(newSel);
+										break singleChainLoop;
 								}
 							}
 							else
@@ -206,6 +207,7 @@ package org.stylekit.ui
 					}
 				}
 			}
+			
 			StyleKit.logger.debug("Analysed style selectors and found "+this._hoverSelectorChains.length+" selectors for elements that require the :hover listener", this);
 		}
 		
