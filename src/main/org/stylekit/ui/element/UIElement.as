@@ -1883,10 +1883,13 @@ package org.stylekit.ui.element
 			// This var will store all the styles sourced from the CSS objects 
 			var evaluatedNetworkStyles:Object;
 			
+			// Determines whether the comparison stage needs execution.
+			var compare:Boolean = true;
+			
 			if(styleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
 			{
 				StyleKit.logger.debug("Evaluating styles: cache key for selector set matches current cache key, using existing values: "+styleSetCacheKey, this);
-				evaluatedNetworkStyles = this.evaluatedStyles;
+				compare = false;
 			}			
 			if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
 			{
@@ -1919,7 +1922,6 @@ package org.stylekit.ui.element
 					);
 				// Loop over sorted selectors and use found index to sort corresponding style.
 				// The created vector is fixed in length.
-
 				for(var i:uint=0; i < this._styles.length; i++)
 				{
 					var sortCandidateStyle:Style = this._styles[i];
@@ -1940,22 +1942,29 @@ package org.stylekit.ui.element
 				evaluatedNetworkStyles = PropertyContainer.defaultStyles;
 
 				// Merge in the styles in order of specificity
-				if(this._styleSelectors != null)
+				for(i=0; i < sortedStyles.length; i++)
 				{
-					for(i=0; i < sortedStyles.length; i++)
+					if(sortedStyles[i] != null)
 					{
-						if(sortedStyles[i] != null)
-						{
-							evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
-						}
+						evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
+					}
+					else
+					{
+						throw new Error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue);
 					}
 				}
+				
 				// Cache it
 				StyleKit.logger.debug("Evaluating styles: caching newly-computed styles for selector set: "+styleSetCacheKey, this);
 				this._evaluatedNetworkStyleCache[styleSetCacheKey] = evaluatedNetworkStyles;
 				
 				previousStyleSetCacheKey = this._evaluatedStyleCurrentCacheKey;
 				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey; // Set the current cache key
+				
+				if(previousStyleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
+				{
+					compare = false;
+				}
 			}
 			
 			// Include local styles
@@ -1964,15 +1973,14 @@ package org.stylekit.ui.element
 				StyleKit.logger.debug("Merging local style into evaluated network styles.", this);
 				this.evaluatedStyles = this._localStyle.evaluate(evaluatedNetworkStyles, this);
 			}
-			else if(this._evaluatedStyleCurrentCacheKey == previousStyleSetCacheKey)
-			{
-				throw new Error(this._evaluatedStyleCurrentCacheKey +","+ styleSetCacheKey)
-				StyleKit.logger.debug("Skipping comparison step as cache key is identical to current cache key and no local styles need merging: "+styleSetCacheKey, this);
-			}
-			else
+			else if(compare)
 			{
 				StyleKit.logger.debug("Going to before/after comparison on evaluated styles for cache key: "+styleSetCacheKey, this);
 				this.evaluatedStyles = evaluatedNetworkStyles;
+			}
+			else
+			{
+				StyleKit.logger.debug("Skipping comparison step as cache key is identical to current cache key and no local styles need merging: "+styleSetCacheKey, this);
 			}
 		}
 		
