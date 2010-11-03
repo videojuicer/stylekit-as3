@@ -124,6 +124,7 @@ package org.stylekit.css.parse
 				}
 			}
 
+			selectorChain.stringValue = selectorChainStr;
 			return selectorChain;
 		}
 		
@@ -212,6 +213,7 @@ package org.stylekit.css.parse
 				}
 				
 			}
+			elementSelector.stringValue = str;
 			return elementSelector;
 		}
 		

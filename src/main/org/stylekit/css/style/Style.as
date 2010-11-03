@@ -12,15 +12,25 @@ package org.stylekit.css.style
 	public class Style extends PropertyContainer
 	{
 		
+		public static var ID_INC:int = 0;
+		
 		/**
 		* A reference to a <code>MediaSelector</code> object used to restrict this instance to a specific set of media types.
 		*/ 
 		protected var _mediaSelector:MediaSelector;
 		protected var _elementSelectorChains:Vector.<ElementSelectorChain>;
+		protected var _styleId:int;
 		
 		public function Style(ownerStyleSheet:StyleSheet)
 		{
 			super(ownerStyleSheet);
+			Style.ID_INC++;
+			this._styleId = Style.ID_INC;
+		}
+		
+		public function get styleId():int
+		{
+			return this._styleId;
 		}
 		
 		public function set mediaSelector(ms:MediaSelector):void

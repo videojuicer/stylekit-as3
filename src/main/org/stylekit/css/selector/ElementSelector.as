@@ -58,6 +58,8 @@ package org.stylekit.css.selector
 		*/
 		protected var _lastLetterOnly:Boolean = false;
 		
+		protected var _stringValue:String;
+		
 		public function ElementSelector()
 		{
 			this._elementClassNames = new Vector.<String>();
@@ -87,6 +89,11 @@ package org.stylekit.css.selector
 		public function get elementClassNames():Vector.<String>
 		{
 			return this._elementClassNames;
+		}
+		
+		public function set elementClassNames(v:Vector.<String>):void
+		{
+			this._elementClassNames = v;
 		}
 		
 		public function get elementPseudoClasses():Vector.<String>
@@ -152,6 +159,16 @@ package org.stylekit.css.selector
 		public function get elementNameMatchRequired():Boolean
 		{
 			return (this.elementName != null && this._elementName != "*");
+		}
+		
+		public function get stringValue():String
+		{
+			return this._stringValue;
+		}
+		
+		public function set stringValue(s:String):void
+		{
+		 	this._stringValue = s;
 		}
 		
 		public function hasElementClassName(className:String):Boolean

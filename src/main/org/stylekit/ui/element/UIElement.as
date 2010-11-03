@@ -42,7 +42,6 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
-	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.events.TransitionWorkerEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
@@ -205,6 +204,8 @@ package org.stylekit.ui.element
 		protected var _rawContentWidth:int = 0;
 		protected var _rawContentHeight:int = 0;
 		
+		protected var _listensForHover:Boolean = false;
+		
 		/**
 		* A reference to the Style object used to store this element's local styles. This Style is treated with a higher 
 		* priority than styles sourced from the BaseUI's stylesheet collection.
@@ -213,6 +214,20 @@ package org.stylekit.ui.element
 		
 		protected var _contentContainer:Sprite;
 		protected var _contentSprites:Vector.<DisplayObject>;
+		
+		// Element state caches
+		protected var _descendants:Vector.<UIElement>; // All descendants. Updated when elements are added/removed to/from this tree.
+		protected var _descendantsByClass:Object; // All descendants mapped by classname.
+		protected var _descendantsById:Object; // All descendants mapped by element ID
+		protected var _descendantsByName:Object; // All descendants mapped by element name
+		protected var _descendantsByPseudoClass:Object; // All descendants mapped by pseudo
+		
+		// Evaluated style cache
+		protected var _evaluatedNetworkStyleCache:Object;
+		protected var _evaluatedStyleCurrentCacheKey:String = "THIS_CACHE_KEY_SHOULD_NEVER_BE_MATCHED_WIBBLE_WIBBLE_BOING";
+		
+		// Evaluated size cache
+		protected var _computedSizes:Object;
 		
 		public function UIElement(baseUI:BaseUI = null)
 		{
@@ -227,6 +242,7 @@ package org.stylekit.ui.element
 			
 			this._elementClassNames = new Vector.<String>();
 			this._elementPseudoClasses = new Vector.<String>();
+
 			
 			this._transitionWorkers = new Vector.<TransitionWorker>();
 			this._transitionWorkerProperties = new Vector.<String>();
@@ -235,10 +251,13 @@ package org.stylekit.ui.element
 			
 			this._painter = new UIElementPainter(this);
 			
-			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
-			{
-				this.baseUI.styleSheetCollection.addEventListener(StyleSheetEvent.STYLESHEET_MODIFIED, this.onStyleSheetModified);
-			}
+			this._evaluatedNetworkStyleCache = {};
+			this._computedSizes = {};
+			
+			this._styles = new Vector.<Style>();
+			this._styleSelectors = new Vector.<ElementSelectorChain>();
+			
+			this.resetDescendantRegistry();
 			
 			this.addEventListener(FocusEvent.FOCUS_IN, this.onFocusIn);
 			this.addEventListener(FocusEvent.FOCUS_OUT, this.onFocusOut);
@@ -260,12 +279,14 @@ package org.stylekit.ui.element
 		
 		public function set parentElement(parent:UIElement):void
 		{
-			if(this._parentElement != null)
+			var prev:UIElement = this._parentElement;
+			if(prev != null)
 			{
 				this._parentElement.removeEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
 			}
 			this._parentElement = parent;
 			this._parentElement.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
+			this.movedToNewAncestorTree(prev, this._parentElement);
 		}
 		
 		public function get baseUI():BaseUI
@@ -298,6 +319,61 @@ package org.stylekit.ui.element
 		public function set styleEligible(styleEligible:Boolean):void
 		{
 			this._styleEligible = styleEligible;
+		}
+		
+		public function get elementClassNames():Vector.<String>
+		{
+			return this._elementClassNames;
+		}
+		
+		public function get elementPseudoClasses():Vector.<String>
+		{
+			return this._elementPseudoClasses;
+		}
+		
+		public function get listensForHover():Boolean
+		{
+			return this._listensForHover;
+		}
+		
+		public function set listensForHover(b:Boolean):void
+		{
+			this._listensForHover = b;
+		}
+		
+		public function get descendants():Vector.<UIElement>
+		{
+			return this._descendants;
+		}
+		
+		public function get descendantsByClass():Object
+		{
+			return this._descendantsByClass;
+		}
+		
+		public function get descendantsById():Object
+		{
+			return this._descendantsById;
+		}
+		
+		public function get descendantsByName():Object
+		{
+			return this._descendantsByName;
+		}
+		
+		public function get descendantsByPseudoClass():Object
+		{
+			return this._descendantsByPseudoClass;
+		}
+		
+		public function get styles():Vector.<Style>
+		{
+			return this._styles;
+		}
+		
+		public function get styleSelectors():Vector.<ElementSelectorChain>
+		{
+			return this._styleSelectors;
 		}
 		
 		public function get effectiveWidth():int
@@ -503,11 +579,6 @@ package org.stylekit.ui.element
 			return this.parentElement.styleParent;
 		}
 		
-		public function get styles():Vector.<Style>
-		{
-			return this._styles;
-		}
-		
 		public function get elementName():String
 		{
 			return this._elementName;
@@ -515,9 +586,13 @@ package org.stylekit.ui.element
 		
 		public function set elementName(elementName:String):void
 		{
+			var prev:String = this._elementName;
 			this._elementName = elementName;
 			
-			this.updateStyles();
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantNameModified(elementName, prev, this);
+			}
 		}
 		
 		public function get elementId():String
@@ -527,8 +602,12 @@ package org.stylekit.ui.element
 		
 		public function set elementId(s:String):void
 		{
+			var prev:String = this._elementId;
 			this._elementId = s;
-			this.updateStyles();
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantIdModified(s, prev, this);
+			}
 		}
 		
 		public function get isFirstChild():Boolean
@@ -768,7 +847,7 @@ package org.stylekit.ui.element
 		protected function onEffectiveDimensionsModified():void
 		{
 			this.redraw();
-			
+			StyleKit.logger.debug("effective dimensions modified: "+this.effectiveWidth+","+this.effectiveHeight, this);
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this));
 		}
 		
@@ -881,6 +960,7 @@ package org.stylekit.ui.element
 		protected function onContentDimensionsModified():void
 		{
 			// TODO update scrollbars
+			StyleKit.logger.debug("content dimensions modified: "+this.contentWidth+","+this.contentHeight, this);
 			this.recalculateEffectiveContentDimensions();
 		}
 		
@@ -968,8 +1048,13 @@ package org.stylekit.ui.element
 		protected function onEffectiveContentDimensionsModified():void
 		{
 			this._controlLines = null;
+			StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
 			
-			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
+			//for(var i:uint=0; i < this._children.length; i++)
+			//{
+			//	this._children[i].recalculateEffectiveContentDimensions();
+			//}
+			//this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
 		
@@ -996,53 +1081,6 @@ package org.stylekit.ui.element
 			return this.evalSize((this.getStyleValue(key) as SizeValue), dimension);
 		}
 		
-		public function getElementsBySelector(selector:*):Vector.<UIElement>
-		{
-			var elements:Vector.<UIElement> = new Vector.<UIElement>();
-			
-			var elementSelector:ElementSelector = null;
-			var chainSelector:ElementSelectorChain = null;
-			
-			if (selector is String)
-			{
-				var parser:ElementSelectorParser = new ElementSelectorParser();
-				
-				chainSelector = parser.parseElementSelectorChain(selector);
-			}
-			else if (selector is ElementSelector)
-			{
-				elementSelector = selector as ElementSelector;
-			}
-			else if (selector is ElementSelectorChain)
-			{
-				chainSelector = selector as ElementSelectorChain;
-			}
-			else
-			{
-				throw new IllegalOperationError("Illegal selector type defined as '"+selector.toString()+"' used when calling 'getElementsBySelector'");
-			}
-			
-			for (var i:int = 0; i < this.children.length; i++)
-			{
-				if (elementSelector != null && this.children[i].matchesElementSelector(elementSelector))
-				{
-					elements.push(this.children[i]);
-				}
-				
-				if (chainSelector != null && this.children[i].matchesElementSelectorChain(chainSelector))
-				{
-					elements.push(this.children[i]);
-				}
-			}
-			
-			if (elements.length > 0)
-			{
-				return elements;
-			}
-			
-			return null;
-		}
-		
 		public function hasElementClassName(className:String):Boolean
 		{
 			return (this._elementClassNames.indexOf(className) > -1);
@@ -1057,7 +1095,10 @@ package org.stylekit.ui.element
 			
 			this._elementClassNames.push(className);
 			
-			this.updateStyles();
+			if(this.parentElement != null)
+			{
+				this.parentElement.registerDescendantClassName(className, this);
+			}
 			
 			return true;
 		}
@@ -1068,7 +1109,10 @@ package org.stylekit.ui.element
 			{
 				this._elementClassNames.splice(this._elementClassNames.indexOf(className), 1);
 				
-				this.updateStyles();
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantClassName(className, this);
+				}
 				
 				return true;
 			}
@@ -1090,8 +1134,10 @@ package org.stylekit.ui.element
 			
 			this._elementPseudoClasses.push(pseudoClass);
 
-			this.updateStyles();
-			this.redraw();
+			if(this.parentElement != null)
+			{
+				this.parentElement.registerDescendantPseudoClass(pseudoClass, this);
+			}
 			
 			return true;
 		}
@@ -1102,8 +1148,10 @@ package org.stylekit.ui.element
 			{
 				this._elementPseudoClasses.splice(this._elementClassNames.indexOf(pseudoClass), 1);
 				
-				this.updateStyles();
-				this.redraw();
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantPseudoClass(pseudoClass, this);
+				}
 				
 				return true;
 			}
@@ -1185,7 +1233,7 @@ package org.stylekit.ui.element
 			
 			this.refreshControlLines();
 			
-			if (this.controlLines != null)
+			if (this.controlLines.length > 0)
 			{				
 				// only we do now is stack the FlowControlLines onto the UIElements content space
 				// the FlowControlLines take care of laying out the indiviual UIElement children.
@@ -1280,9 +1328,6 @@ package org.stylekit.ui.element
 			}
 			
 			this.updateChildrenIndex();
-			
-			child.updateStyles();
-			child.redraw();
 			
 			return child;
 		}
@@ -1437,74 +1482,448 @@ package org.stylekit.ui.element
 			return value;
 		}
 		
-		public function updateStyles(parentChanged:Boolean = false):void
+		/**
+		* Returns a local state vector for this element.
+		*/
+		public function generateStateVector():Array
 		{
-			// TODO remove listeners
-			// BUG: somewhere here the evalulatedStyles on the UIElement are reset to the defaults
-			
-			var prevStyles:Vector.<Style> = this._styles;
-			var changed:Boolean = parentChanged;
-			
-			this._styles = new Vector.<Style>();
-			this._styleSelectors = new Vector.<ElementSelectorChain>();
-			
-			if (this.baseUI != null && this.baseUI.styleSheetCollection != null)
+			return [this.elementId, this.elementName, this._elementClassNames.join(","), this._elementPseudoClasses.join(","), this._parentIndex];
+		}
+		
+		/**
+		* Returns a state vector for this element, to be used as a cache key.
+		*/
+		public function generateStateVectorKey():String
+		{
+			return this.generateStateVector().join("/");
+		}
+		
+		/**
+		* Resets the descendant registry to a fresh state.
+		*/
+		public function resetDescendantRegistry():void
+		{
+			this._descendants = new Vector.<UIElement>(); // All descendants. Updated when elements are added/removed to/from this tree.
+			this._descendantsByClass = {} // All descendants mapped by classname.
+			this._descendantsById = {}; // All descendants mapped by element ID
+			this._descendantsByName = {}; // All descendants mapped by element name
+			this._descendantsByPseudoClass = {}; // All descendants mapped by pseudo
+		}
+		
+		public function registerDescendantClassName(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
 			{
-				for (var i:int = 0; i < this.baseUI.styleSheetCollection.length; ++i)
+				if(this._descendantsByClass[name] == null)
 				{
-					var sheet:StyleSheet = this.baseUI.styleSheetCollection.styleSheets[i];
-					
-					for (var j:int = 0; j < sheet.styles.length; ++j)
+					this._descendantsByClass[name] = new Vector.<UIElement>();
+				}
+			
+				var desc:Vector.<UIElement> = this._descendantsByClass[name] as Vector.<UIElement>;
+				if(desc.indexOf(originatingElement) < 0)
+				{
+					desc.push(originatingElement);
+				}
+				this._descendantsByClass[name] = desc;
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.registerDescendantClassName(name, originatingElement);
+				}
+			}
+		}
+		
+		public function unregisterDescendantClassName(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
+			{
+				var desc:Vector.<UIElement> = this._descendantsByClass[name] as Vector.<UIElement>;
+				var i:int = desc.indexOf(originatingElement);
+				if(i < 0)
+				{
+					StyleKit.logger.error("Unregistering descendant class name, but descendant was never registered. The descendant cache has lost sync.", this);
+				}
+				else
+				{
+					desc.splice(i, 1);
+					this._descendantsByClass[name] = desc;
+				}
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantClassName(name, originatingElement);
+				}
+			}
+		}
+		
+		public function registerDescendantPseudoClass(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
+			{
+				if(this._descendantsByPseudoClass[name] == null)
+				{
+					this._descendantsByPseudoClass[name] = new Vector.<UIElement>();
+				}
+				
+				var desc:Vector.<UIElement> = this._descendantsByPseudoClass[name] as Vector.<UIElement>;
+				if(desc.indexOf(originatingElement) < 0)
+				{
+					desc.push(originatingElement);
+				}
+				this._descendantsByPseudoClass[name] = desc;
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.registerDescendantPseudoClass(name, originatingElement);
+				}
+			}
+		}
+		
+		public function unregisterDescendantPseudoClass(name:String, originatingElement:UIElement):void
+		{
+			if(name != null)
+			{
+				var desc:Vector.<UIElement> = this._descendantsByPseudoClass[name] as Vector.<UIElement>;
+				var i:int = desc.indexOf(originatingElement);
+				if(i < 0)
+				{
+					StyleKit.logger.error("Unregistering descendant pseudoclass, but descendant was never registered. The descendant cache has lost sync.", this);
+				}
+				else
+				{
+					desc.splice(i, 1);
+					this._descendantsByPseudoClass[name] = desc;
+				}
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.unregisterDescendantPseudoClass(name, originatingElement);
+				}
+			}
+		}
+		
+		public function descendantNameModified(newName:String, previousName:String, originatingElement:UIElement):void
+		{
+			// Register new name
+			if(newName != null)
+			{
+				if(this._descendantsByName[newName] == null)
+				{
+					this._descendantsByName[newName] = new Vector.<UIElement>();
+				}
+				
+				var n:Vector.<UIElement> = this._descendantsByName[newName] as Vector.<UIElement>;
+				if(n.indexOf(originatingElement) < 0)
+				{
+					n.push(originatingElement);
+				}
+			}
+			
+			// Unregister previous name
+			if(previousName != null)
+			{
+				var d:Vector.<UIElement> = this._descendantsByName[previousName] as Vector.<UIElement>;
+				if(d != null)
+				{
+					var i:int = d.indexOf(originatingElement);
+					if(i >= 0)
 					{
-						var style:Style = sheet.styles[j];
+						d.splice(i, 1);
+						this._descendantsByName[previousName] = d;
+					}
+				}
+			}
+			
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantNameModified(newName, previousName, originatingElement);
+			}
+		}
+		
+		public function descendantIdModified(newId:String, previousId:String, originatingElement:UIElement):void
+		{
+			// Register new name
+			if(newId != null)
+			{
+				if(this._descendantsById[newId] == null)
+				{
+					this._descendantsById[newId] = new Vector.<UIElement>();
+				}
+				
+				var n:Vector.<UIElement> = this._descendantsById[newId] as Vector.<UIElement>;
+				if(n.indexOf(originatingElement) < 0)
+				{
+					n.push(originatingElement);
+				}
+			}
+			
+			// Unregister previous name
+			if(previousId != null)
+			{
+				var d:Vector.<UIElement> = this._descendantsById[previousId] as Vector.<UIElement>;
+				if(d != null)
+				{
+					var i:int = d.indexOf(originatingElement);
+					if(i >= 0)
+					{
+						d.splice(i, 1);
+						this._descendantsById[previousId] = d;
+					}
+				}
+			}
+			
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantIdModified(newId, previousId, originatingElement);
+			}
+		}
+		
+		/**
+		* Registers a descendant to this element and all elements above it.
+		*/
+		public function descendantAdded(descendant:UIElement):void
+		{
+			// Add to main descendant list
+			if(this._descendants.indexOf(descendant) < 0)
+			{
+				this._descendants.push(descendant);
+			
+				// Add to ID hash
+				this.descendantIdModified(descendant.elementId, null, descendant);
+				// Add to name hash
+				this.descendantNameModified(descendant.elementName, null, descendant);
+				// Register classes
+				for(var i:uint=0; i < descendant.elementClassNames.length; i++)
+				{
+					this.registerDescendantClassName(descendant.elementClassNames[i], descendant);
+				}
+				// Register pseudoclasses
+				for(i=0; i < descendant.elementPseudoClasses.length; i++)
+				{
+					this.registerDescendantPseudoClass(descendant.elementPseudoClasses[i], descendant);
+				}
+			
+				if(this.parentElement != null)
+				{
+					this.parentElement.descendantAdded(descendant);
+				}
+			}
+		}
+		
+		/**
+		* Unregisters a descendant from this element and all elements above it.
+		*/
+		public function descendantRemoved(descendant:UIElement):void
+		{
+			// Add to main descendant list
+			this._descendants.splice(this._descendants.indexOf(descendant), 1);
+			
+			// Strip from ID hash
+			this.descendantIdModified(null, descendant.elementId, descendant);
+			// Strip from name hash
+			this.descendantNameModified(null, descendant.elementName, descendant);
+			// DE-register classes
+			for(var i:uint=0; i < descendant.elementClassNames.length; i++)
+			{
+				this.unregisterDescendantClassName(descendant.elementClassNames[i], descendant);
+			}
+			// DE-register pseudoclasses
+			for(i=0; i < descendant.elementPseudoClasses.length; i++)
+			{
+				this.unregisterDescendantPseudoClass(descendant.elementPseudoClasses[i], descendant);
+			}
+			if(this.parentElement != null)
+			{
+				this.parentElement.descendantRemoved(descendant);
+			}
+		}
+		
+		/**
+		* Called when this element is removed from an ancestor and added to a new one. Descends the tree and unregisters all descendants of this node.
+		*/
+		public function movedToNewAncestorTree(removedFrom:UIElement, addedTo:UIElement):void
+		{
+			if(removedFrom != null)
+			{
+				removedFrom.descendantRemoved(this);
+			}
+			if(addedTo != null)
+			{
+				addedTo.descendantAdded(this);
+			}
+			
+			for(var i:uint=0; i < this._children.length; i++)
+			{
+				this._children[i].movedToNewAncestorTree(removedFrom, addedTo);
+			}
+		}
+		
+		/**
+		* Traverses the descendants of this element by selector chain and returns all the matches.
+		*/
+		public function getElementsBySelectorSet(selectors:Vector.<ElementSelector>):Vector.<UIElement>
+		{
+			var reducedSet:Vector.<UIElement> = new Vector.<UIElement>();
+			selectors = selectors.concat(); // clone the vector
+			var selector:ElementSelector = selectors.shift();
+			var elementSets:Array = [];
+			
+				// for each criterion specified by the selector (a class, an id, a pseudo, whatever)
+				// we'll grab the set of descendants for that set, and calculate the intersection.
+				if(selector.elementNameMatchRequired)
+				{
+					elementSets.push(this.descendantsByName[selector.elementName]);
+				}
+				if(selector.elementID != null)
+				{
+					elementSets.push(this.descendantsById[selector.elementID]);
+				}
+				if(selector.elementClassNames.length > 0)
+				{
+					for(var n:uint = 0; n < selector.elementClassNames.length; n++)
+					{
+						elementSets.push(this.descendantsByClass[selector.elementClassNames[n]]);
+					}
+				}
+				if(selector.elementPseudoClasses.length > 0)
+				{
+					for(var p:uint = 0; p < selector.elementPseudoClasses.length; p++)
+					{
+						elementSets.push(this.descendantsByPseudoClass[selector.elementPseudoClasses[p]]);
+					}
+				}
+			
+			// Calculate the intersection of elements in the elementSets
+			for(var es:uint = 0; es < elementSets.length; es++)
+			{
+				if(elementSets[es] != null)
+				{
+					var eSet:Vector.<UIElement> = elementSets[es] as Vector.<UIElement>;
+					// Loop set and add to the reducedSet only if it appears on all elementSets
+					for(var s:uint = 0; s < eSet.length; s++)
+					{
+						var elem:UIElement = eSet[s];
+						var foundCount:int = 0;
 						
-						for (var k:int = 0; k < style.elementSelectorChains.length; ++k)
+						for(var ss:uint = 0; ss < elementSets.length; ss++)
 						{
-							var chain:ElementSelectorChain = style.elementSelectorChains[k];
-							
-							if (this.matchesElementSelectorChain(chain))
+							if(elementSets[ss] != null && (elementSets[ss] as Vector.<UIElement>).indexOf(elem) >= 0)
 							{
-								if (this._styles.indexOf(style) == -1)
-								{
-									// TODO add listener
-									this._styles.push(style);
-									this._styleSelectors.push(chain);
-									if(prevStyles == null || prevStyles.indexOf(style) > -1)
-									{
-										changed = true;
-									}
-								}
-								
-								break;
+								foundCount++;
 							}
+						}
+						
+						if(foundCount >= elementSets.length && reducedSet.indexOf(elem) < 0)
+						{
+							reducedSet.push(elem);
 						}
 					}
 				}
 			}
 			
-			// Evaluate the new styles
-			this.evaluateStyles();
+			// If the selector was prefixed with the ">" character, it requires the reduced set to only contain direct parents of the 
+			// calling element.
+			var c_red:int = reducedSet.length;
 			
-			// Now have the children update if there was an update
-			if(changed)
+			if(selector.parentSelector != null)
 			{
-				for(i = 0; i < this._children.length; i++)
-				{
-					this._children[i].updateStyles(true);
-				}
+				reducedSet = reducedSet.filter(function(elem:UIElement, index:int, set:Vector.<UIElement>):Boolean {
+					return (elem.parentElement == this);
+				}, this);
+				
 			}
+				
+			// Reduced set now contains the set of descendant elements matching the current candidate selector.
+			if(selectors.length == 0)
+			{
+				// If we've reached the end of the selector chain, there is no need to recurse further.
+				return reducedSet;
+			}
+			else
+			{
+				// If there are more selectors, we need to reduce the set again by recursing into this tier's reduced set.
+				var recursedSet:Vector.<UIElement> = new Vector.<UIElement>();
+				
+				for(var r:uint = 0; r < reducedSet.length; r++)
+				{
+					var subRec:Vector.<UIElement> = reducedSet[r].getElementsBySelectorSet(selectors);
+						for(var sr:uint = 0; sr < subRec.length; sr++)
+						{
+							if(recursedSet.indexOf(subRec[sr]) < 0)
+							{
+								recursedSet.push(subRec[sr]);
+							}
+						}
+				}
+				
+				return recursedSet;
+				
+			}
+			return null;
+		}
+		
+		public function flushStyles():void
+		{
+			StyleKit.logger.debug("Flushing styles ready for a fresh style push", this);
+			this._styles = new Vector.<Style>();
+			this._styleSelectors = new Vector.<ElementSelectorChain>();
+		}
+		
+		public function pushStyle(style:Style, matchedSelectorChain:ElementSelectorChain):void
+		{
+			if(this._styles.length != this._styleSelectors.length)
+			{
+				StyleKit.logger.error("Lost style sync on matched style pair. styles has "+this._styles.length+" objects, last is ID "+this._styles[this._styles.length-1].styleId+". selectors has "+this._styleSelectors.length+", last is "+this._styleSelectors[this._styleSelectors.length-1].stringValue, this);
+			}
+			this._styles.push(style);
+			this._styleSelectors.push(matchedSelectorChain);
+		}
+		
+		public function commitStyles():void
+		{
+			StyleKit.logger.debug("Committing all pushed styles, going to evaluation stage.", this);
+			this.evaluateStyles();
+		}
+		
+		protected function cacheKeyForSelectorsAndStyles(styles:Vector.<Style>, selectors:Vector.<ElementSelectorChain>):String
+		{
+			var styleSetCacheKeys:Vector.<String> = new Vector.<String>();
+			for(var s:int = 0; s < selectors.length; s++)
+			{
+				styleSetCacheKeys.push(styles[s].styleId+":"+selectors[s].stringValue);
+			}
+			return styleSetCacheKeys.join("|");
 		}
 		
 		protected function evaluateStyles():void
 		{
 			
-			// Begin specificity sort			
-			// Sort matched selectors by specificity
-			if(this._styleSelectors != null)
+			// Build a cache key based on the styles currently applied to this element
+			var styleSetCacheKey:String = this.cacheKeyForSelectorsAndStyles(this._styles, this._styleSelectors);
+			var previousStyleSetCacheKey:String;
+			
+			// This var will store all the styles sourced from the CSS objects 
+			var evaluatedNetworkStyles:Object;
+			
+			// Determines whether the comparison stage needs execution.
+			var compare:Boolean = true;
+			
+			if(styleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
 			{
+				StyleKit.logger.debug("Evaluating styles: cache key for selector set matches current cache key, using existing values: "+styleSetCacheKey, this);
+				compare = false;
+			}			
+			if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
+			{
+				StyleKit.logger.debug("Evaluating styles: retrieving cached computed styles for cache key: "+styleSetCacheKey, this);
+				evaluatedNetworkStyles = this._evaluatedNetworkStyleCache[styleSetCacheKey] as Object;
+			}
+			else
+			{
+				// Begin specificity sort
 				var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
 				var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
-				
+
 					sortedSelectorChains.sort(
 						function(x:ElementSelectorChain, y:ElementSelectorChain):Number
 						{
@@ -1524,7 +1943,6 @@ package org.stylekit.ui.element
 					);
 				// Loop over sorted selectors and use found index to sort corresponding style.
 				// The created vector is fixed in length.
-
 				for(var i:uint=0; i < this._styles.length; i++)
 				{
 					var sortCandidateStyle:Style = this._styles[i];
@@ -1539,125 +1957,47 @@ package org.stylekit.ui.element
 						}
 					}
 				}
-			}
-			// End specificity sort
-			
-			// Set up initial values
-			var newEvaluatedStyles:Object = PropertyContainer.defaultStyles;
-			
-			// Merge in the styles in order of specificity
-			if(this._styleSelectors != null)
-			{
+				// End specificity sort
+
+				// Set up initial values
+				evaluatedNetworkStyles = PropertyContainer.defaultStyles;
+
+				// Merge in the styles in order of specificity
 				for(i=0; i < sortedStyles.length; i++)
 				{
-					// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
-					// went out of sync before or during this method's execution.
-
-					var evalCandidateStyle:Style = sortedStyles[i];
-					newEvaluatedStyles = evalCandidateStyle.evaluate(newEvaluatedStyles, this);
+					//if(sortedStyles[i] != null)
+					//{
+					evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
+					//}
+					//else
+					//{
+					//	StyleKit.logger.error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue, this);
+					//}
+				}
+				
+				// Cache it
+				StyleKit.logger.debug("Evaluating styles: caching newly-computed styles for selector set: "+styleSetCacheKey, this);
+				this._evaluatedNetworkStyleCache[styleSetCacheKey] = evaluatedNetworkStyles;
+				
+				previousStyleSetCacheKey = this._evaluatedStyleCurrentCacheKey;
+				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey; // Set the current cache key
+				
+				if(previousStyleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
+				{
+					compare = false;
 				}
 			}
 			
 			// Include local styles
 			if(this._localStyle != null)
 			{
-				newEvaluatedStyles = this._localStyle.evaluate(newEvaluatedStyles, this);
+				StyleKit.logger.debug("Merging local style into evaluated network styles.", this);
+				this.evaluatedStyles = this._localStyle.evaluate(evaluatedNetworkStyles, this);
 			}
-			
-			// Setter carries the comparison check and event dispatch
-			this.evaluatedStyles = newEvaluatedStyles;
-			
-			// reset our control lines
-			this._controlLines = null;
-		}
-		
-		public function matchesElementSelector(selector:ElementSelector):Boolean
-		{
-			if (selector.elementNameMatchRequired && selector.elementName != null)
+			else if(compare)
 			{
-				if (selector.elementName != this.elementName)
-				{
-					return false;
-				}
+				this.evaluatedStyles = evaluatedNetworkStyles;
 			}
-			
-			if (selector.elementID != null)
-			{
-				if (selector.elementID != this.elementId)
-				{
-					return false;
-				}
-			}
-			
-			if (selector.elementClassNames.length > 0)
-			{
-				for (var i:int = 0; i < selector.elementClassNames.length; i++)
-				{
-					if (!this.hasElementClassName(selector.elementClassNames[i]))
-					{
-						return false;
-					}
-				}
-			}
-			
-			if (selector.elementPseudoClasses.length > 0)
-			{
-				for (var j:int = 0; j < selector.elementPseudoClasses.length; j++)
-				{
-					if (!this.hasElementPseudoClass(selector.elementPseudoClasses[j]))
-					{
-						return false;
-					}
-				}
-			}
-			
-			if(selector.parentSelector != null)
-			{
-				if(this.styleParent == null || !this.styleParent.matchesElementSelector(selector.parentSelector))
-				{
-					return false;
-				}
-			}
-			
-			return true;
-		}
-		
-		public function matchesElementSelectorChain(chain:ElementSelectorChain):Boolean
-		{
-			var collection:Vector.<ElementSelector> = chain.elementSelectors.concat();
-			collection.reverse();
-			
-			// This element must match the first selector
-			var firstSelectorMatched:Boolean = this.matchesElementSelector(collection[0]);
-			if(!firstSelectorMatched) return false;
-			
-			// With that sorted, let's take the parent selectors into account
-			
-			var selectorIndex:int = 1; // We already did the first one
-			var matchedSelectorCount:int = 1; // We already did the first one
-			var selector:ElementSelector;
-			var prevElem:UIElement;
-			var elem:UIElement = this.styleParent;
-			
-			if(collection.length > 1)
-			{
-				while(selectorIndex < collection.length && elem != null && (prevElem != elem))
-				{
-					selector = collection[selectorIndex];
-
-					if(elem.matchesElementSelector(selector))
-					{
-						// If it matches, log the match and move us to the next selector
-						matchedSelectorCount++;
-						selectorIndex++;
-					}
-
-					prevElem = elem;
-					elem = elem.styleParent;
-				}
-			}
-			
-			return (matchedSelectorCount == collection.length);
 		}
 		
 		public function beginPropertyTransition(propertyName:String, initialValue:Value, endValue:Value):void
@@ -1770,11 +2110,6 @@ package org.stylekit.ui.element
 			this.layoutChildren();
 		}
 		
-		protected function onStyleSheetModified(e:StyleSheetEvent):void
-		{
-			this.updateStyles();
-		}
-		
 		protected function onFocusIn(e:FocusEvent):void
 		{
 			this.addElementPseudoClass("focus");
@@ -1787,7 +2122,10 @@ package org.stylekit.ui.element
 		
 		protected function onMouseOver(e:MouseEvent):void
 		{
-			this.addElementPseudoClass("hover");
+			if(this._listensForHover)
+			{
+				this.addElementPseudoClass("hover");
+			}
 		}
 		
 		protected function onMouseOut(e:MouseEvent):void

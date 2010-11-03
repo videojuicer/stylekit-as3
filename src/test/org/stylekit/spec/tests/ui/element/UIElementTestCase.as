@@ -16,6 +16,8 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.selector.ElementSelector;
 	import org.stylekit.css.selector.ElementSelectorChain;
+	import org.stylekit.css.parse.StyleSheetParser;
+	import org.stylekit.css.parse.ElementSelectorParser;
 	import org.stylekit.css.selector.MediaSelector;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.css.value.PropertyListValue;
@@ -171,139 +173,133 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(1, child3.parentIndex);
 		}
 		
-		[Test(description="Tests that a UIElement can be matched against a selector, and fail against a incorrect match")]
-		public function selectorsMatchAnElement():void
+		[Test(description="Ensures that descendants may be retrieved by chain selector")]
+		public function getElementsBySelectorSet():void
 		{
+			var base:UIElement = new UIElement();
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
 			var child:UIElement = new UIElement();
-			child.elementName = "h1";
-			child.addElementClassName("selected");
+
+			root.addElementClassName("r");
+			middle.addElementClassName("m");
+			child.addElementClassName("c");
+
+			base.addElement(root); root.addElement(middle); middle.addElement(child);
+
+			child.addElementClassName("x");
+			middle.addElementClassName("x");
 			
-			var selector:ElementSelector = new ElementSelector();
-			selector.elementName = "h1";
-			selector.addElementClassName("selected");
-			selector.addElementPseudoClass("hover");
+			var parser:ElementSelectorParser = new ElementSelectorParser();
+			var chain:ElementSelectorChain = parser.parseElementSelectorChain(".r .c");
 			
-			var invalidSelector:ElementSelector = new ElementSelector();
-			invalidSelector.elementName = "div";
-			invalidSelector.addElementClassName("unselected");
-			invalidSelector.addElementPseudoClass("mouseover");
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(child, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
 			
-			Assert.assertFalse(child.matchesElementSelector(selector));
-			Assert.assertFalse(child.matchesElementSelector(invalidSelector));
+			chain = parser.parseElementSelectorChain(".m .c");
 			
-			child.addElementPseudoClass("hover");
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(child, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
+
+			chain = parser.parseElementSelectorChain(".r");
 			
-			Assert.assertTrue(child.matchesElementSelector(selector));
-			Assert.assertFalse(child.matchesElementSelector(invalidSelector));
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(root, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
+			
+			chain = parser.parseElementSelectorChain(".x");
+			
+			Assert.assertEquals(2, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertTrue(base.getElementsBySelectorSet(chain.elementSelectors).indexOf(child) > -1);
+			Assert.assertTrue(base.getElementsBySelectorSet(chain.elementSelectors).indexOf(middle) > -1);
+			
+			chain = parser.parseElementSelectorChain(".r > .x");
+			
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(middle, base.getElementsBySelectorSet(chain.elementSelectors)[0]);			
+
+			chain = parser.parseElementSelectorChain(".r > .c");
+			
+			Assert.assertEquals(0, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			
+			chain = parser.parseElementSelectorChain(".m > .c");
+			
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(child, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
+			
+			chain = parser.parseElementSelectorChain(".r > .m");
+			
+			Assert.assertEquals(1, base.getElementsBySelectorSet(chain.elementSelectors).length);
+			Assert.assertEquals(middle, base.getElementsBySelectorSet(chain.elementSelectors)[0]);
 		}
 		
-		[Test(description="Tests that a UIElement can be matched against a chain of selector elements")]
-		public function chainSelectorsMatchAnElement():void
+		[Test(description="Tests a complete style distribution cycle using a BaseUI and a set of child elements.")]
+		public function styleAllocationEvaluatesStylesPostHoc():void
 		{
-			var child1:ElementSelector = new ElementSelector();
-			child1.elementName = "p";
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".foo { width: 10px; } .foo .bar { height: 50px; } .foo > .bar { max-height: 100px; } .foo:hover > .bar { max-width: 200px; }");
 			
-			var child2:ElementSelector = new ElementSelector();
-			child2.elementName = "div";
-			child2.addElementClassName("current");
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo:UIElement = new UIElement(baseUI);
+			var barChild:UIElement = new UIElement(baseUI);
+			var barDesc:UIElement = new UIElement(baseUI);
 			
-			var child3:ElementSelector = new ElementSelector();
-			child3.elementName = "body";
-			child3.addElementPseudoClass("hover");
+			baseUI.addElement(foo);
+			foo.addElement(barChild);
+			barChild.addElement(barDesc);
 			
-			var element1:UIElement = new UIElement();
-			element1.elementName = "p";
-			element1.styleEligible = true;
+			ssCol.addStyleSheet(ss); // MUTATE!
+			foo.addElementClassName("foo");
+			barChild.addElementClassName("bar"); barDesc.addElementClassName("bar");
 			
-			var element2:UIElement = new UIElement();
-			element2.elementName = "d-iv";
-			element2.addElementClassName("current");
-			element2.styleEligible = true;
+			// Now inspect the styles
+			Assert.assertEquals(10, (foo.evaluatedStyles["width"] as SizeValue).value);
+			Assert.assertEquals(50, (barChild.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertEquals(50, (barDesc.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
+			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-width"] as SizeValue));
+			Assert.assertNull((barChild.evaluatedStyles["max-width"] as SizeValue));
 			
-			var element3:UIElement = new UIElement();
-			element3.elementName = "body";
-			element3.addElementPseudoClass("hover");
-			element3.styleEligible = true;
-			
-			element1.parentElement = element2;
-			element2.parentElement = element3;
-			
-			var chain:ElementSelectorChain = new ElementSelectorChain();
-			
-			chain.addElementSelector(child1);
-			chain.addElementSelector(child2);
-			chain.addElementSelector(child3);	
-			
-			Assert.assertFalse(element1.matchesElementSelectorChain(chain));
-			
-			element2.elementName = "div";
-			
-			Assert.assertTrue(element1.matchesElementSelectorChain(chain));
+			// Modify the state on an element
+			foo.addElementPseudoClass("hover");
+			Assert.assertEquals(10, (foo.evaluatedStyles["width"] as SizeValue).value);
+			Assert.assertEquals(50, (barChild.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertEquals(50, (barDesc.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
+			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-width"] as SizeValue));
+			Assert.assertEquals(200, (barChild.evaluatedStyles["max-width"] as SizeValue).value);
 		}
 		
-		public function elementCanCollectStyles():void
+		[Test(description="Tests a complete style distribution cycle using a BaseUI and a set of child elements.")]
+		public function styleAllocationEvaluatesStylesPreHoc():void
 		{
-			var collection:StyleSheetCollection = new StyleSheetCollection();
-			var styleSheet:StyleSheet = new StyleSheet();
-			var style:Style = new Style(styleSheet);
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".foo { width: 10px; } .foo .bar { height: 50px; } .foo > .bar { max-height: 100px; }");
+			ssCol.addStyleSheet(ss); // MUTATE!
 			
-			style.mediaSelector = new MediaSelector();
-			style.mediaSelector.addMedia("div");
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo:UIElement = new UIElement(baseUI);
+			var barChild:UIElement = new UIElement(baseUI);
+			var barDesc:UIElement = new UIElement(baseUI);
 			
-			styleSheet.addStyle(style);
+			foo.addElementClassName("foo");
+			barChild.addElementClassName("bar"); barDesc.addElementClassName("bar");
 			
-			collection.addStyleSheet(styleSheet);
+			baseUI.addElement(foo);
+			foo.addElement(barChild);
+			barChild.addElement(barDesc);
 			
-			var baseUI:BaseUI = new BaseUI(collection);
-			var uiElement:UIElement = baseUI.createUIElement();
-			uiElement.elementName = "div";
-			
-			uiElement.updateStyles();
-		
-			Assert.assertEquals(1, uiElement.styles.length);
-			
-			var newStyle:Style = uiElement.styles[0];
-			
-			Assert.assertEquals(style, newStyle);
-		}
-		
-		public function getElementsBySelector():void
-		{
-			var selector:ElementSelector = new ElementSelector();
-			selector.elementName = "div";
-			
-			var elements:Vector.<UIElement> = this._element.getElementsBySelector(selector);
-			
-			Assert.assertNotNull(elements);
-			Assert.assertEquals(2, elements.length);
-		}
-		
-		public function getElementsBySelectorString():void
-		{			
-			var elements:Vector.<UIElement> = this._element.getElementsBySelector("div");
-			
-			Assert.assertNotNull(elements);
-			Assert.assertEquals(1, elements.length);
-		}
-		
-		public function getElementsByChainSelector():void
-		{
-			var chainSelector:ElementSelectorChain = new ElementSelectorChain();
-			
-			var selector:ElementSelector = new ElementSelector();
-			selector.elementName = "p";
-			
-			chainSelector.addElementSelector(selector);
-			
-			selector = new ElementSelector();
-			selector.elementName = "div";
-			
-			chainSelector.addElementSelector(selector);
-			
-			var elements:Vector.<UIElement> = this._element.getElementsBySelector(chainSelector);
-			
-			Assert.assertNotNull(elements);
-			Assert.assertEquals(1, elements.length);
+			// Now inspect the styles
+			Assert.assertEquals(10, (foo.evaluatedStyles["width"] as SizeValue).value);
+			Assert.assertEquals(50, (barChild.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertEquals(50, (barDesc.evaluatedStyles["height"] as SizeValue).value);
+			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
+			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
 		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]
@@ -399,6 +395,161 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertTrue(el.hasStyleProperty("padding-bottom"));
 			Assert.assertTrue(el.hasStyleProperty("padding-right"));
 			Assert.assertTrue(el.hasStyleProperty("value-not-present-in-defaults"));
+		}
+		
+		[Test(description="Generates a key for the local styling state vector")]
+		public function stateVectorsGenerated():void
+		{
+			var el:UIElement = new UIElement();
+			el.elementName = "foo";
+			el.elementId = "bar";
+			el.addElementClassName("class1");
+			el.addElementClassName("class2");
+			el.addElementPseudoClass("pseudo1");
+			el.addElementPseudoClass("pseudo2");
+			
+			Assert.assertEquals("bar/foo/class1,class2/pseudo1,pseudo2/0", el.generateStateVectorKey());
+		}
+		
+		[Test(description="Registers descendants being moved between trees")]
+		public function descendantCacheUpdatedOnElementParentChange():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+				middle.addElementClassName("m");
+			var child:UIElement = new UIElement();
+				child.addElementClassName("c");
+			var other:UIElement = new UIElement();
+			
+			
+			// Add middle+child to root and assert indexes
+			root.addElement(middle);
+			root.addElement(child);
+			
+			Assert.assertEquals(2, root.descendants.length);
+			Assert.assertEquals(0, root.descendants.indexOf(middle));
+			Assert.assertEquals(1, root.descendants.indexOf(child));
+			
+			Assert.assertEquals(0, middle.descendants.length);
+			Assert.assertEquals(0, child.descendants.length);
+			
+			Assert.assertEquals(1, (root.descendantsByClass["m"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["m"] as Vector.<UIElement>).indexOf(middle));
+			Assert.assertEquals(1, (root.descendantsByClass["c"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["c"] as Vector.<UIElement>).indexOf(child));
+
+			// Move child to leaf and assert indexes
+			middle.addElement(child);
+			
+			Assert.assertEquals(2, root.descendants.length);
+			Assert.assertEquals(0, root.descendants.indexOf(middle));
+			Assert.assertEquals(1, root.descendants.indexOf(child));
+			
+			Assert.assertEquals(1, middle.descendants.length);
+			Assert.assertEquals(0, middle.descendants.indexOf(child));
+			Assert.assertEquals(0, child.descendants.length);
+			
+			Assert.assertEquals(1, (root.descendantsByClass["m"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["m"] as Vector.<UIElement>).indexOf(middle));
+			Assert.assertEquals(1, (root.descendantsByClass["c"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (root.descendantsByClass["c"] as Vector.<UIElement>).indexOf(child));
+
+			Assert.assertNull(middle.descendantsByClass["m"]);
+			Assert.assertEquals(1, (middle.descendantsByClass["c"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByClass["c"] as Vector.<UIElement>).indexOf(child));
+			
+		}
+		
+		[Test(description="Registers descendants switching classnames")]
+		public function descendantCacheUpdateOnClassNameAddedOrRemoved():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.addElementClassName("foo");
+			
+			Assert.assertEquals(1, (root.descendantsByClass["foo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByClass["foo"] as Vector.<UIElement>).length);
+			
+			child.removeElementClassName("foo");
+			
+			Assert.assertEquals(0, (root.descendantsByClass["foo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByClass["foo"] as Vector.<UIElement>).length);
+		}
+		
+		[Test(description="Registers descendants switching pseudoclasses")]
+		public function descendantCacheUpdateOnPseudoClassAddedOrRemoved():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.addElementPseudoClass("pseudo");
+			
+			Assert.assertEquals(1, (root.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+			
+			child.removeElementPseudoClass("pseudo");
+			
+			Assert.assertEquals(0, (root.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByPseudoClass["pseudo"] as Vector.<UIElement>).length);
+		}
+		
+		[Test(description="Registers descendants modifying their element names")]
+		public function descendantCacheUpdateOnElementNameModified():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.elementName = "div";
+			
+			Assert.assertEquals(1, (root.descendantsByName["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByName["div"] as Vector.<UIElement>).length);
+			
+			child.elementName = "ul";
+			
+			Assert.assertEquals(0, (root.descendantsByName["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsByName["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (root.descendantsByName["ul"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsByName["ul"] as Vector.<UIElement>).length);
+			
+			middle.elementName = "span";
+			
+			Assert.assertNull(child.descendantsByName["span"]);
+			Assert.assertNull(middle.descendantsByName["span"]);
+			Assert.assertEquals(1, (root.descendantsByName["span"] as Vector.<UIElement>).length);
+		}
+		
+		[Test(description="Registers descendants modifying their element ID's")]
+		public function descendantCacheUpdateOnElementIdModified():void
+		{
+			var root:UIElement = new UIElement();
+			var middle:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			root.addElement(middle); middle.addElement(child);
+			
+			child.elementId = "div";
+			
+			Assert.assertEquals(1, (root.descendantsById["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsById["div"] as Vector.<UIElement>).length);
+			
+			child.elementId = "ul";
+			
+			Assert.assertEquals(0, (root.descendantsById["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(0, (middle.descendantsById["div"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (root.descendantsById["ul"] as Vector.<UIElement>).length);
+			Assert.assertEquals(1, (middle.descendantsById["ul"] as Vector.<UIElement>).length);
+			
+			middle.elementId = "span";
+			
+			Assert.assertNull(child.descendantsById["span"]);
+			Assert.assertNull(middle.descendantsById["span"]);
+			Assert.assertEquals(1, (root.descendantsById["span"] as Vector.<UIElement>).length);
 		}
 		
 		[Test(async, description="Ensures that properties with a defined transition and non-zero duration are not altered immediately")]
