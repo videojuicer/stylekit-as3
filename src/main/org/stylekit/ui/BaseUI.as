@@ -136,9 +136,9 @@ package org.stylekit.ui
 			this.allocateStyles(originatingElement);
 		}
 		
-		public function allocateStyles(rootElement:UIElement):void
+		public function allocateStyles(mutatedElement:UIElement):void
 		{
-			StyleKit.logger.debug("Allocating styles after a mutation on "+rootElement, this);
+			StyleKit.logger.debug("Allocating styles after a mutation on "+mutatedElement, this);
 			
 			var encounteredElements:Vector.<UIElement> = new Vector.<UIElement>();
 			
@@ -155,22 +155,23 @@ package org.stylekit.ui
 						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
 						if(matched.length == 0)
 						{
+							// Skip if no matches
 							continue;
 						}
 						
 						var reducedMatch:Vector.<UIElement>;
-						if(rootElement == this)
+						if(mutatedElement == this)
 						{
 							reducedMatch = matched;
 						}
 						else
 						{
 							reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
-								return (rootElement.parentElement.descendants.indexOf(item) > -1)
+								return (mutatedElement.parentElement.descendants.indexOf(item) > -1)
 							}, this);
 						} 
 						
-						StyleKit.logger.debug("Allocating selector '"+selectorChain.stringValue+"' - matched "+matched.length+" total, pushing to "+reducedMatch.length+" elements within modified tree.", this);
+						StyleKit.logger.debug("Allocating selector '"+selectorChain.stringValue+"', matched "+matched.length+" total. Pushing to "+reducedMatch.length+" elements within modified tree.", this);
 						for(var k:int = 0; k < reducedMatch.length; k++)
 						{
 							var thisMatch:UIElement = reducedMatch[k];
