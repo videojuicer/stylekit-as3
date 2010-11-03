@@ -153,23 +153,33 @@ package org.stylekit.ui
 					if(selectorChain.elementSelectors.length > 0)
 					{
 						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
-						StyleKit.logger.debug("Allocating style with selector '"+selectorChain.stringValue+"' - matched "+matched.length+" elements.", this);
-						for(var k:int = 0; k < matched.length; k++)
+						
+						
+						var reducedMatch:Vector.<UIElement>;
+						if(rootElement == this)
 						{
-							var thisMatch:UIElement = matched[k];
-							if((rootElement == this) || rootElement.parentElement.descendants.indexOf(thisMatch) > -1)
+							reducedMatch = matched;
+						}
+						else
+						{
+							reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
+								return (rootElement.parentElement.descendants.indexOf(item) > -1)
+							}, this);
+						} 
+						
+						StyleKit.logger.debug("Allocating selector '"+selectorChain.stringValue+"' - matched "+matched.length+" total, pushing to "+reducedMatch.length+" elements within modified tree.", this);
+						for(var k:int = 0; k < reducedMatch.length; k++)
+						{
+							var thisMatch:UIElement = reducedMatch[k];
+							// If they're not in the encounteredElement list, flush the styles and put them there.
+							if(encounteredElements.indexOf(thisMatch) < 0)
 							{
-								// If they're not in the encounteredElement list, flush the styles and put them there.
-								if(encounteredElements.indexOf(thisMatch) < 0)
-								{
-									thisMatch.flushStyles();
-									encounteredElements.push(thisMatch);
-								}
-							
-								// Push the style and the matching selector chain to the element
-								thisMatch.pushStyle(style, selectorChain);
+								thisMatch.flushStyles();
+								encounteredElements.push(thisMatch);
 							}
-
+							
+							// Push the style and the matching selector chain to the element
+							thisMatch.pushStyle(style, selectorChain);
 						}
 					}
 				}
