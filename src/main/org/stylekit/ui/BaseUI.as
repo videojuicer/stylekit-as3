@@ -167,9 +167,10 @@ package org.stylekit.ui
 				{
 					var c:ElementSelectorChain = s.elementSelectorChains[j];
 					var hI:int = c.stringValue.indexOf(":hover")
-					StyleKit.logger.debug("Found selector that requires the application of a :hover listener : "+c.stringValue, this);
+					
 					if(hI > -1)
 					{
+						StyleKit.logger.debug("Found selector that requires the application of a :hover listener : "+c.stringValue, this);
 						// Pick apart the chain
 						var newChain:ElementSelectorChain = new ElementSelectorChain();
 						singleChainLoop:for(var k:int = 0; k < c.elementSelectors.length; k++)
