@@ -222,7 +222,7 @@ package org.stylekit.ui.element
 		
 		// Evaluated style cache
 		protected var _evaluatedNetworkStyleCache:Object;
-		protected var _evaluatedStyleCurrentCacheKey:String;
+		protected var _evaluatedStyleCurrentCacheKey:String = "THIS_CACHE_KEY_SHOULD_NEVER_BE_MATCHED_WIBBLE_WIBBLE_BOING";
 		
 		// Evaluated size cache
 		protected var _evaluatedSizes:Object;
@@ -1863,20 +1863,31 @@ package org.stylekit.ui.element
 			this.evaluateStyles();
 		}
 		
+		protected function cacheKeyForSelectorsAndStyles(styles:Vector.<Style>, selectors:Vector.<ElementSelectorChain>):String
+		{
+			var styleSetCacheKeys:Vector.<String> = new Vector.<String>();
+			for(var s:int = 0; s < selectors.length; s++)
+			{
+				styleSetCacheKeys.push(styles[s].styleId+":"+selectors[s].stringValue);
+			}
+			return styleSetCacheKeys.join("|");
+		}
+		
 		protected function evaluateStyles():void
 		{
 			
 			// Build a cache key based on the styles currently applied to this element
-			var styleSetCacheKeys:Vector.<String> = new Vector.<String>();
-			for(var s:int = 0; s < this._styleSelectors.length; s++)
-			{
-				styleSetCacheKeys.push(this._styleSelectors[s].stringValue);
-			}
-			var styleSetCacheKey:String = styleSetCacheKeys.join("|");
+			var styleSetCacheKey:String = this.cacheKeyForSelectorsAndStyles(this._styles, this._styleSelectors);
+			var previousStyleSetCacheKey:String;
 			
 			// This var will store all the styles sourced from the CSS objects 
 			var evaluatedNetworkStyles:Object;
 			
+			if(styleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
+			{
+				StyleKit.logger.debug("Evaluating styles: cache key for selector set matches current cache key, using existing values: "+styleSetCacheKey, this);
+				evaluatedNetworkStyles = this.evaluatedStyles;
+			}			
 			if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
 			{
 				StyleKit.logger.debug("Evaluating styles: retrieving cached computed styles for cache key: "+styleSetCacheKey, this);
@@ -1942,6 +1953,8 @@ package org.stylekit.ui.element
 				// Cache it
 				StyleKit.logger.debug("Evaluating styles: caching newly-computed styles for selector set: "+styleSetCacheKey, this);
 				this._evaluatedNetworkStyleCache[styleSetCacheKey] = evaluatedNetworkStyles;
+				
+				previousStyleSetCacheKey = this._evaluatedStyleCurrentCacheKey;
 				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey; // Set the current cache key
 			}
 			
@@ -1951,11 +1964,11 @@ package org.stylekit.ui.element
 				StyleKit.logger.debug("Merging local style into evaluated network styles.", this);
 				this.evaluatedStyles = this._localStyle.evaluate(evaluatedNetworkStyles, this);
 			}
-			//else if(this._evaluatedStyleCurrentCacheKey == styleSetCacheKey)
-			//{
-			//	throw new Error(this._evaluatedStyleCurrentCacheKey +","+ styleSetCacheKey)
-			//	StyleKit.logger.debug("Skipping comparison step as cache key is identical to current cache key and no local styles need merging: "+styleSetCacheKey, this);
-			//}
+			else if(this._evaluatedStyleCurrentCacheKey == previousStyleSetCacheKey)
+			{
+				throw new Error(this._evaluatedStyleCurrentCacheKey +","+ styleSetCacheKey)
+				StyleKit.logger.debug("Skipping comparison step as cache key is identical to current cache key and no local styles need merging: "+styleSetCacheKey, this);
+			}
 			else
 			{
 				StyleKit.logger.debug("Going to before/after comparison on evaluated styles for cache key: "+styleSetCacheKey, this);
