@@ -117,31 +117,37 @@ package org.stylekit.ui
 		public override function registerDescendantClassName(name:String, originatingElement:UIElement):void
 		{
 			super.registerDescendantClassName(name, originatingElement);
+			this.allocateHoverListeners();
 			this.allocateStyles(originatingElement);
 		}
 		public override function unregisterDescendantClassName(name:String, originatingElement:UIElement):void
 		{
 			super.unregisterDescendantClassName(name, originatingElement);
+			this.allocateHoverListeners();
 			this.allocateStyles(originatingElement);
 		}
 		public override function registerDescendantPseudoClass(name:String, originatingElement:UIElement):void
 		{
 			super.registerDescendantPseudoClass(name, originatingElement);
+			this.allocateHoverListeners();
 			this.allocateStyles(originatingElement);
 		}
 		public override function unregisterDescendantPseudoClass(name:String, originatingElement:UIElement):void
 		{
 			super.unregisterDescendantPseudoClass(name, originatingElement);
+			this.allocateHoverListeners();
 			this.allocateStyles(originatingElement);
 		}
 		public override function descendantNameModified(newName:String, previousName:String, originatingElement:UIElement):void
 		{
 			super.descendantNameModified(newName, previousName, originatingElement);
+			this.allocateHoverListeners();
 			this.allocateStyles(originatingElement);
 		}
 		public override function descendantIdModified(newId:String, previousId:String, originatingElement:UIElement):void
 		{
 			super.descendantIdModified(newId, previousId, originatingElement);
+			this.allocateHoverListeners();
 			this.allocateStyles(originatingElement);
 		}
 		
@@ -170,7 +176,6 @@ package org.stylekit.ui
 					
 					if(hI > -1)
 					{
-						StyleKit.logger.debug("Found selector that requires the application of a :hover listener : "+c.stringValue, this);
 						// Pick apart the chain
 						var newChain:ElementSelectorChain = new ElementSelectorChain();
 						singleChainLoop:for(var k:int = 0; k < c.elementSelectors.length; k++)
@@ -213,7 +218,31 @@ package org.stylekit.ui
 		
 		public function allocateHoverListeners():void
 		{
+			var i:int;
+			var enabled:int = 0;
 			
+			if(this.descendants == null || this.descendants.length == 0)
+			{
+				return;
+			}
+			
+			for(i = 0; i < this.descendants.length; i++)
+			{
+				this.descendants[i].listensForHover = false;
+			}
+			for(i = 0; i < this._hoverSelectorChains.length; i++)
+			{
+				var matches:Vector.<UIElement> = this.getElementsBySelectorSet(this._hoverSelectorChains[i].elementSelectors);
+				for(var j:int = 0; j < matches.length; j++)
+				{
+					if(!matches[j].listensForHover)
+					{
+						matches[j].listensForHover = true;
+						enabled++;
+					}
+				}
+			}
+			StyleKit.logger.debug("Enabled hover on "+enabled+"/"+this.descendants.length+" elements as required by styles.", this);
 		}
 		
 		public function allocateStyles(mutatedElement:UIElement):void
