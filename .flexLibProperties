@@ -72,6 +72,7 @@
     <classEntry path="org.stylekit.css.value.NumericValue"/>
     <classEntry path="StyleKitConsole"/>
     <classEntry path="org.stylekit.ui.element.SpriteWrapperUIElement"/>
+    <classEntry path="org.stylekit.ui.element.paint.BackgroundFiller"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

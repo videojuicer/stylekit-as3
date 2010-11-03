@@ -27,16 +27,15 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.URLValue;
 	import org.stylekit.ui.element.UIElement;
 	import org.utilkit.crypto.Base64;
+	import org.utilkit.crypto.MD5;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.parser.URLParser;
 	
 	public class UIElementPainter
 	{
-		protected var _backgroundLoader:Loader;
-		protected var _backgroundBytes:ByteArray;
-		protected var _backgroundBitmapData:BitmapData;
+		protected static var __backgroundFillers:Vector.<BackgroundFiller> = new Vector.<BackgroundFiller>();
 		
-		protected var _previousBackgroundImageValue:URLValue;
+		protected var _currentBackgroundFiller:BackgroundFiller;
 		
 		protected var _uiElement:UIElement;
 		
@@ -118,39 +117,39 @@ package org.stylekit.ui.element.paint
 			
 			if (backgroundImage != null)
 			{
-				if (this._backgroundLoader == null || this._previousBackgroundImageValue != backgroundImage)
-				{
-					this._previousBackgroundImageValue = backgroundImage;
-					
-					this._backgroundBitmapData = null;
-					this._backgroundBytes = null;
-					this._backgroundLoader = null;
-					
-					this._backgroundLoader = new Loader();
-					
-					this._backgroundLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onBackgroundLoaderComplete);
+				var backgroundSignature:String = backgroundImage.url; // MD5.encrypt(
+				var filler:BackgroundFiller = UIElementPainter.findBackgroundFillerBySignature(backgroundSignature);
 				
-					if (backgroundImage.url.indexOf("data:") == 0)
+				if (filler == null)
+				{
+					if (this._currentBackgroundFiller != null)
 					{
-						var dataURI:DataURIParser = new DataURIParser(backgroundImage.url);
-						var bytes:ByteArray = Base64.decodeToByteArray(dataURI.rawData);
-						bytes.position = 0;
-						
-						this._backgroundLoader.loadBytes(bytes);
+						this._currentBackgroundFiller.removeEventListener(Event.COMPLETE, this.onBackgroundFillerComplete);
 					}
-					else
+					
+					filler = new BackgroundFiller();
+					filler.addEventListener(Event.COMPLETE, this.onBackgroundFillerComplete);
+					
+					filler.load(backgroundImage);
+					
+					UIElementPainter.__backgroundFillers.push(filler);
+					this._currentBackgroundFiller = filler;
+				}
+				
+				if (filler.loaderComplete)
+				{
+					if (filler.hasEventListener(Event.COMPLETE))
 					{
-						var uriParser:URLParser = new URLParser(backgroundImage.url);
-						
-						this._backgroundLoader.load(new URLRequest(uriParser.url), new LoaderContext(true));
+						filler.removeEventListener(Event.COMPLETE, this.onBackgroundFillerComplete);
 					}
+					
+					var backgroundBitmapData:BitmapData = filler.createBitmapFillForElement(uiElement);
+					
+					graphics.beginBitmapFill(backgroundBitmapData, null, false, true);
 				}
 				else
 				{
-					if (this._backgroundBitmapData != null)
-					{
-						graphics.beginBitmapFill(this._backgroundBitmapData, null, false, true);
-					}
+					filler.addEventListener(Event.COMPLETE, this.onBackgroundFillerComplete);
 				}
 			}
 
@@ -209,59 +208,26 @@ package org.stylekit.ui.element.paint
 			graphics.endFill();
 		}
 		
-		protected function onBackgroundLoaderComplete(e:Event):void
+		protected static function findBackgroundFillerBySignature(signature:String):BackgroundFiller
 		{
-			trace("Background Image Loaded");
-			
-			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
-			var backgroundRepeat:RepeatValue = (uiElement.getStyleValue("background-repeat") as RepeatValue);
-			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
-			
-			var tempBitmapData:BitmapData = (this._backgroundLoader.content as Bitmap).bitmapData;
-			var bitmapData:BitmapData = new BitmapData(this.uiElement.effectiveWidth, this.uiElement.effectiveHeight, true, backgroundColor);
-			
-			// need to draw the image repeated and positioned like the rules above in the bitmapData object
-			var xRepeat:int = Math.ceil(backgroundRepeat.horizontalRepeat ? (bitmapData.width / tempBitmapData.width) : 1);
-			var yRepeat:int = Math.ceil(backgroundRepeat.verticalRepeat ? (bitmapData.height / tempBitmapData.height) : 1);
-
-			//var bitmapBytes:ByteArray = tempBitmapData.getPixels(new Rectangle(0, 0, tempBitmapData.width, tempBitmapData.height));
-			
-			var contentX:Number = this.uiElement.calculateContentPoint().x;
-			var contentY:Number = this.uiElement.calculateContentPoint().y;
-			
-			for (var y:int = 0; y < yRepeat; y++)
+			if (UIElementPainter.__backgroundFillers != null && UIElementPainter.__backgroundFillers.length > 0)
 			{
-				for (var x:int = 0; x < xRepeat; x++)
+				for (var i:int = 0; i < UIElementPainter.__backgroundFillers.length; i++)
 				{
-					//bitmapBytes.position = 0;
+					var filler:BackgroundFiller = UIElementPainter.__backgroundFillers[i];
 					
-					var width:int = (xRepeat == 1) ? tempBitmapData.width : ((xRepeat - 1) == x ? bitmapData.width - (tempBitmapData.width * (xRepeat - 1)) : tempBitmapData.width);
-					var height:int = (yRepeat == 1) ? tempBitmapData.height : ((yRepeat - 1) == y ? bitmapData.height - (tempBitmapData.height * (yRepeat - 1)) : tempBitmapData.height);
-					
-					//var rect:Rectangle = new Rectangle((x * tempBitmapData.width), (y * tempBitmapData.height), width, height);
-					
-					//bitmapData.setPixels(rect, bitmapBytes);
-					
-					// starting position
-					var startX:int = contentX + tempBitmapData.width * x;
-					var startY:int = contentY + tempBitmapData.height * y;
-					
-					trace("Drawing from: "+startX+"/"+startY+" -> "+xRepeat+"/"+yRepeat);
-					
-					for (var h:int = height; h >= 0; h--)
+					if (filler.signature == signature)
 					{
-						for (var w:int = width; w >= 0; w--)
-						{
-							bitmapData.setPixel32(w + startX, h + startY, tempBitmapData.getPixel32(w, h));
-						}
+						return filler;
 					}
 				}
 			}
 			
-			
-			
-			this._backgroundBitmapData = bitmapData;
-			
+			return null;
+		}
+		
+		protected function onBackgroundFillerComplete(e:Event):void
+		{
 			this.paint();
 		}
 	}
