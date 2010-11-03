@@ -153,7 +153,10 @@ package org.stylekit.ui
 					if(selectorChain.elementSelectors.length > 0)
 					{
 						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
-						
+						if(matched.length == 0)
+						{
+							continue;
+						}
 						
 						var reducedMatch:Vector.<UIElement>;
 						if(rootElement == this)
