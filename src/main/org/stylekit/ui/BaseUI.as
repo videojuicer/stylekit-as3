@@ -157,7 +157,7 @@ package org.stylekit.ui
 						for(var k:int = 0; k < matched.length; k++)
 						{
 							var thisMatch:UIElement = matched[k];
-							if(rootElement.descendants.indexOf(thisMatch) > -1)
+							if((rootElement == this) || rootElement.parentElement.descendants.indexOf(thisMatch) > -1)
 							{
 								// If they're not in the encounteredElement list, flush the styles and put them there.
 								if(encounteredElements.indexOf(thisMatch) < 0)
