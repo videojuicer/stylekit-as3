@@ -1523,7 +1523,7 @@ package org.stylekit.ui.element
 				var i:int = desc.indexOf(originatingElement);
 				if(i < 0)
 				{
-					throw new Error("Unregistering descendant class name, but descendant was never registered. The descendant cache has lost sync.");
+					StyleKit.logger.error("Unregistering descendant class name, but descendant was never registered. The descendant cache has lost sync.", this);
 				}
 				else
 				{
@@ -1569,7 +1569,7 @@ package org.stylekit.ui.element
 				var i:int = desc.indexOf(originatingElement);
 				if(i < 0)
 				{
-					throw new Error("Unregistering descendant pseudoclass, but descendant was never registered. The descendant cache has lost sync.");
+					StyleKit.logger.error("Unregistering descendant pseudoclass, but descendant was never registered. The descendant cache has lost sync.", this);
 				}
 				else
 				{
@@ -1855,7 +1855,7 @@ package org.stylekit.ui.element
 		{
 			if(this._styles.length != this._styleSelectors.length)
 			{
-				throw new Error("Lost style sync on matched style pair. styles has "+this._styles.length+" objects, last is ID "+this._styles[this._styles.length-1].styleId+". selectors has "+this._styleSelectors.length+", last is "+this._styleSelectors[this._styleSelectors.length-1].stringValue+" on "+this);
+				StyleKit.logger.error("Lost style sync on matched style pair. styles has "+this._styles.length+" objects, last is ID "+this._styles[this._styles.length-1].styleId+". selectors has "+this._styleSelectors.length+", last is "+this._styleSelectors[this._styleSelectors.length-1].stringValue, this);
 			}
 			this._styles.push(style);
 			this._styleSelectors.push(matchedSelectorChain);
@@ -1948,14 +1948,14 @@ package org.stylekit.ui.element
 				// Merge in the styles in order of specificity
 				for(i=0; i < sortedStyles.length; i++)
 				{
-					if(sortedStyles[i] != null)
-					{
-						evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
-					}
-					else
-					{
-						throw new Error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue+" on "+this);
-					}
+					//if(sortedStyles[i] != null)
+					//{
+					evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
+					//}
+					//else
+					//{
+					//	StyleKit.logger.error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue, this);
+					//}
 				}
 				
 				// Cache it
