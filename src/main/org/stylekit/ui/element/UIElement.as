@@ -1933,9 +1933,10 @@ package org.stylekit.ui.element
 				{
 					for(i=0; i < sortedStyles.length; i++)
 					{
-						// if you get a runtime error here saying that one of these styles is null, then the _styleSelectors and _styles variables
-						// went out of sync before or during this method's execution.
-						evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
+						if(sortedStyles[i] != null)
+						{
+							evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
+						}
 					}
 				}
 				// Cache it
