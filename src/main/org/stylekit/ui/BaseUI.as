@@ -153,7 +153,7 @@ package org.stylekit.ui
 					if(selectorChain.elementSelectors.length > 0)
 					{
 						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
-						StyleKit.logger.debug("Allocating style with selector '"+selectorChain.stringValue+"' - matched "+matched.length+" elements. Applying...", this);
+						StyleKit.logger.debug("Allocating style with selector '"+selectorChain.stringValue+"' - matched "+matched.length+" elements.", this);
 						for(var k:int = 0; k < matched.length; k++)
 						{
 							var thisMatch:UIElement = matched[k];
@@ -169,15 +169,14 @@ package org.stylekit.ui
 						}
 					}
 				}
-				
-				// Commit the styles on all encountered elements.
-				for(var l:int = 0; l < encounteredElements.length; l++)
-				{
-					encounteredElements[l].commitStyles();
-				}
-				StyleKit.logger.debug("Committed new styles on "+encounteredElements.length+" encountered elements.", this);
-				
 			}
+			
+			// Commit the styles on all encountered elements.
+			for(var l:int = 0; l < encounteredElements.length; l++)
+			{
+				encounteredElements[l].commitStyles();
+			}
+			StyleKit.logger.debug("Committed new styles on "+encounteredElements.length+" encountered elements.", this);
 		}
 		
 		protected function onRootResized(e:Event):void
