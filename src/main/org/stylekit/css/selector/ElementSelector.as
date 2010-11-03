@@ -91,6 +91,11 @@ package org.stylekit.css.selector
 			return this._elementClassNames;
 		}
 		
+		public function set elementClassNames(v:Vector.<String>):void
+		{
+			this._elementClassNames = v;
+		}
+		
 		public function get elementPseudoClasses():Vector.<String>
 		{
 			return this._elementPseudoClasses;

@@ -204,6 +204,8 @@ package org.stylekit.ui.element
 		protected var _rawContentWidth:int = 0;
 		protected var _rawContentHeight:int = 0;
 		
+		protected var _listensForHover:Boolean = false;
+		
 		/**
 		* A reference to the Style object used to store this element's local styles. This Style is treated with a higher 
 		* priority than styles sourced from the BaseUI's stylesheet collection.
@@ -327,6 +329,16 @@ package org.stylekit.ui.element
 		public function get elementPseudoClasses():Vector.<String>
 		{
 			return this._elementPseudoClasses;
+		}
+		
+		public function get listensForHover():Boolean
+		{
+			return this._listensForHover;
+		}
+		
+		public function set listensForHover(b:Boolean):void
+		{
+			this._listensForHover = b;
 		}
 		
 		public function get descendants():Vector.<UIElement>
@@ -2110,7 +2122,10 @@ package org.stylekit.ui.element
 		
 		protected function onMouseOver(e:MouseEvent):void
 		{
-			this.addElementPseudoClass("hover");
+			if(this._listensForHover)
+			{
+				this.addElementPseudoClass("hover");
+			}
 		}
 		
 		protected function onMouseOut(e:MouseEvent):void

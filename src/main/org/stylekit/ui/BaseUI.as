@@ -22,6 +22,12 @@ package org.stylekit.ui
 		*/
 		protected var _collapsedStyles:Vector.<Style>;
 		
+		/**
+		* A vector of element selector chains from the current collapsed style set that 
+		* describe elements which require a listener for the :hover state.
+		*/
+		protected var _hoverSelectorChains:Vector.<ElementSelectorChain>;
+		
 		public function BaseUI(styleSheetCollection:StyleSheetCollection = null, root:DisplayObject = null)
 		{
 			this._styleSheetCollection = styleSheetCollection;
@@ -34,15 +40,14 @@ package org.stylekit.ui
 			
 			this._root = root;
 			
+			this._hoverSelectorChains = new Vector.<ElementSelectorChain>();
+			
 			super();
 			
 			if (this._root != null && this._root.stage != null)
 			{
 				this._root.stage.addEventListener(Event.RESIZE, this.onRootResized, false, 1);
 			}
-			
-			// Register self as stylable
-			this.descendantAdded(this);
 		}
 		
 		public override function get baseUI():BaseUI
@@ -105,7 +110,8 @@ package org.stylekit.ui
 				}	
 			}
 			
-			// Sort
+			this.populateHoverListeners();
+			this.allocateHoverListeners();
 		}
 		
 		public override function registerDescendantClassName(name:String, originatingElement:UIElement):void
@@ -137,6 +143,75 @@ package org.stylekit.ui
 		{
 			super.descendantIdModified(newId, previousId, originatingElement);
 			this.allocateStyles(originatingElement);
+		}
+		
+		public override function descendantAdded(descendant:UIElement):void
+		{
+			super.descendantAdded(descendant);
+			this.allocateHoverListeners();
+			this.allocateStyles(descendant);
+		}
+		
+		/**
+		* Examines the list of collapsed styles to build a set of selectors that target elements which need to have the :hover pseudoclass applied to them.
+		*/
+		public function populateHoverListeners():void
+		{
+			this._hoverSelectorChains = new Vector.<ElementSelectorChain>();
+			
+			allStylesLoop:for(var i:int = 0; i < this._collapsedStyles.length; i++)
+			{
+				var s:Style = this._collapsedStyles[i];
+				
+				allChainsLoop:for(var j:int = 0; j < s.elementSelectorChains.length; j++)
+				{
+					var c:ElementSelectorChain = s.elementSelectorChains[j];
+					var hI:int = c.stringValue.indexOf(":hover")
+					
+					if(hI > -1)
+					{
+						// Pick apart the chain
+						var newChain:ElementSelectorChain = new ElementSelectorChain();
+						singleChainLoop:for(var k:int = 0; k < c.elementSelectors.length; k++)
+						{
+							var sel:ElementSelector = c.elementSelectors[k];
+							if(sel.hasElementPseudoClass("hover"))
+							{
+								if((k == 0) && (!sel.elementNameMatchRequired) && (sel.elementClassNames.length == 0) && (sel.elementID == null))
+								{
+									// If it has no element name, id, or classes, then ignore it. It's a wildcard that applies to all elements and we don't allow it.
+									break singleChainLoop;
+								}
+								else
+								{
+									// If the selector references hover, then break it up, add it to the newChain and terminate.
+									var newSel:ElementSelector = new ElementSelector();
+										newSel.elementID = sel.elementID;
+										newSel.elementName = sel.elementName;
+										newSel.elementClassNames = sel.elementClassNames;
+										newChain.addElementSelector(newSel);
+								}
+							}
+							else
+							{
+								// Else, just append the selector to the newChain
+								newChain.addElementSelector(sel);
+							}
+							
+							if(newChain.elementSelectors.length > 0)
+							{
+								this._hoverSelectorChains.push(newChain);
+							}
+						}
+					}
+				}
+			}
+			StyleKit.logger.debug("Analysed style selectors and found "+this._hoverSelectorChains.length+" selectors for elements that require the :hover listener", this);
+		}
+		
+		public function allocateHoverListeners():void
+		{
+			
 		}
 		
 		public function allocateStyles(mutatedElement:UIElement):void
