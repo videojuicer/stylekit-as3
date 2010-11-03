@@ -176,7 +176,6 @@ package org.stylekit.ui
 							}
 						} 
 						
-						//StyleKit.logger.debug("Allocating selector '"+selectorChain.stringValue+"', matched "+matched.length+" total. Pushing to "+reducedMatch.length+" elements within modified tree.", this);
 						for(var k:int = 0; k < reducedMatch.length; k++)
 						{
 							var thisMatch:UIElement = reducedMatch[k];
@@ -195,11 +194,14 @@ package org.stylekit.ui
 			}
 			
 			// Commit the styles on all encountered elements.
-			for(var l:int = 0; l < encounteredElements.length; l++)
+			if(encounteredElements.length > 0)
 			{
-				encounteredElements[l].commitStyles();
+				StyleKit.logger.debug("Committing new styles on "+encounteredElements.length+" encountered elements.", this);
+				for(var l:int = 0; l < encounteredElements.length; l++)
+				{
+					encounteredElements[l].commitStyles();
+				}
 			}
-			StyleKit.logger.debug("Committed new styles on "+encounteredElements.length+" encountered elements.", this);
 		}
 		
 		protected function onRootResized(e:Event):void

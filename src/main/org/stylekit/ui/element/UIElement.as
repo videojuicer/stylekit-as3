@@ -1902,7 +1902,6 @@ package org.stylekit.ui.element
 			}
 			else
 			{
-				StyleKit.logger.debug("Evaluating styles: computing new styles for cache key: "+styleSetCacheKey, this);
 				// Begin specificity sort
 				var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
 				var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
@@ -1979,12 +1978,7 @@ package org.stylekit.ui.element
 			}
 			else if(compare)
 			{
-				StyleKit.logger.debug("Going to before/after comparison on evaluated styles for cache key: "+styleSetCacheKey, this);
 				this.evaluatedStyles = evaluatedNetworkStyles;
-			}
-			else
-			{
-				StyleKit.logger.debug("Skipping comparison step as cache key is identical to current cache key and no local styles need merging: "+styleSetCacheKey, this);
 			}
 		}
 		
