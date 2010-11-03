@@ -225,7 +225,7 @@ package org.stylekit.ui.element
 		protected var _evaluatedStyleCurrentCacheKey:String = "THIS_CACHE_KEY_SHOULD_NEVER_BE_MATCHED_WIBBLE_WIBBLE_BOING";
 		
 		// Evaluated size cache
-		protected var _evaluatedSizes:Object;
+		protected var _computedSizes:Object;
 		
 		public function UIElement(baseUI:BaseUI = null)
 		{
@@ -250,7 +250,7 @@ package org.stylekit.ui.element
 			this._painter = new UIElementPainter(this);
 			
 			this._evaluatedNetworkStyleCache = {};
-			this._evaluatedSizes = {};
+			this._computedSizes = {};
 			
 			this._styles = new Vector.<Style>();
 			this._styleSelectors = new Vector.<ElementSelectorChain>();
@@ -1037,7 +1037,12 @@ package org.stylekit.ui.element
 		{
 			this._controlLines = null;
 			StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
-			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
+			
+			//for(var i:uint=0; i < this._children.length; i++)
+			//{
+			//	this._children[i].recalculateEffectiveContentDimensions();
+			//}
+			//this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
 		

@@ -156,6 +156,12 @@ package org.stylekit.ui
 					if(selectorChain.elementSelectors.length > 0)
 					{
 						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
+
+						// Add self as a candidate for matching styles
+						if(this.selectorChainApplicable(selectorChain))
+						{
+							matched.push(this);
+						}
 						if(matched.length == 0)
 						{
 							// Skip if no matches
@@ -205,6 +211,50 @@ package org.stylekit.ui
 					encounteredElements[l].commitStyles();
 				}
 			}
+		}
+		
+		protected function selectorChainApplicable(chain:ElementSelectorChain):Boolean
+		{
+			var selectors:Vector.<ElementSelector> = chain.elementSelectors;
+			
+			if(selectors.length > 1)
+			{
+				return false;
+			}
+			
+			var selector:ElementSelector = selectors[0];
+			var i:int = 0;
+			
+			if(selector.elementNameMatchRequired && (selector.elementName != this.elementName))
+			{
+				return false;
+			}
+			if(selector.elementID != null && (selector.elementID != this.elementId))
+			{
+				return false;
+			}
+			if(selector.elementClassNames.length > 0)
+			{
+				for(i = 0; i < selector.elementClassNames.length; i++)
+				{
+					if(!this.hasElementClassName(selector.elementClassNames[i]))
+					{
+						return false;
+					}
+				}
+			}
+			if(selector.elementPseudoClasses.length > 0)
+			{
+				for(i = 0; i < selector.elementPseudoClasses.length; i++)
+				{
+					if(!this.hasElementPseudoClass(selector.elementPseudoClasses[i]))
+					{
+						return false;
+					}
+				}
+			}
+			
+			return true;
 		}
 		
 		protected function onRootResized(e:Event):void
