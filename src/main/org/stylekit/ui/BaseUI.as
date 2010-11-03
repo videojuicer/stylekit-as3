@@ -40,6 +40,9 @@ package org.stylekit.ui
 			{
 				this._root.stage.addEventListener(Event.RESIZE, this.onRootResized, false, 1);
 			}
+			
+			// Register self as stylable
+			this.descendantAdded(this);
 		}
 		
 		public override function get baseUI():BaseUI
