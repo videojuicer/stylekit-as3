@@ -1795,7 +1795,7 @@ package org.stylekit.ui.element
 							}
 						}
 						
-						if(foundCount >= elementSets.length)
+						if(foundCount >= elementSets.length && reducedSet.indexOf(elem) < 0)
 						{
 							reducedSet.push(elem);
 						}
@@ -1853,6 +1853,10 @@ package org.stylekit.ui.element
 		
 		public function pushStyle(style:Style, matchedSelectorChain:ElementSelectorChain):void
 		{
+			if(this._styles.length != this._styleSelectors.length)
+			{
+				throw new Error("Lost style sync on matched style pair. styles has "+this._styles.length+" objects, last is ID "+this._styles[this._styles.length-1].styleId+". selectors has "+this._styleSelectors.length+", last is "+this._styleSelectors[this._styleSelectors.length-1].stringValue+" on "+this);
+			}
 			this._styles.push(style);
 			this._styleSelectors.push(matchedSelectorChain);
 		}
@@ -1950,7 +1954,7 @@ package org.stylekit.ui.element
 					}
 					else
 					{
-						throw new Error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue);
+						throw new Error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue+" on "+this);
 					}
 				}
 				
