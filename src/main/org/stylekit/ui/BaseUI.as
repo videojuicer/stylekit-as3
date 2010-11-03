@@ -169,6 +169,11 @@ package org.stylekit.ui
 							reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
 								return (mutatedElement.parentElement.descendants.indexOf(item) > -1)
 							}, this);
+							
+							if(reducedMatch.length == 0)
+							{
+								continue;
+							}
 						} 
 						
 						StyleKit.logger.debug("Allocating selector '"+selectorChain.stringValue+"', matched "+matched.length+" total. Pushing to "+reducedMatch.length+" elements within modified tree.", this);
