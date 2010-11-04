@@ -286,6 +286,7 @@ package org.stylekit.ui
 										newSel.elementID = sel.elementID;
 										newSel.elementName = sel.elementName;
 										newSel.elementClassNames = sel.elementClassNames;
+										newSel.parentSelector = sel.parentSelector;
 										newChain.addElementSelector(newSel);
 										break singleChainLoop;
 								}
