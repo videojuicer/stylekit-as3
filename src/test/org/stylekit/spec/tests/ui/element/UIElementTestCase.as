@@ -273,6 +273,56 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(200, (barChild.evaluatedStyles["max-width"] as SizeValue).value);
 		}
 		
+		[Test(description="Tests that hover listeners are properly allocated during a style refresh")]
+		public function hoverListenersAllocatedOnDomMutate():void
+		{
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".foo { width: 10px; } .foo .bar { height: 50px; } .foo > .bar { max-height: 100px; }");
+			
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo1:UIElement = new UIElement(baseUI);
+			var foo2:UIElement = new UIElement(baseUI);
+			var barChild:UIElement = new UIElement(baseUI);
+			var barDesc:UIElement = new UIElement(baseUI);
+			
+			baseUI.addElement(foo1);
+			baseUI.addElement(foo2);
+			foo1.addElement(barChild);
+			barChild.addElement(barDesc);
+			
+			ssCol.addStyleSheet(ss); // MUTATE!
+			foo1.addElementClassName("foo"); foo2.addElementClassName("foo");
+			barChild.addElementClassName("bar"); barDesc.addElementClassName("bar");
+			
+			Assert.assertFalse(baseUI.listensForHover);
+			Assert.assertFalse(foo1.listensForHover); 
+			Assert.assertFalse(foo2.listensForHover);
+			Assert.assertFalse(barChild.listensForHover);
+			Assert.assertFalse(barDesc.listensForHover);
+			
+			ssCol.removeStyleSheet(ss);
+			ss = ssParse.parse(".foo:hover { background-color red; } .foo > .bar:hover { height: 50px; }");
+			ssCol.addStyleSheet(ss);
+			
+			Assert.assertFalse(baseUI.listensForHover);
+			Assert.assertTrue(foo1.listensForHover); 
+			Assert.assertTrue(foo2.listensForHover);
+			Assert.assertTrue(barChild.listensForHover);
+			Assert.assertFalse(barDesc.listensForHover);
+			
+			ssCol.removeStyleSheet(ss);
+			ss = ssParse.parse(".foo { background-color red; } .bar:hover .foo { height: 50px; }");
+			ssCol.addStyleSheet(ss);
+			
+			Assert.assertFalse(baseUI.listensForHover);
+			Assert.assertFalse(foo1.listensForHover); 
+			Assert.assertFalse(foo2.listensForHover);
+			Assert.assertTrue(barChild.listensForHover);
+			Assert.assertTrue(barDesc.listensForHover);
+		}
+		
 		[Test(description="Tests a complete style distribution cycle using a BaseUI and a set of child elements.")]
 		public function styleAllocationEvaluatesStylesPreHoc():void
 		{
