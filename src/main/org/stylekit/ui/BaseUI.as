@@ -18,6 +18,13 @@ package org.stylekit.ui
 		protected var _root:DisplayObject;
 		
 		/**
+		* A flattened vector of selector chains from the styles, sorted by specificity.
+		* For styles that use multiple comma-seperated selector chains, an entry will be created for each
+		* selector and the corresponding style will be re-added to the _collapsedStyles vector as a duplicate pointer.
+		*/
+		protected var _collapsedSelectorChains:Vector.<ElementSelectorChain>;
+		
+		/**
 		* A flattened vector of styles present on the StyleSheetCollection
 		*/
 		protected var _collapsedStyles:Vector.<Style>;
@@ -89,11 +96,12 @@ package org.stylekit.ui
 		}
 		
 		/**
-		* Retrieves all the styles from the current StyleSheetCollection and flattens them into an ordered list
+		* Retrieves all the styles from the current StyleSheetCollection and flattens them into a specificity-sorted pair of vectors.
 		*/
 		public function collapseStyles():void
 		{
 			this._collapsedStyles = new Vector.<Style>();
+			this._collapsedSelectorChains = new Vector.<ElementSelectorChain>();
 			
 			// Flatten
 			if(this.styleSheetCollection != null)
@@ -105,11 +113,44 @@ package org.stylekit.ui
 					for(var j:uint = 0; j < sheet.styles.length; j++)
 					{
 						var style:Style = sheet.styles[j];
-						this._collapsedStyles.push(style);
+						
+						for(var k:uint = 0; k < style.elementSelectorChains.length; k++)
+						{
+							var chain:ElementSelectorChain = style.elementSelectorChains[k];
+							
+							this._collapsedSelectorChains.push(chain);
+							this._collapsedStyles.push(style);
+						}
 					}
 				}	
 			}
 			
+			// Sort
+			// Do a litle bubble sort thingy, since AS3's sort won't cut it for sorting multiple lists
+			var n:int = this._collapsedSelectorChains.length-1;
+			for(var a:uint = 0; a <= n; a++)
+			{
+				for(var b:uint = n; b > a; b--)
+				{
+					if(this._collapsedSelectorChains[b-1].specificity > this._collapsedSelectorChains[b].specificity)
+					{
+						// Swap j-1 to j in both vectors
+						
+						// Selector swap
+						var prevChain:ElementSelectorChain = this._collapsedSelectorChains[b-1];
+							this._collapsedSelectorChains[b-1] = this._collapsedSelectorChains[b];
+							this._collapsedSelectorChains[b] = prevChain;
+						// Style swap
+						var prevStyle:Style = this._collapsedStyles[b-1];
+							this._collapsedStyles[b-1] = this._collapsedStyles[b];
+							this._collapsedStyles[b] = prevStyle;
+					}
+				}
+			}
+			// End specificity sort
+			
+			
+			// Now refresh the hover listeners
 			this.populateHoverListeners();
 			this.allocateHoverListeners();
 		}
@@ -251,59 +292,56 @@ package org.stylekit.ui
 			
 			var encounteredElements:Vector.<UIElement> = new Vector.<UIElement>();
 			
-			for(var i:uint = 0; i < this._collapsedStyles.length; i++)
+			for(var i:uint = 0; i < this._collapsedSelectorChains.length; i++)
 			{
 				var style:Style = this._collapsedStyles[i];
-				for(var j:uint = 0; j < style.elementSelectorChains.length; j++)
+				var selectorChain:ElementSelectorChain = this._collapsedSelectorChains[i];
+			
+				// Get all elements matching this selector
+				if(selectorChain.elementSelectors.length > 0)
 				{
-					var selectorChain:ElementSelectorChain = style.elementSelectorChains[j];
-				
-					// Get all elements matching this selector
-					if(selectorChain.elementSelectors.length > 0)
-					{
-						var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
+					var matched:Vector.<UIElement> = this.getElementsBySelectorSet(selectorChain.elementSelectors);
 
-						// Add self as a candidate for matching styles
-						if(this.selectorChainApplicable(selectorChain))
+					// Add self as a candidate for matching styles
+					if(this.selectorChainApplicable(selectorChain))
+					{
+						matched.unshift(this);
+					}
+					if(matched.length == 0)
+					{
+						// Skip if no matches
+						continue;
+					}
+					
+					var reducedMatch:Vector.<UIElement>;
+					if(mutatedElement == this)
+					{
+						reducedMatch = matched;
+					}
+					else
+					{
+						reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
+							return (mutatedElement.parentElement.descendants.indexOf(item) > -1)
+						}, this);
+						
+						if(reducedMatch.length == 0)
 						{
-							matched.push(this);
-						}
-						if(matched.length == 0)
-						{
-							// Skip if no matches
 							continue;
 						}
-						
-						var reducedMatch:Vector.<UIElement>;
-						if(mutatedElement == this)
+					} 
+					
+					for(var k:int = 0; k < reducedMatch.length; k++)
+					{
+						var thisMatch:UIElement = reducedMatch[k];
+						// If they're not in the encounteredElement list, flush the styles and put them there.
+						if(encounteredElements.indexOf(thisMatch) < 0)
 						{
-							reducedMatch = matched;
+							thisMatch.flushStyles();
+							encounteredElements.push(thisMatch);
 						}
-						else
-						{
-							reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
-								return (mutatedElement.parentElement.descendants.indexOf(item) > -1)
-							}, this);
-							
-							if(reducedMatch.length == 0)
-							{
-								continue;
-							}
-						} 
 						
-						for(var k:int = 0; k < reducedMatch.length; k++)
-						{
-							var thisMatch:UIElement = reducedMatch[k];
-							// If they're not in the encounteredElement list, flush the styles and put them there.
-							if(encounteredElements.indexOf(thisMatch) < 0)
-							{
-								thisMatch.flushStyles();
-								encounteredElements.push(thisMatch);
-							}
-							
-							// Push the style and the matching selector chain to the element
-							thisMatch.pushStyle(style, selectorChain);
-						}
+						// Push the style and the matching selector chain to the element
+						thisMatch.pushStyle(style, selectorChain);
 					}
 				}
 			}
