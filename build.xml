@@ -57,8 +57,9 @@
 	<target name="compile" depends="init" description="Compiles the main StyleKit-as3 SWC">
 		<compc output="${bin.loc}/stylekit-as3.swc" fork="false">
 			<source-path path-element="${main.src.loc}" />
+			<source-path path-element="${util.src.loc}" />
 			<include-sources dir="${main.src.loc}" includes="*" />
-			<include-sources dir="${util.src.loc}" includes="*" />
+      <include-sources dir="${util.src.loc}" includes="*" />
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
 			<compiler.headless-server>true</compiler.headless-server>
 		</compc>
