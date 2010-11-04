@@ -1875,8 +1875,11 @@ package org.stylekit.ui.element
 			{
 				StyleKit.logger.error("Lost style sync on matched style pair. styles has "+this._styles.length+" objects, last is ID "+this._styles[this._styles.length-1].styleId+". selectors has "+this._styleSelectors.length+", last is "+this._styleSelectors[this._styleSelectors.length-1].stringValue, this);
 			}
-			this._styles.push(style);
-			this._styleSelectors.push(matchedSelectorChain);
+			if(this._styles.indexOf(style) > -1)
+			{
+				this._styles.push(style);
+				this._styleSelectors.push(matchedSelectorChain);
+			}
 		}
 		
 		public function commitStyles():void
@@ -1920,59 +1923,14 @@ package org.stylekit.ui.element
 			}
 			else
 			{
-				// Begin specificity sort
-				var sortedSelectorChains:Vector.<ElementSelectorChain> = this._styleSelectors.concat();
-				var sortedStyles:Vector.<Style> = new Vector.<Style>(sortedSelectorChains.length, true);
-
-					sortedSelectorChains.sort(
-						function(x:ElementSelectorChain, y:ElementSelectorChain):Number
-						{
-							if(x.specificity > y.specificity)
-							{
-								return 1;
-							}
-							else if(x.specificity < y.specificity)
-							{
-								return -1;
-							}
-							else
-							{
-								return 0;
-							}
-						}
-					);
-				// Loop over sorted selectors and use found index to sort corresponding style.
-				// The created vector is fixed in length.
-				for(var i:uint=0; i < this._styles.length; i++)
-				{
-					var sortCandidateStyle:Style = this._styles[i];
-					// loop over style's selector chains and find index of any in the sorted selector vector, spector.
-					// the found index is the insertion index for this style.
-					for(var j:uint=0; j<sortCandidateStyle.elementSelectorChains.length; j++)
-					{
-						var fI:int = sortedSelectorChains.indexOf(sortCandidateStyle.elementSelectorChains[j]);
-						if(fI > -1)
-						{
-							sortedStyles[fI] = sortCandidateStyle;
-						}
-					}
-				}
-				// End specificity sort
 
 				// Set up initial values
 				evaluatedNetworkStyles = PropertyContainer.defaultStyles;
 
 				// Merge in the styles in order of specificity
-				for(i=0; i < sortedStyles.length; i++)
+				for(var i:int = 0; i < this._styles.length; i++)
 				{
-					//if(sortedStyles[i] != null)
-					//{
-					evaluatedNetworkStyles = sortedStyles[i].evaluate(evaluatedNetworkStyles, this);
-					//}
-					//else
-					//{
-					//	StyleKit.logger.error("style and matched selector state lost sync. Couldn't find style for i="+i+",  selector="+sortedSelectorChains[i].stringValue, this);
-					//}
+					evaluatedNetworkStyles = this._styles[i].evaluate(evaluatedNetworkStyles, this);
 				}
 				
 				// Cache it
