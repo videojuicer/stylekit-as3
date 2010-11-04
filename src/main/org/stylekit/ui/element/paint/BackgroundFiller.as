@@ -101,14 +101,17 @@ package org.stylekit.ui.element.paint
 			var positionX:Number = 0;
 			var positionY:Number = 0;
 			
-			if (backgroundPosition.positionX != null)
+			if (backgroundPosition != null)
 			{
-				positionX = backgroundPosition.positionX.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
-			}
-			
-			if (backgroundPosition.positionY != null)
-			{
-				positionY = backgroundPosition.positionX.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
+				if (backgroundPosition.positionX != null)
+				{
+					positionX = backgroundPosition.positionX.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
+				}
+				
+				if (backgroundPosition.positionY != null)
+				{
+					positionY = backgroundPosition.positionY.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT);
+				}
 			}
 			
 			for (var y:int = 0; y < backgroundYRepeat; y++)

@@ -85,8 +85,8 @@ package org.stylekit.css.value
 			
 			for (var i:uint = 0; i < tokens.length; i++)
 			{
-				var val:uint = BackgroundPositionValue.validStrings.indexOf(tokens[i]);
-				var token:uint = (val == -1 ? 0 : Math.max(1, val));
+				var val:int = BackgroundPositionValue.validStrings.indexOf(tokens[i]);
+				var token:int = (val == -1 ? 0 : Math.max(1, val));
 				
 				if (i == 0)
 				{
@@ -97,7 +97,7 @@ package org.stylekit.css.value
 					}
 					else
 					{
-						value.positionX = SizeValue.parse(token[i]);
+						value.positionX = SizeValue.parse(tokens[i]);
 						value.positionY = SizeValue.parse("50%");
 					}
 				}
@@ -109,7 +109,7 @@ package org.stylekit.css.value
 					}
 					else
 					{
-						value.positionY = SizeValue.parse(token[i]);
+						value.positionY = SizeValue.parse(tokens[i]);
 					}
 				}
 			}
