@@ -106,11 +106,21 @@ package org.stylekit.ui.element.paint
 				if (backgroundPosition.positionX != null)
 				{
 					positionX = backgroundPosition.positionX.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
+					
+					if (backgroundPosition.positionX.units == "%" && backgroundPosition.positionX.value > 0)
+					{
+						positionX = positionX - (this._bitmapData.width / 2);
+					}
 				}
 				
 				if (backgroundPosition.positionY != null)
 				{
 					positionY = backgroundPosition.positionY.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT);
+					
+					if (backgroundPosition.positionY.units == "%" && backgroundPosition.positionY.value > 0)
+					{
+						positionY = positionY - (this._bitmapData.height / 2);
+					}
 				}
 			}
 			
