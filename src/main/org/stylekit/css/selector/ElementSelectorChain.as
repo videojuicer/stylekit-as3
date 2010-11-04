@@ -16,10 +16,21 @@ package org.stylekit.css.selector
 		
 		protected var _elementSelectors:Vector.<ElementSelector>;
 		protected var _stringValue:String;
+		protected var _selectorId:int;
+		
+		public static var ID_INC:int = 0;
 		
 		public function ElementSelectorChain()
 		{
 			this._elementSelectors = new Vector.<ElementSelector>();
+			
+			ElementSelectorChain.ID_INC++;
+			this._selectorId = ElementSelectorChain.ID_INC;
+		}
+		
+		public function get selectorId():int
+		{
+			return this._selectorId;
 		}
 		
 		public function addElementSelector(e:ElementSelector, atIndex:int=-1):void

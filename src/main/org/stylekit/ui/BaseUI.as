@@ -35,6 +35,9 @@ package org.stylekit.ui
 		*/
 		protected var _hoverSelectorChains:Vector.<ElementSelectorChain>;
 		
+		protected var _domTransactionInProgress:Boolean = false;
+		protected var _domTransactionMutatedElements:Vector.<UIElement>;
+		
 		public function BaseUI(styleSheetCollection:StyleSheetCollection = null, root:DisplayObject = null)
 		{
 			this._styleSheetCollection = styleSheetCollection;
@@ -92,7 +95,7 @@ package org.stylekit.ui
 			// Update styles flatlist
 			StyleKit.logger.debug("BaseUI caught stylesheet modification, recollapsing styles into flattened list.", this);
 			this.collapseStyles();
-			this.allocateStyles(this);
+			this.domModified(this);
 		}
 		
 		/**
@@ -158,45 +161,92 @@ package org.stylekit.ui
 		public override function registerDescendantClassName(name:String, originatingElement:UIElement):void
 		{
 			super.registerDescendantClassName(name, originatingElement);
-			this.allocateHoverListeners();
-			this.allocateStyles(originatingElement);
+			this.domModified(originatingElement);
 		}
 		public override function unregisterDescendantClassName(name:String, originatingElement:UIElement):void
 		{
 			super.unregisterDescendantClassName(name, originatingElement);
-			this.allocateHoverListeners();
-			this.allocateStyles(originatingElement);
+			this.domModified(originatingElement);
 		}
 		public override function registerDescendantPseudoClass(name:String, originatingElement:UIElement):void
 		{
 			super.registerDescendantPseudoClass(name, originatingElement);
-			this.allocateHoverListeners();
-			this.allocateStyles(originatingElement);
+			this.domModified(originatingElement);
 		}
 		public override function unregisterDescendantPseudoClass(name:String, originatingElement:UIElement):void
 		{
 			super.unregisterDescendantPseudoClass(name, originatingElement);
-			this.allocateHoverListeners();
-			this.allocateStyles(originatingElement);
+			this.domModified(originatingElement);
 		}
 		public override function descendantNameModified(newName:String, previousName:String, originatingElement:UIElement):void
 		{
 			super.descendantNameModified(newName, previousName, originatingElement);
-			this.allocateHoverListeners();
-			this.allocateStyles(originatingElement);
+			this.domModified(originatingElement);
 		}
 		public override function descendantIdModified(newId:String, previousId:String, originatingElement:UIElement):void
 		{
 			super.descendantIdModified(newId, previousId, originatingElement);
-			this.allocateHoverListeners();
-			this.allocateStyles(originatingElement);
+			this.domModified(originatingElement);
 		}
 		
 		public override function descendantAdded(descendant:UIElement):void
 		{
 			super.descendantAdded(descendant);
-			this.allocateHoverListeners();
-			this.allocateStyles(descendant);
+			this.domModified(descendant);
+		}
+		
+		protected function domModified(element:UIElement):void
+		{
+			if(this._domTransactionInProgress == true)
+			{
+				if(this._domTransactionMutatedElements.indexOf(element) < 0)
+				{
+					this._domTransactionMutatedElements.push(element);
+				}
+			}
+			else
+			{
+				this.allocateHoverListeners();
+				this.allocateStyles(element);
+			}
+		}
+		
+		/** 
+		* Allows a series of DOM tree manipulations to take place without firing the selector-based allocation routines.
+		* Usage:
+		* baseUIInstance.domTransaction(function(baseUI:BaseUI) {
+		*
+		* }, scope);
+		*
+		* The <code>thisObj</code> parameter determines the scope of "this" during the transaction function.
+		*/
+		public function runDomTransaction(routine:Function, thisObj:*):void
+		{
+			this.enterDomTransaction();
+			routine.apply(thisObj, [this]);
+			this.commitDomTransaction();
+		}
+		
+		public function enterDomTransaction():void
+		{
+			this._domTransactionInProgress = true;
+			this._domTransactionMutatedElements = new Vector.<UIElement>();
+		}
+		
+		public function commitDomTransaction():void
+		{
+			this._domTransactionInProgress = false;
+
+
+			if(this._domTransactionMutatedElements.length > 0)
+			{
+				StyleKit.logger.debug("Committing DOM transaction with "+this._domTransactionMutatedElements.length+" elements modified during transaction.", this);
+				this.domModified(this);				
+			}
+			else
+			{
+				StyleKit.logger.debug("Committing DOM transaction with no changes encountered during the transaction.", this);
+			}
 		}
 		
 		/**

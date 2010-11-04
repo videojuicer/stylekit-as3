@@ -1873,9 +1873,9 @@ package org.stylekit.ui.element
 		{
 			if(this._styles.length != this._styleSelectors.length)
 			{
-				StyleKit.logger.error("Lost style sync on matched style pair. styles has "+this._styles.length+" objects, last is ID "+this._styles[this._styles.length-1].styleId+". selectors has "+this._styleSelectors.length+", last is "+this._styleSelectors[this._styleSelectors.length-1].stringValue, this);
+				StyleKit.logger.error("Lost style sync on matched style pair.", this);
 			}
-			if(this._styles.indexOf(style) > -1)
+			if(this._styles.indexOf(style) < 0)
 			{
 				this._styles.push(style);
 				this._styleSelectors.push(matchedSelectorChain);
@@ -1893,9 +1893,9 @@ package org.stylekit.ui.element
 			var styleSetCacheKeys:Vector.<String> = new Vector.<String>();
 			for(var s:int = 0; s < selectors.length; s++)
 			{
-				styleSetCacheKeys.push(styles[s].styleId+":"+selectors[s].stringValue);
+				styleSetCacheKeys.push(selectors[s].selectorId);
 			}
-			return styleSetCacheKeys.join("|");
+			return styleSetCacheKeys.join(",");
 		}
 		
 		protected function evaluateStyles():void
