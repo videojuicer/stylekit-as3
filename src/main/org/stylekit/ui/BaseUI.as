@@ -135,10 +135,12 @@ package org.stylekit.ui
 					if(this._collapsedSelectorChains[b-1].specificity > this._collapsedSelectorChains[b].specificity)
 					{
 						// Swap j-1 to j in both vectors
+						
+						// Selector swap
 						var prevChain:ElementSelectorChain = this._collapsedSelectorChains[b-1];
 							this._collapsedSelectorChains[b-1] = this._collapsedSelectorChains[b];
 							this._collapsedSelectorChains[b] = prevChain;
-						
+						// Style swap
 						var prevStyle:Style = this._collapsedStyles[b-1];
 							this._collapsedStyles[b-1] = this._collapsedStyles[b];
 							this._collapsedStyles[b] = prevStyle;
