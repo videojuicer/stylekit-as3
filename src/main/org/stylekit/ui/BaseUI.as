@@ -392,22 +392,11 @@ package org.stylekit.ui
 						continue;
 					}
 					
+					// Reduce the matches to those within the modified tree: the mutated element and it's descendants.
 					var reducedMatch:Vector.<UIElement>;
-					if(mutatedElement == this)
-					{
-						reducedMatch = matched;
-					}
-					else
-					{
-						reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
-							return (mutatedElement.parentElement.descendants.indexOf(item) > -1)
-						}, this);
-						
-						if(reducedMatch.length == 0)
-						{
-							continue;
-						}
-					} 
+					reducedMatch = matched.filter(function(item:UIElement, index:int, set:Vector.<UIElement>):Boolean {
+						return (item == mutatedElement || mutatedElement.descendants.indexOf(item) > -1)
+					}, this);
 					
 					for(var k:int = 0; k < reducedMatch.length; k++)
 					{
