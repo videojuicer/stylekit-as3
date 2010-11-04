@@ -23,6 +23,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.AnimationDirectionValue;
 	import org.stylekit.css.value.AnimationIterationCountValue;
 	import org.stylekit.css.value.BackgroundCompoundValue;
+	import org.stylekit.css.value.BackgroundPositionValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
@@ -641,6 +642,7 @@ package org.stylekit.css.parse
 					//case "box-orient":
 					case "box-pack":
 					case "box-lines":
+						break;
 					case "font":
 						property.value = FontCompoundValue.parse(unparsedPropertyValue);
 						break;
@@ -688,6 +690,9 @@ package org.stylekit.css.parse
 						break;
 					case "background-repeat":
 						property.value = RepeatValue.parse(unparsedPropertyValue);
+						break;
+					case "background-position":
+						property.value = BackgroundPositionValue.parse(unparsedPropertyValue);
 						break;
 					case "padding": case "margin": case "border-width": case "border-radius":
 						property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);

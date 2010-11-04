@@ -10,9 +10,11 @@ package org.stylekit.ui.element.paint
 	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
 	
+	import org.stylekit.css.value.BackgroundPositionValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.RepeatValue;
+	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
 	import org.stylekit.ui.element.UIElement;
 	import org.utilkit.crypto.Base64;
@@ -88,7 +90,7 @@ package org.stylekit.ui.element.paint
 			var backgroundHorizontalRepeat:Boolean = (uiElement.getStyleValue("background-repeat") as RepeatValue).horizontalRepeat;
 			var backgroundVerticalRepeat:Boolean = (uiElement.getStyleValue("background-repeat") as RepeatValue).verticalRepeat;
 			
-			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
+			var backgroundPosition:BackgroundPositionValue = (uiElement.getStyleValue("background-position") as BackgroundPositionValue);
 
 			var backgroundXRepeat:int = Math.ceil((backgroundHorizontalRepeat ? (elementEffectiveWidth / this._bitmapData.width) : 1));
 			var backgroundYRepeat:int = Math.ceil((backgroundVerticalRepeat ? (elementEffectiveHeight / this._bitmapData.height) : 1));
@@ -96,7 +98,18 @@ package org.stylekit.ui.element.paint
 			var fillBitmapData:BitmapData = new BitmapData(uiElement.effectiveWidth, uiElement.effectiveHeight, true, backgroundColor);
 			
 			// so how does one position a background?
+			var positionX:Number = 0;
+			var positionY:Number = 0;
 			
+			if (backgroundPosition.positionX != null)
+			{
+				positionX = backgroundPosition.positionX.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
+			}
+			
+			if (backgroundPosition.positionY != null)
+			{
+				positionY = backgroundPosition.positionX.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
+			}
 			
 			for (var y:int = 0; y < backgroundYRepeat; y++)
 			{
@@ -105,8 +118,8 @@ package org.stylekit.ui.element.paint
 					var sectionWidth:int = (backgroundXRepeat == 1 ? this._bitmapData.width : (backgroundXRepeat - 1 == x ? (elementEffectiveWidth - (this._bitmapData.width * (backgroundXRepeat - 1))) : this._bitmapData.width));
 					var sectionHeight:int = (backgroundYRepeat == 1 ? this._bitmapData.height : (backgroundYRepeat - 1 == x ? (elementEffectiveHeight - (this._bitmapData.height * (backgroundYRepeat - 1))) : this._bitmapData.height));
 					
-					var sectionX:int = (elementContentX + (this._bitmapData.width * x));
-					var sectionY:int = (elementContentY + (this._bitmapData.height * y));
+					var sectionX:int = (positionX + elementContentX + (this._bitmapData.width * x));
+					var sectionY:int = (positionY + elementContentY + (this._bitmapData.height * y));
 					
 					//if (backgroundPosition != null && backgroundPosition.position == PositionValue.
 					
