@@ -87,11 +87,16 @@ package org.stylekit.ui.element.paint
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundHorizontalRepeat:Boolean = (uiElement.getStyleValue("background-repeat") as RepeatValue).horizontalRepeat;
 			var backgroundVerticalRepeat:Boolean = (uiElement.getStyleValue("background-repeat") as RepeatValue).verticalRepeat;
+			
+			var backgroundPosition:PositionValue = (uiElement.getStyleValue("background-position") as PositionValue);
 
 			var backgroundXRepeat:int = Math.ceil((backgroundHorizontalRepeat ? (elementEffectiveWidth / this._bitmapData.width) : 1));
 			var backgroundYRepeat:int = Math.ceil((backgroundVerticalRepeat ? (elementEffectiveHeight / this._bitmapData.height) : 1));
 			
 			var fillBitmapData:BitmapData = new BitmapData(uiElement.effectiveWidth, uiElement.effectiveHeight, true, backgroundColor);
+			
+			// so how does one position a background?
+			
 			
 			for (var y:int = 0; y < backgroundYRepeat; y++)
 			{
@@ -102,6 +107,8 @@ package org.stylekit.ui.element.paint
 					
 					var sectionX:int = (elementContentX + (this._bitmapData.width * x));
 					var sectionY:int = (elementContentY + (this._bitmapData.height * y));
+					
+					//if (backgroundPosition != null && backgroundPosition.position == PositionValue.
 					
 					for (var h:int = sectionHeight; h >= 0; h--)
 					{
