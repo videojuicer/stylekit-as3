@@ -1050,10 +1050,10 @@ package org.stylekit.ui.element
 			this._controlLines = null;
 			StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
 			
-			//for(var i:uint=0; i < this._children.length; i++)
-			//{
-			//	this._children[i].recalculateEffectiveContentDimensions();
-			//}
+			for(var i:uint=0; i < this._children.length; i++)
+			{
+				this._children[i].recalculateEffectiveContentDimensions();
+			}
 			//this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
@@ -1888,12 +1888,16 @@ package org.stylekit.ui.element
 			this.evaluateStyles();
 		}
 		
-		protected function cacheKeyForSelectorsAndStyles(styles:Vector.<Style>, selectors:Vector.<ElementSelectorChain>):String
+		protected function cacheKeyForSelectorsAndStyles(styles:Vector.<Style>, selectors:Vector.<ElementSelectorChain>, local:Style):String
 		{
 			var styleSetCacheKeys:Vector.<String> = new Vector.<String>();
 			for(var s:int = 0; s < selectors.length; s++)
 			{
 				styleSetCacheKeys.push(selectors[s].selectorId);
+			}
+			if(local != null)
+			{
+				styleSetCacheKeys.push(local.elementSelectorChains[0].selectorId);
 			}
 			return styleSetCacheKeys.join(",");
 		}
@@ -1902,24 +1906,20 @@ package org.stylekit.ui.element
 		{
 			
 			// Build a cache key based on the styles currently applied to this element
-			var styleSetCacheKey:String = this.cacheKeyForSelectorsAndStyles(this._styles, this._styleSelectors);
+			var styleSetCacheKey:String = this.cacheKeyForSelectorsAndStyles(this._styles, this._styleSelectors, this._localStyle);
 			var previousStyleSetCacheKey:String;
 			
 			// This var will store all the styles sourced from the CSS objects 
 			var evaluatedNetworkStyles:Object;
 			
-			// Determines whether the comparison stage needs execution.
-			var compare:Boolean = true;
-			
 			if(styleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
 			{
 				StyleKit.logger.debug("Evaluating styles: cache key for selector set matches current cache key, using existing values: "+styleSetCacheKey, this);
-				compare = false;
-			}			
-			if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
+			}
+			else if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
 			{
 				StyleKit.logger.debug("Evaluating styles: retrieving cached computed styles for cache key: "+styleSetCacheKey, this);
-				evaluatedNetworkStyles = this._evaluatedNetworkStyleCache[styleSetCacheKey] as Object;
+				this.evaluatedStyles = this._evaluatedNetworkStyleCache[styleSetCacheKey] as Object;
 			}
 			else
 			{
@@ -1933,27 +1933,17 @@ package org.stylekit.ui.element
 					evaluatedNetworkStyles = this._styles[i].evaluate(evaluatedNetworkStyles, this);
 				}
 				
+				if(this._localStyle != null)
+				{
+					evaluatedNetworkStyles = this._localStyle.evaluate(evaluatedNetworkStyles, this);
+				}
+				
 				// Cache it
 				StyleKit.logger.debug("Evaluating styles: caching newly-computed styles for selector set: "+styleSetCacheKey, this);
 				this._evaluatedNetworkStyleCache[styleSetCacheKey] = evaluatedNetworkStyles;
-				
-				previousStyleSetCacheKey = this._evaluatedStyleCurrentCacheKey;
 				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey; // Set the current cache key
 				
-				if(previousStyleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
-				{
-					compare = false;
-				}
-			}
-			
-			// Include local styles
-			if(this._localStyle != null)
-			{
-				StyleKit.logger.debug("Merging local style into evaluated network styles.", this);
-				this.evaluatedStyles = this._localStyle.evaluate(evaluatedNetworkStyles, this);
-			}
-			else if(compare)
-			{
+				// Compare it
 				this.evaluatedStyles = evaluatedNetworkStyles;
 			}
 		}

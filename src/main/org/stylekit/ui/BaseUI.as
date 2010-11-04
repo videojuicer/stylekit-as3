@@ -158,6 +158,34 @@ package org.stylekit.ui
 			this.allocateHoverListeners();
 		}
 		
+		public override function addElementClassName(name:String):Boolean
+		{
+			var b:Boolean = super.addElementClassName(name);
+			this.domModified(this);
+			return b;
+		}
+		
+		public override function removeElementClassName(name:String):Boolean
+		{
+			var b:Boolean = super.removeElementClassName(name);
+			this.domModified(this);
+			return b;
+		}
+		
+		public override function addElementPseudoClass(name:String):Boolean
+		{
+			var b:Boolean = super.addElementPseudoClass(name);
+			this.domModified(this);
+			return b;
+		}
+		
+		public override function removeElementPseudoClass(name:String):Boolean
+		{
+			var b:Boolean = super.removeElementPseudoClass(name);
+			this.domModified(this);
+			return b;
+		}
+		
 		public override function registerDescendantClassName(name:String, originatingElement:UIElement):void
 		{
 			super.registerDescendantClassName(name, originatingElement);

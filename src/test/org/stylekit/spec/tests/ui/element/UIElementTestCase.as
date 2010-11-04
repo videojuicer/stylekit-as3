@@ -351,6 +351,65 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertNull((barDesc.evaluatedStyles["max-height"] as SizeValue));
 			Assert.assertEquals(100, (barChild.evaluatedStyles["max-height"] as SizeValue).value);
 		}
+		
+		[Test(description="Ensures that relative percentage sizings are recomputed on a change of parent dimensions")]
+		public function sizeChangesArePropagated():void
+		{
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".foo { width: 100px; } .bar { width: 50%; } .car { width: 50%; }");
+			ssCol.addStyleSheet(ss); // MUTATE!
+			
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo:UIElement = new UIElement(baseUI);
+			var bar:UIElement = new UIElement(baseUI);
+			var car:UIElement = new UIElement(baseUI);
+			
+			baseUI.addElementClassName("base"); foo.addElementClassName("foo"); bar.addElementClassName("bar"); car.addElementClassName("car");
+			
+			baseUI.addElement(foo); foo.addElement(bar); bar.addElement(car);
+			
+			Assert.assertEquals(100, foo.effectiveContentWidth);
+			Assert.assertEquals(50, bar.effectiveContentWidth);
+			Assert.assertEquals(25, car.effectiveContentWidth);
+			
+			ss = ssParse.parse(".foo { width: 200px; }");
+			ssCol.addStyleSheet(ss);
+			
+			Assert.assertEquals(200, foo.effectiveContentWidth);
+			Assert.assertEquals(100, bar.effectiveContentWidth);
+			Assert.assertEquals(50, car.effectiveContentWidth);
+		}
+		
+		[Test(description="Ensures that relative percentage sizings are recomputed on a change of parent dimensions: special case for the BaseUI")]
+		public function sizeChangesArePropagatedFromBase():void
+		{
+			var ssCol:StyleSheetCollection = new StyleSheetCollection();
+			var ssParse:StyleSheetParser = new StyleSheetParser();
+			var ss:StyleSheet = ssParse.parse(".base { width: 100px; } .foo { width: 50%; } .bar { width: 50%; }");
+			ssCol.addStyleSheet(ss); // MUTATE!
+			
+			// Create some elements
+			var baseUI:BaseUI = new BaseUI(ssCol);
+			var foo:UIElement = new UIElement(baseUI);
+			var bar:UIElement = new UIElement(baseUI);
+			
+			baseUI.addElementClassName("base"); foo.addElementClassName("foo"); bar.addElementClassName("bar");
+			
+			baseUI.addElement(foo); foo.addElement(bar);
+			
+			Assert.assertEquals(100, baseUI.effectiveContentWidth);
+			Assert.assertEquals(50, foo.effectiveContentWidth);
+			Assert.assertEquals(25, bar.effectiveContentWidth);
+			
+			ss = ssParse.parse(".base { width: 200px; }");
+			ssCol.addStyleSheet(ss);
+			
+			Assert.assertEquals(200, baseUI.effectiveContentWidth);
+			Assert.assertEquals(100, foo.effectiveContentWidth);
+			Assert.assertEquals(50, bar.effectiveContentWidth);
+		}
 			
 		[Test(async, description="Tests that a UIElement can react to the events dispatched from its children")]
 		public function parentElementCanListen():void
