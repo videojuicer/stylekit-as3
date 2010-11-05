@@ -70,8 +70,7 @@ package org.stylekit.ui.element
 		
 		protected static var EFFECTIVE_CONTENT_DIMENSION_CSS_PROPERTIES:Array = [
 			"width", "height", 
-			"max-width", "max-height", "min-width", "min-height", 
-			"display"
+			"max-width", "max-height", "min-width", "min-height"
 		];
 		protected static var EFFECTIVE_DIMENSION_CSS_PROPERTIES:Array = [
 			"padding-left", "padding-right", "padding-top", "padding-bottom", 
