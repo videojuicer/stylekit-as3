@@ -2069,6 +2069,7 @@ package org.stylekit.ui.element
 		{
 			if(this._listensForHover)
 			{
+				StyleKit.logger.debug("Hoverin'", this);
 				this.addElementPseudoClass("hover");
 			}
 		}
