@@ -661,16 +661,13 @@ package org.stylekit.ui.element
 				}
 			}
 			// Find missing keys
-			if(!changeFound)
+			for(var prevKey:String in previousEvaluatedStyles)
 			{
-				for(var prevKey:String in previousEvaluatedStyles)
+				if(newEvaluatedStyles[prevKey] == null && previousEvaluatedStyles[prevKey] != null)
 				{
-					if(newEvaluatedStyles[prevKey] == null && previousEvaluatedStyles[prevKey] != null)
-					{
-						StyleKit.logger.debug("Found deleted style prop for "+prevKey+" ("+previousEvaluatedStyles[prevKey]+" > "+newEvaluatedStyles[prevKey]+")", this)
-						changeFound = true;
-						alteredKeys.push(prevKey);
-					}
+					StyleKit.logger.debug("Found deleted style prop for "+prevKey+" ("+previousEvaluatedStyles[prevKey]+" > "+newEvaluatedStyles[prevKey]+")", this)
+					changeFound = true;
+					alteredKeys.push(prevKey);
 				}
 			}
 
