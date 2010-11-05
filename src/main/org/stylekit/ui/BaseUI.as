@@ -161,28 +161,28 @@ package org.stylekit.ui
 		public override function addElementClassName(name:String):Boolean
 		{
 			var b:Boolean = super.addElementClassName(name);
-			this.domModified(this);
+			if(b) this.domModified(this);
 			return b;
 		}
 		
 		public override function removeElementClassName(name:String):Boolean
 		{
 			var b:Boolean = super.removeElementClassName(name);
-			this.domModified(this);
+			if(b) this.domModified(this);
 			return b;
 		}
 		
 		public override function addElementPseudoClass(name:String):Boolean
 		{
 			var b:Boolean = super.addElementPseudoClass(name);
-			this.domModified(this);
+			if(b) this.domModified(this);
 			return b;
 		}
 		
 		public override function removeElementPseudoClass(name:String):Boolean
 		{
 			var b:Boolean = super.removeElementPseudoClass(name);
-			this.domModified(this);
+			if(b) this.domModified(this);
 			return b;
 		}
 		
@@ -248,11 +248,11 @@ package org.stylekit.ui
 		*
 		* The <code>thisObj</code> parameter determines the scope of "this" during the transaction function.
 		*/
-		public function runDomTransaction(routine:Function, thisObj:*):void
+		public function runDomTransaction(routine:Function, mutatingElement:UIElement, thisObj:*):void
 		{
 			this.enterDomTransaction();
 			routine.apply(thisObj, [this]);
-			this.commitDomTransaction();
+			this.commitDomTransaction(mutatingElement);
 		}
 		
 		public function enterDomTransaction():void
@@ -261,7 +261,7 @@ package org.stylekit.ui
 			this._domTransactionMutatedElements = new Vector.<UIElement>();
 		}
 		
-		public function commitDomTransaction():void
+		public function commitDomTransaction(mutatingElement:UIElement = null):void
 		{
 			this._domTransactionInProgress = false;
 
@@ -269,7 +269,7 @@ package org.stylekit.ui
 			if(this._domTransactionMutatedElements.length > 0)
 			{
 				StyleKit.logger.debug("Committing DOM transaction with "+this._domTransactionMutatedElements.length+" elements modified during transaction.", this);
-				this.domModified(this);				
+				this.domModified((mutatingElement == null)? this : mutatingElement);
 			}
 			else
 			{
