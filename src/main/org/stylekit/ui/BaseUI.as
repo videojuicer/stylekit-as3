@@ -417,6 +417,11 @@ package org.stylekit.ui
 			// Commit the styles on all encountered elements.
 			if(encounteredElements.length > 0)
 			{
+				// Pre-sort the list by tree position; we want to style higher-order objects first.
+				encounteredElements = encounteredElements.sort(function(x:UIElement, y:UIElement):Number {
+					return y.descendants.length - x.descendants.length; 
+				});
+				
 				StyleKit.logger.debug("Committing new styles on "+encounteredElements.length+" encountered elements.", this);
 				for(var l:int = 0; l < encounteredElements.length; l++)
 				{
