@@ -121,7 +121,7 @@ package org.stylekit.css.value
 				return (this.url == (other as URLValue).url);
 			}
 			
-			return super.isEquivalent(other);
+			return false;
 		}
 	}
 	

@@ -269,7 +269,7 @@ package org.stylekit.ui
 			if(this._domTransactionMutatedElements.length > 0)
 			{
 				StyleKit.logger.debug("Committing DOM transaction with "+this._domTransactionMutatedElements.length+" elements modified during transaction.", this);
-				this.domModified((mutatingElement == null)? this : mutatingElement);
+				this.domModified(this);//((mutatingElement == null)? this : mutatingElement);
 			}
 			else
 			{
