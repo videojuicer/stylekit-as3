@@ -1916,6 +1916,7 @@ package org.stylekit.ui.element
 			else if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
 			{
 				StyleKit.logger.debug("Evaluating styles: retrieving cached computed styles for cache key: "+styleSetCacheKey, this);
+				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey;
 				this.evaluatedStyles = this._evaluatedNetworkStyleCache[styleSetCacheKey] as Object;
 			}
 			else
