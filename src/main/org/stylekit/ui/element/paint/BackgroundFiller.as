@@ -95,7 +95,7 @@ package org.stylekit.ui.element.paint
 			var backgroundXRepeat:int = Math.ceil((backgroundHorizontalRepeat ? (elementEffectiveWidth / this._bitmapData.width) : 1));
 			var backgroundYRepeat:int = Math.ceil((backgroundVerticalRepeat ? (elementEffectiveHeight / this._bitmapData.height) : 1));
 			
-			var fillBitmapData:BitmapData = new BitmapData(uiElement.effectiveWidth, uiElement.effectiveHeight, true, backgroundColor);
+			var fillBitmapData:BitmapData = new BitmapData(Math.max(1, uiElement.effectiveWidth), Math.max(1, uiElement.effectiveHeight), true, backgroundColor);
 			
 			// so how does one position a background?
 			var positionX:Number = 0;
