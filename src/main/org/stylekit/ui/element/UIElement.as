@@ -1227,6 +1227,9 @@ package org.stylekit.ui.element
 				super.removeChildAt(i);
 			}
 			
+			// calculate the effective dimensions of this object so we can layout the children correctly
+			this.recalculateEffectiveDimensions();
+			
 			this.refreshControlLines();
 			
 			if (this.controlLines.length > 0)

@@ -348,7 +348,7 @@ package org.stylekit.ui.element.layout
 					
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (relativeParent.width - e.effectiveWidth) - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
+						e.x = (relativeParent.effectiveWidth - e.effectiveWidth) - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
@@ -358,7 +358,7 @@ package org.stylekit.ui.element.layout
 
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = (relativeParent.height - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
+						e.y = (relativeParent.effectiveHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
 					}
 					
 					StyleKit.logger.debug("El -> "+e.x+"/"+e.y);
@@ -424,10 +424,10 @@ package org.stylekit.ui.element.layout
 						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
 					}
 				}
-
-				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
 				
 				e.recalculateEffectiveContentDimensions();
+
+				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
 			}
 		}
 		
