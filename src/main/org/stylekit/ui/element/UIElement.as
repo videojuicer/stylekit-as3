@@ -37,6 +37,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.SizeValue;
+	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.TimeValue;
 	import org.stylekit.css.value.TimingFunctionValue;
 	import org.stylekit.css.value.TransitionCompoundValue;
@@ -247,6 +248,7 @@ package org.stylekit.ui.element
 			this._transitionWorkerProperties = new Vector.<String>();
 			
 			this._contentSprites = new Vector.<DisplayObject>();
+			this._contentContainer = new Sprite();
 			
 			this._painter = new UIElementPainter(this);
 			
@@ -378,6 +380,36 @@ package org.stylekit.ui.element
 		public function get effectiveWidth():int
 		{
 			return this._effectiveWidth;
+		}
+		
+		public function get contentSprites():Vector.<DisplayObject>
+		{
+			return this._contentSprites;
+		}
+		
+		public function get contentContainer():Sprite
+		{
+			return this._contentContainer;
+		}
+		
+		public function get rawContentWidth():int
+		{
+			return this._rawContentWidth;
+		}
+		
+		public function set rawContentWidth(value:int):void
+		{
+			this._rawContentWidth = value;
+		}
+		
+		public function get rawContentHeight():int
+		{
+			return this._rawContentHeight;
+		}
+		
+		public function set rawContentHeight(value:int):void
+		{
+			this._rawContentHeight = value;
 		}
 		
 		/**
@@ -1159,7 +1191,7 @@ package org.stylekit.ui.element
 		{
 			this._controlLines = new Vector.<FlowControlLine>();
 			
-			var textAlign:AlignmentValue = (this.getStyleValue("text-align") as AlignmentValue);
+			var textAlign:TextAlignValue = (this.getStyleValue("text-align") as TextAlignValue);
 			
 			if (this.hasElementClassName("_timeline") && this.children.length == 3)
 			{
@@ -1188,10 +1220,10 @@ package org.stylekit.ui.element
 			trace("Added "+this._controlLines.length+" control lines");
 		}
 		
-		protected function newControlLine(textAlign:AlignmentValue):void
+		protected function newControlLine(textAlign:TextAlignValue):void
 		{
 			this._controlLines.push(
-				     new FlowControlLine(this.effectiveContentWidth, (textAlign.leftAlign ? "left" : (textAlign.rightAlign ? "right" : "left")))
+				     new FlowControlLine(this.effectiveContentWidth, (textAlign.leftAlign ? "left" : (textAlign.rightAlign ? "right" : (textAlign.centerAlign ? "center" : "left"))))
 			  );
 		}
 		
@@ -1224,7 +1256,15 @@ package org.stylekit.ui.element
 		{
 			for (var k:int = 0; k < super.numChildren; k++)
 			{
-				super.removeChildAt(i);
+				super.removeChildAt(k);
+			}
+			
+			if (this._contentContainer != null)
+			{
+				for (var c:int = 0; c < this._contentContainer.numChildren; c++)
+				{
+					this._contentContainer.removeChildAt(c);
+				}
 			}
 			
 			// calculate the effective dimensions of this object so we can layout the children correctly
@@ -1243,7 +1283,7 @@ package org.stylekit.ui.element
 				var y:Number = 0;
 				
 				// position the content container
-				this._contentContainer = new Sprite();
+				//this._contentContainer = new Sprite();
 				this._contentContainer.x = this.calculateContentPoint().x;
 				this._contentContainer.y = this.calculateContentPoint().y;
 				

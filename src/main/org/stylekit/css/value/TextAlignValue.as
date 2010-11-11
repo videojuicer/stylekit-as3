@@ -32,6 +32,21 @@ package org.stylekit.css.value
 			this.modified();
 		}
 		
+		public function get leftAlign():Boolean
+		{
+			return (this._textAlign == TextAlignValue.TEXT_ALIGN_LEFT);
+		}
+		
+		public function get rightAlign():Boolean
+		{
+			return (this._textAlign == TextAlignValue.TEXT_ALIGN_RIGHT);
+		}
+		
+		public function get centerAlign():Boolean
+		{
+			return (this._textAlign == TextAlignValue.TEXT_ALIGN_CENTER);
+		}
+		
 		public static function parse(str:String):TextAlignValue
 		{
 			var fvVal:TextAlignValue = new TextAlignValue();

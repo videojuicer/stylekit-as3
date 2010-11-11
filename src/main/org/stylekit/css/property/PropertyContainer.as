@@ -167,7 +167,7 @@ package org.stylekit.css.property
 				"clear": AlignmentValue.parse("none"),				
 				"float": FloatValue.parse("none"),
 				"position": PositionValue.parse("static"),
-				"text-align": AlignmentValue.parse("left"),
+				"text-align": TextAlignValue.parse("left"),
 				"vertical-align": AlignmentValue.parse("left"),
 				"overflow": OverflowValue.parse("visible"),
 				
@@ -188,7 +188,6 @@ package org.stylekit.css.property
 				"font-weight": FontWeightValue.parse("normal"),
 				
 				// text
-				"text-align": TextAlignValue.parse("left"),
 				"text-decoration": TextDecorationValue.parse("none"),
 				"text-indent": SizeValue.parse("0"),
 				"text-transform": TextTransformValue.parse("none"),

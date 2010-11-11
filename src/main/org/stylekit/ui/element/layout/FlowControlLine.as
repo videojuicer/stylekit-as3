@@ -29,6 +29,7 @@ package org.stylekit.ui.element.layout
 	{
 		public static var FLOW_DIRECTION_LEFT:String = "left";
 		public static var FLOW_DIRECTION_RIGHT:String = "right";
+		public static var FLOW_DIRECTION_CENTER:String = "center";
 		
 		protected var _elements:Vector.<UIElement>;
 		protected var _maxWidth:Number;
@@ -284,6 +285,8 @@ package org.stylekit.ui.element.layout
 			var leftEdgeCollector:int = 0;
 			var rightEdgeCollector:int = 0;
 			
+			var textAlign:uint = TextAlignValue.TEXT_ALIGN_CENTER;
+			
 			for(var i:uint = 0; i < this._elements.length; i++)
 			{
 				var e:UIElement = this._elements[i];
@@ -386,7 +389,12 @@ package org.stylekit.ui.element.layout
 					}
 					else if (displayValue.display == DisplayValue.DISPLAY_INLINE)
 					{
-						if (this._flowDirection == "right")
+						if (this._flowDirection == FlowControlLine.FLOW_DIRECTION_CENTER)
+						{
+							e.x = (this._maxWidth / 2) - (e.effectiveWidth / 2);
+						}
+						else
+						if (this._flowDirection == FlowControlLine.FLOW_DIRECTION_RIGHT)
 						{
 							e.x = (this._maxWidth - rightEdgeCollector);
 							
