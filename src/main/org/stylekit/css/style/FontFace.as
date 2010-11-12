@@ -33,5 +33,14 @@ package org.stylekit.css.style
 		{
 			return this._mediaSelector;
 		}
+		
+		protected function registerFontFamily():void
+		{
+			// we need to download the font file or decode it from Base64?
+			// get the definition of the font class
+			// register the font class to the specified font family name
+			
+			// remote fonts (via swf's): http://www.flashmorgan.com/index.php/2007/06/18/runtime-font-embedding-in-as3-there-is-no-need-to-embed-the-entire-fontset-anymore/
+		}
 	}
 }
