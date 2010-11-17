@@ -419,7 +419,7 @@ package org.stylekit.ui.element.layout
 					
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = e.x - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
+						e.x = (e.parentElement.effectiveHeight - e.effectiveHeight)  - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
@@ -427,9 +427,14 @@ package org.stylekit.ui.element.layout
 						e.y = e.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 					
+					if (e.hasElementClassName("_menu"))
+					{
+						trace("hee");
+					} 
+					
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
+						e.y = (e.parentElement.effectiveHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
 					}
 				}
 				
