@@ -894,7 +894,24 @@ package org.stylekit.ui.element
 					Search children to find greatest _y + effectiveHeight
 			*/
 			
-			for (var i:int = 0; i < this.children.length; i++)
+			if (this.hasElementClassName("_menu"))
+			{
+				trace("HUMMM");
+			}
+			
+			for (var i:int = 0; i < this.controlLines.length; i++)
+			{
+				var line:FlowControlLine = this.controlLines[i];
+				
+				if (line.width > w)
+				{
+					w = line.width;
+				}
+				
+				h += line.height;
+			}
+			
+			/*for (var i:int = 0; i < this.children.length; i++)
 			{
 				var child:UIElement = this.children[i];
 				
@@ -912,7 +929,7 @@ package org.stylekit.ui.element
 				{
 					h = child.y + child.effectiveHeight;
 				}
-			}
+			}*/
 			
 			this.setContentDimensions(w, h);
 		}
@@ -1279,7 +1296,10 @@ package org.stylekit.ui.element
 			
 			this.refreshControlLines();
 			
-			if (this.controlLines.length > 0)
+			this._contentContainer.x = this.calculateContentPoint().x;
+			this._contentContainer.y = this.calculateContentPoint().y;
+			
+			if (this.controlLines != null && this.controlLines.length > 0)
 			{				
 				// only we do now is stack the FlowControlLines onto the UIElements content space
 				// the FlowControlLines take care of laying out the indiviual UIElement children.
@@ -1291,8 +1311,7 @@ package org.stylekit.ui.element
 				
 				// position the content container
 				//this._contentContainer = new Sprite();
-				this._contentContainer.x = this.calculateContentPoint().x;
-				this._contentContainer.y = this.calculateContentPoint().y;
+
 				
 				//this._contentContainer.graphics.beginFill(0x000000, 0.8);
 				//this._contentContainer.graphics.drawRect(0, 0, this.effectiveContentWidth, this.effectiveContentHeight);

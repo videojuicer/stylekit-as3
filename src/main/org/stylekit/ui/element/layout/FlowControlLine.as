@@ -75,7 +75,8 @@ package org.stylekit.ui.element.layout
 			{
 				var e:UIElement = this._elements[i];
 				
-				if(e.effectiveHeight > h && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)
+				// TODO: should include the relative height but only the amount that exists inside the current box
+				if(e.effectiveHeight > h && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE && (e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
 				{
 					h = e.effectiveHeight;
 				}
@@ -361,7 +362,7 @@ package org.stylekit.ui.element.layout
 
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = (relativeParent.effectiveHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
+						e.y = (relativeParent.effectiveContentHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) - this.y;
 					}
 					
 					StyleKit.logger.debug("El -> "+e.x+"/"+e.y);
@@ -419,7 +420,8 @@ package org.stylekit.ui.element.layout
 					
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (e.parentElement.effectiveHeight - e.effectiveHeight)  - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
+						e.x = e.x - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
+						//e.x = (e.parentElement.effectiveWidth - e.effectiveWidth)  - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
@@ -427,14 +429,10 @@ package org.stylekit.ui.element.layout
 						e.y = e.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 					
-					if (e.hasElementClassName("_menu"))
-					{
-						trace("hee");
-					} 
-					
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = (e.parentElement.effectiveHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
+						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
+						//e.y = ((e.parentElement.effectiveHeight - e.effectiveHeight) - (e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) * 2));
 					}
 				}
 				
