@@ -933,7 +933,7 @@ package org.stylekit.ui.element
 			{
 				var uiElement:UIElement = this.children[i];
 				var numericValue:NumericValue = (uiElement.getStyleValue("box-flex") as NumericValue);
-
+				
 				if ((uiElement.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
 				{
 					if (uiElement.hasStyleProperty("box-flex") && numericValue.value > 0)
@@ -1000,6 +1000,23 @@ package org.stylekit.ui.element
 			var w:int = 0;
 			var h:int = 0;
 			
+			var borderLeft:SizeValue = (this.getStyleValue("border-left-width") as SizeValue);
+			var borderRight:SizeValue = (this.getStyleValue("border-right-width") as SizeValue);
+			
+			var borderLeftStyle:LineStyleValue = (this.getStyleValue("border-left-style") as LineStyleValue);
+			var borderRightStyle:LineStyleValue = (this.getStyleValue("border-right-style") as LineStyleValue);
+			
+			var bLeft:int = (borderLeft != null && borderLeftStyle != null && borderLeftStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderLeft.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+			var bRight:int = (borderRight != null && borderRightStyle != null && borderRightStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderRight.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
+			
+			// the flex cost is the amount 
+			
+			var extraEffectiveWidth:Number = 0;
+			
+			extraEffectiveWidth += (bLeft + bRight);
+			extraEffectiveWidth += (this.evalStyleSize("margin-left", SizeValue.DIMENSION_WIDTH) + this.evalStyleSize("margin-right", SizeValue.DIMENSION_WIDTH));
+			extraEffectiveWidth += (this.evalStyleSize("padding-left", SizeValue.DIMENSION_WIDTH) + this.evalStyleSize("padding-right", SizeValue.DIMENSION_WIDTH));
+			
 			/* TODO
 				After:
 					Width:
@@ -1009,33 +1026,23 @@ package org.stylekit.ui.element
 			*/
 			
 			// Width
-			/*if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_NONE)
-			{
-				w = 0;
-			}
-			else */ if (this.hasStyleProperty("box-flex") && (this.getStyleValue("box-flex") as NumericValue).value > 0)
+			if (this.hasStyleProperty("box-flex") && (this.getStyleValue("box-flex") as NumericValue).value > 0)
 			{				
 				var flexCost:Number = this.parentElement.calculateBoxFlexSize(this);
-				
-				var borderLeft:SizeValue = (this.getStyleValue("border-left-width") as SizeValue);
-				var borderRight:SizeValue = (this.getStyleValue("border-right-width") as SizeValue);
 
-				var borderLeftStyle:LineStyleValue = (this.getStyleValue("border-left-style") as LineStyleValue);
-				var borderRightStyle:LineStyleValue = (this.getStyleValue("border-right-style") as LineStyleValue);
-				
-				var bLeft:int = (borderLeft != null && borderLeftStyle != null && borderLeftStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderLeft.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
-				var bRight:int = (borderRight != null && borderRightStyle != null && borderRightStyle.lineStyle != LineStyleValue.LINE_STYLE_NONE ? borderRight.evaluateSize(this, SizeValue.DIMENSION_WIDTH) : 0);
-				
-				// the flex cost is the amount 
-				
-				var extraEffectiveWidth:Number = 0;
-				
-				extraEffectiveWidth += (bLeft + bRight);
-				extraEffectiveWidth += (this.evalStyleSize("margin-left", SizeValue.DIMENSION_WIDTH) + this.evalStyleSize("margin-right", SizeValue.DIMENSION_WIDTH));
-				extraEffectiveWidth += (this.evalStyleSize("padding-left", SizeValue.DIMENSION_WIDTH) + this.evalStyleSize("padding-right", SizeValue.DIMENSION_WIDTH));
-				
 				// flexxxxxo
 				w = flexCost - extraEffectiveWidth;
+			}
+			else if (this.hasStyleProperty("width") && (this.getStyleValue("width") as SizeValue).auto)
+			{
+				if (this.hasStyleProperty("float") && ((this.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_LEFT || (this.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_RIGHT))
+				{
+					w = this.contentWidth;
+				}
+				else if (this.parentElement != null)
+				{
+					w = this.parentElement.contentWidth - extraEffectiveWidth;
+				}
 			}
 			else if(this.hasStyleProperty("width") && !isNaN((this.getStyleValue("width") as SizeValue).value)) 
 			{
