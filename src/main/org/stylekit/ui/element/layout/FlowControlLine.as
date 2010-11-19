@@ -138,8 +138,8 @@ package org.stylekit.ui.element.layout
 		{
 			var added:Boolean = false;
 			
-			trace("appendElement >> ", e, e.effectiveContentWidth, e.effectiveContentHeight, e.effectiveWidth, e.effectiveHeight);
-			trace("appendElement >> ", this, this._maxWidth, this.elements.length, this._elementTotalEffectiveWidth, this._leftFloatElementCount, this._rightFloatElementCount);
+			//StyleKit.logger.debug("appendElement >> ", e, e.effectiveContentWidth, e.effectiveContentHeight, e.effectiveWidth, e.effectiveHeight);
+			//StyleKit.logger.debug("appendElement >> ", this, this._maxWidth, this.elements.length, this._elementTotalEffectiveWidth, this._leftFloatElementCount, this._rightFloatElementCount);
 			
 			if(this.treatElementAsNonFloatedBlock(e))
 			{
@@ -364,8 +364,6 @@ package org.stylekit.ui.element.layout
 					{
 						e.y = (relativeParent.effectiveContentHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) - this.y;
 					}
-					
-					StyleKit.logger.debug("El -> "+e.x+"/"+e.y);
 				}
 				else if (floatValue.float == FloatValue.FLOAT_LEFT)
 				{
@@ -478,6 +476,5 @@ package org.stylekit.ui.element.layout
 		{
 			return (e.hasStyleProperty("clear") && ((e.getStyleValue("clear") as Value).stringValue == "right" || (e.getStyleValue("clear") as Value).stringValue == "both"));
 		}
-		
 	}
 }
