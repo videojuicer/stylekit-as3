@@ -726,8 +726,6 @@ package org.stylekit.ui.element
 			// Dispatch and perform local actions
 			if(changeFound)
 			{
-				//trace(">>> CHANGE FOUND ON ", this, this.toString(), this.elementId, this.elementName);
-				
 				this.onStylePropertyValuesChanged(alteredKeys);
 				this.dispatchEvent(new UIElementEvent(UIElementEvent.EVALUATED_STYLES_MODIFIED, this));
 			}
@@ -893,11 +891,6 @@ package org.stylekit.ui.element
 				Height:
 					Search children to find greatest _y + effectiveHeight
 			*/
-			
-			if (this.hasElementClassName("_menu"))
-			{
-				trace("HUMMM");
-			}
 			
 			for (var i:int = 0; i < this.controlLines.length; i++)
 			{
@@ -1217,11 +1210,6 @@ package org.stylekit.ui.element
 			
 			var textAlign:TextAlignValue = (this.getStyleValue("text-align") as TextAlignValue);
 			
-			if (this.hasElementClassName("_timeline") && this.children.length == 3)
-			{
-				StyleKit.logger.debug("Timeline found!");
-			}
-			
 			// create a new line
 			this.newControlLine(textAlign);
 			
@@ -1241,7 +1229,7 @@ package org.stylekit.ui.element
 				}
 			}
 			
-			trace("Added "+this._controlLines.length+" control lines");
+			StyleKit.logger.debug("Added "+this._controlLines.length+" control lines");
 		}
 		
 		protected function newControlLine(textAlign:TextAlignValue):void

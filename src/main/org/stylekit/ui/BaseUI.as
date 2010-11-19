@@ -476,12 +476,12 @@ package org.stylekit.ui
 		
 		protected function onRootResized(e:Event):void
 		{
-			trace("BaseUI resizing from "+this.effectiveContentWidth+"/"+this.effectiveContentHeight+" ...");
+			StyleKit.logger.info("BaseUI resizing from "+this.effectiveContentWidth+"/"+this.effectiveContentHeight+" ...");
 			
 			this.recalculateEffectiveContentDimensions();
 			
-			trace("BaseUI parent -> "+this.stageRoot.stage.width+"/"+this.stageRoot.stage.height);
-			trace("BaseUI resized to "+this.effectiveContentWidth+"/"+this.effectiveContentHeight+" ...");
+			StyleKit.logger.debug("Stage size -> "+this.stageRoot.stage.width+"/"+this.stageRoot.stage.height);
+			StyleKit.logger.info("BaseUI resized to "+this.effectiveContentWidth+"/"+this.effectiveContentHeight);
 		}
 	}
 }
