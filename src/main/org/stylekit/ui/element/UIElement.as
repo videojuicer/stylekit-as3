@@ -1383,6 +1383,9 @@ package org.stylekit.ui.element
 			
 			child.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this.onChildDimensionsChanged);
 			
+			child.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
+			child.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
+			
 			if (index < this._children.length)
 			{
 				this._children.splice(index, 0, child);
@@ -1414,6 +1417,9 @@ package org.stylekit.ui.element
 			var child:UIElement = this._children[index];
 			
 			child.removeEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this.onChildDimensionsChanged);
+			
+			child.removeEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
+			child.removeEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			
 			child._parentElement = null;
 			child._baseUI = null;
