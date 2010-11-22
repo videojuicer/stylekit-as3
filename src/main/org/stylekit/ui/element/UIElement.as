@@ -82,7 +82,8 @@ package org.stylekit.ui.element
 		protected static var REDRAW_CSS_PROPERTIES:Array = [
 			"border-top-color", "border-left-color", "border-right-color", "border-bottom-color",
 			"border-top-style", "border-left-style", "border-right-style", "border-bottom-style",
-			"background-color", "background-image", "background-position"
+			"background-color", "background-image", "background-position",
+			"font-family", "font-size", "color"
 		];
 		protected static var LAYOUT_CSS_PROPERTIES:Array = [
 			"float", "position", "display", 

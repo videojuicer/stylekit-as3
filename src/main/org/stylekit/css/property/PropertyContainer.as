@@ -181,7 +181,7 @@ package org.stylekit.css.property
 				"box-flex": NumericValue.parse("0.0"),
 				
 				// font
-				"font-family": Value.parse("sans-serif"),
+				"font-family": Value.parse("inherit"),
 				"font-size": SizeValue.parse("medium"),
 				"font-style": FontStyleValue.parse("medium"),
 				"font-variant": FontVariantValue.parse("normal"),
