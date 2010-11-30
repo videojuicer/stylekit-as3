@@ -3,6 +3,7 @@ package org.stylekit.ui.element.paint
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
+	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -63,20 +64,32 @@ package org.stylekit.ui.element.paint
 			this._loader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onLoaderComplete);
 			this._loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderIOError);
 			
-			if (this._url.url.indexOf("data:") == 0)
+			try
 			{
-				var dataParserURI:DataURIParser = new DataURIParser(this._url.url);
-				var bufferBytes:ByteArray = Base64.decodeToByteArray(dataParserURI.rawData);
-				bufferBytes.position = 0;
-				
-				this._loader.loadBytes(bufferBytes);
+				if (this._url.url.indexOf("data:") == 0)
+				{
+					var dataParserURI:DataURIParser = new DataURIParser(this._url.url);
+					var bufferBytes:ByteArray = Base64.decodeToByteArray(dataParserURI.rawData);
+					bufferBytes.position = 0;
+					
+					this._loader.loadBytes(bufferBytes);
+				}
+				else
+				{
+					var parserURI:URLParser = new URLParser(this._url.url);
+					
+					this._loader.load(new URLRequest(parserURI.url), new LoaderContext(true));
+				}
 			}
-			else
+			catch (e:IOError)
 			{
-				var parserURI:URLParser = new URLParser(this._url.url);
-				
-				this._loader.load(new URLRequest(parserURI.url), new LoaderContext(true));
+				// image didnt load
 			}
+			catch (e:SecurityError)
+			{
+				
+			}
+
 		}
 		
 		public function createBitmapFillForElement(uiElement:UIElement):BitmapData

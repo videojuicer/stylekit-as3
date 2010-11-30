@@ -34,6 +34,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.NumericValue;
+	import org.stylekit.css.value.OverflowValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.PropertyListValue;
 	import org.stylekit.css.value.SizeValue;
@@ -885,7 +886,7 @@ package org.stylekit.ui.element
 		{
 			var w:int = this._rawContentWidth;
 			var h:int = this._rawContentHeight;
-
+			
 			/* TODO
 				Width:
 					Search children to find greatest _x + effectiveWidth
@@ -1077,7 +1078,8 @@ package org.stylekit.ui.element
 			{
 				h = this.evalStyleSize("height", SizeValue.DIMENSION_HEIGHT);
 			}
-			else {
+			else
+			{
 				h = this.contentHeight;
 			}
 			// Apply height constraints
