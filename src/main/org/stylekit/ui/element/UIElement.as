@@ -1212,14 +1212,14 @@ package org.stylekit.ui.element
 			this._controlLines = new Vector.<FlowControlLine>();
 			
 			var textAlign:TextAlignValue = (this.getStyleValue("text-align") as TextAlignValue);
-			
+
 			// create a new line
 			this.newControlLine(textAlign);
 			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				var child:UIElement = this.children[i];
-
+				
 				if (!this.currentControlLine.appendElement(child))
 				{
 					this.newControlLine(textAlign);
@@ -1230,6 +1230,29 @@ package org.stylekit.ui.element
 						throw new StackOverflowError("Found a FlowControlLine that isnt able to accept our UIElement after exhausting the stack of lines");
 					}
 				}
+			}
+			
+			this._controlLines.sort(function(line1:FlowControlLine, line2:FlowControlLine):int
+			{
+				if (line1.highestZIndex < line2.highestZIndex)
+				{
+					return -11;
+				}
+				else if (line1.highestZIndex > line2.highestZIndex)
+				{
+					return 1;
+				}
+				else
+				{
+					return 0;
+				}
+			});
+			
+			//this._controlLines.reverse();
+			
+			if (this._controlLines.length == 4)
+			{
+				trace("llalal");
 			}
 			
 			StyleKit.logger.debug("Added "+this._controlLines.length+" control lines");

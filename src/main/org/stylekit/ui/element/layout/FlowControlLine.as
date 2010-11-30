@@ -11,6 +11,8 @@ package org.stylekit.ui.element.layout
 	import org.stylekit.css.value.AlignmentValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
+	import org.stylekit.css.value.IntegerValue;
+	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TextAlignValue;
@@ -44,6 +46,7 @@ package org.stylekit.ui.element.layout
 		protected var _leftFloatElementCount:uint = 0;
 		protected var _rightFloatElementCount:uint = 0;
 		protected var _elementTotalEffectiveWidth:uint = 0;
+		protected var _elementHighestZIndex:int = 0;
 		
 		/**
 		* Instantiates a new line with the given flow direction (available options are left or right)
@@ -192,6 +195,7 @@ package org.stylekit.ui.element.layout
 				}
 				
 				//this.layoutElements();
+				this.recalculateZIndex();
 			}
 
 			return added;
@@ -275,6 +279,24 @@ package org.stylekit.ui.element.layout
 			}
 		}
 		
+		public function get highestZIndex():int
+		{
+			return this._elementHighestZIndex;
+		}
+		
+		protected function recalculateZIndex():void
+		{
+			for (var i:int = 0; i < this._elements.length; i++)
+			{
+				var zIndex:int = (this._elements[i].getStyleValue("z-index") as IntegerValue).value;
+				
+				if (zIndex > this._elementHighestZIndex)
+				{
+					this._elementHighestZIndex = zIndex;
+				}
+			}
+		}
+		
 		/*
 		* Actually performs the layout of all elements on this line.
 		*/
@@ -288,7 +310,15 @@ package org.stylekit.ui.element.layout
 			
 			var textAlign:uint = TextAlignValue.TEXT_ALIGN_CENTER;
 			
-			for(var i:uint = 0; i < this._elements.length; i++)
+			// sort elements by there z-index
+			//this._elements.sort(this.sortElementsByZIndex);
+			
+			var highestZIndex:Number = 0;
+			var highest0Index:Number = 0;
+			
+			var sortedChildren:Vector.<UIElement> = new Vector.<UIElement>();
+			
+			for (var i:uint = 0; i < this._elements.length; i++)
 			{
 				var e:UIElement = this._elements[i];
 				
@@ -310,8 +340,49 @@ package org.stylekit.ui.element.layout
 				
 				StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
 				
-				super.addChild(e);
+				var zIndex:int = (e.getStyleValue("z-index") as IntegerValue).value;
+				var insertIndex:int = 0;
 				
+				if (zIndex > 0)
+				{
+					// the current z-index is higher than we have ever seen, so we can stick it at the end
+					if (zIndex >= highestZIndex)
+					{
+						insertIndex = super.numChildren;
+						
+						highestZIndex = zIndex;
+					}
+					// the current z-index is lower than our highest, so we need to work out where it sits
+					else
+					{
+						for (var k:uint = super.numChildren - 1; k >= 0; k--)
+						{
+							var displayObject:DisplayObject = super.getChildAt(k);
+							
+							if (displayObject is UIElement)
+							{
+								var el:UIElement = (displayObject as UIElement);
+								var elZIndex:int = (el.getStyleValue("z-index") as IntegerValue).value;
+								
+								if (zIndex >= elZIndex)
+								{
+									insertIndex = k;
+									
+									break;
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					insertIndex = 0;
+					
+					highest0Index++;
+				}
+				
+				super.addChildAt(e, insertIndex);
+
 				e.x = 0;
 				e.y = 0;
 				

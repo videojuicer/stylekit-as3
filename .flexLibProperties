@@ -74,6 +74,7 @@
     <classEntry path="org.stylekit.ui.element.SpriteWrapperUIElement"/>
     <classEntry path="org.stylekit.ui.element.paint.BackgroundFiller"/>
     <classEntry path="org.stylekit.css.value.BackgroundPositionValue"/>
+    <classEntry path="org.stylekit.css.value.IntegerValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

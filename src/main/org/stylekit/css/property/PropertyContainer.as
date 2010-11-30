@@ -16,6 +16,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.FontStyleValue;
 	import org.stylekit.css.value.FontVariantValue;
 	import org.stylekit.css.value.FontWeightValue;
+	import org.stylekit.css.value.IntegerValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.OverflowValue;
@@ -220,7 +221,7 @@ package org.stylekit.css.property
 				"padding-bottom": SizeValue.parse("0"),
 				"padding-top": SizeValue.parse("0"),
 				
-				"z-index": SizeValue.parse("auto"),
+				"z-index": IntegerValue.parse("0"),
 				
 				// transitions
 				"transition-timing-function": 	ValueArray.parse("ease", TimingFunctionValue),

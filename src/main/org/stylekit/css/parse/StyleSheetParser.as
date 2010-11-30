@@ -36,6 +36,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.FontVariantValue;
 	import org.stylekit.css.value.FontWeightValue;
 	import org.stylekit.css.value.InheritValue;
+	import org.stylekit.css.value.IntegerValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.ListStyleCompoundValue;
 	import org.stylekit.css.value.ListStylePositionValue;
@@ -681,6 +682,9 @@ package org.stylekit.css.parse
 						break;
 					case "opacity":
 						property.value = NumericValue.parse(unparsedPropertyValue);
+						break;
+					case "z-index":
+						property.value = IntegerValue.parse(unparsedPropertyValue);
 						break;
 					case "visibility":
 						property.value = VisibilityValue.parse(unparsedPropertyValue);
