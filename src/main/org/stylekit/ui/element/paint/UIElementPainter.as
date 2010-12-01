@@ -58,10 +58,10 @@ package org.stylekit.ui.element.paint
 			// we skip some null checks because most properties should be set by default
 			// 
 			
-			var backgroundAlpha:Number = 1.0;
+			var backgroundAlpha:Number = (uiElement.getStyleValue("background-color") as ColorValue).alphaValue;
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
-			  
+			
 			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT);
 			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
 			var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
@@ -101,7 +101,7 @@ package org.stylekit.ui.element.paint
 			var topLeftR:Number = (borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? topLeftRadius.evaluateSize(uiElement) : 0);
 		
 			var alpha:Number = uiElement.hasStyleProperty("opacity") ? (uiElement.getStyleValue("opacity") as NumericValue).value : 1.0;
-			
+	
 			uiElement.alpha = alpha;
 			
 			graphics.clear();
@@ -112,7 +112,7 @@ package org.stylekit.ui.element.paint
 			{
 				backgroundAlpha = 0;
 			}
-			
+
 			graphics.beginFill(backgroundColor, backgroundAlpha);
 			
 			if (backgroundImage != null)

@@ -8,11 +8,8 @@ package org.stylekit.ui.element
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	
-	import flashx.textLayout.formats.Float;
-	
-	import mx.controls.Text;
-	import mx.skins.Border;
+	import flash.ui.Mouse;
+	import flash.ui.MouseCursor;
 	
 	import org.stylekit.StyleKit;
 	import org.stylekit.css.StyleSheet;
@@ -29,6 +26,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
+	import org.stylekit.css.value.CursorValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FloatValue;
@@ -2155,12 +2153,16 @@ package org.stylekit.ui.element
 				StyleKit.logger.debug("Hoverin'", this);
 				this.addElementPseudoClass("hover");
 			}
+			
+			this.refreshCursor();
 		}
 		
 		protected function onMouseOut(e:MouseEvent):void
 		{
 			this.removeElementPseudoClass("hover");
 			this.removeElementPseudoClass("active");
+			
+			Mouse.cursor = MouseCursor.AUTO;
 		}
 		
 		protected function onMouseClick(e:MouseEvent):void
@@ -2181,6 +2183,21 @@ package org.stylekit.ui.element
 		protected function onMouseUp(e:MouseEvent):void
 		{
 			this.removeElementPseudoClass("active");
+		}
+		
+		private function refreshCursor():void
+		{
+			var value:CursorValue = (this.getStyleValue("cursor") as CursorValue);
+			
+			var cursor:int = (value == null ? CursorValue.CURSOR_DEFAULT : value.cursor);
+
+			switch (cursor)
+			{
+				case CursorValue.CURSOR_POINTER:
+					Mouse.cursor = MouseCursor.HAND;
+					break;
+				
+			}
 		}
 		
 		/* Overrides to block the Flash methods when they called outside of this class */

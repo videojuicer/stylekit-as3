@@ -3,6 +3,7 @@ package org.stylekit.css.value
 	
 	import org.stylekit.css.parse.ValueParser;
 	import org.stylekit.css.value.Value;
+	import org.utilkit.util.Hex;
 	import org.utilkit.util.StringUtil;
 	
 	public class ColorValue extends Value
@@ -152,6 +153,7 @@ package org.stylekit.css.value
 		}
 		
 		protected var _hexValue:uint;
+		protected var _alphaValue:Number = 1.0;
 		
 		public function ColorValue()
 		{
@@ -169,6 +171,24 @@ package org.stylekit.css.value
 			{
 				// Word value.
 				cVal.hexValue = wVal;
+			}
+			else if (str.indexOf("rgba") != -1 || str.indexOf("rgb") != -1)
+			{
+				var rgba:String = str.substr(str.indexOf("(") + 1);
+				rgba = rgba.substr(0, rgba.length - 1);
+				rgba = rgba.replace(/ /g, '');
+				
+				var values:Array = rgba.split(",");
+				
+				var red:int = Math.max(0, Math.min(255, parseInt(values[0])));
+				var green:int = Math.max(0, Math.min(255, parseInt(values[1])));
+				var blue:int = Math.max(0, Math.min(255, parseInt(values[2])));
+				var alpha:Number = (values.length == 4 ? Math.max(0, Math.min(1.0, values[3])) : 1.0);
+				
+				var hex:uint = Hex.rgbToHex(red, green, blue);
+				
+				cVal.alphaValue = alpha;
+				cVal.hexValue = hex;
 			}
 			else
 			{
@@ -215,6 +235,18 @@ package org.stylekit.css.value
 		public function get hexValue():uint
 		{
 			return this._hexValue;
+		}
+		
+		public function set alphaValue(n:Number):void
+		{
+			this._alphaValue = Math.max(0, Math.min(n, 1.0));
+			
+			this.modified();
+		}
+		
+		public function get alphaValue():Number
+		{
+			return this._alphaValue;
 		}
 		
 		public override function isEquivalent(other:Value):Boolean

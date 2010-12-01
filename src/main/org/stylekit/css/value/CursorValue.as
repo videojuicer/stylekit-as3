@@ -85,7 +85,7 @@ package org.stylekit.css.value
 			// type matches
 			if (other is CursorValue)
 			{
-				return (this.cursor == (other as CursorValue).cursor) && (this.cursorUrl.isEquivalent((other as CursorValue).cursorUrl));
+				return (this.cursor == (other as CursorValue).cursor); // && (this.cursorUrl.isEquivalent((other as CursorValue).cursorUrl));
 			}
 			
 			return super.isEquivalent(other);
