@@ -1249,12 +1249,7 @@ package org.stylekit.ui.element
 			});
 			
 			//this._controlLines.reverse();
-			
-			if (this._controlLines.length == 4)
-			{
-				trace("llalal");
-			}
-			
+
 			StyleKit.logger.debug("Added "+this._controlLines.length+" control lines");
 		}
 		
@@ -1297,13 +1292,12 @@ package org.stylekit.ui.element
 				super.removeChildAt(k);
 			}
 			
-			if (this._contentContainer != null)
+			if (this._contentContainer != null && this._contentContainer.parent != null)
 			{
-				for (var c:int = 0; c < this._contentContainer.numChildren; c++)
-				{
-					this._contentContainer.removeChildAt(c);
-				}
+				this.removeChild(this._contentContainer);
 			}
+				
+			this._contentContainer = new Sprite();
 			
 			// calculate the effective dimensions of this object so we can layout the children correctly
 			this.recalculateEffectiveDimensions();
@@ -1345,8 +1339,6 @@ package org.stylekit.ui.element
 					
 					this._contentContainer.addChild(line);
 				}
-				
-				super.addChild(this._contentContainer);
 			}
 			
 			if (this._contentSprites != null)
@@ -1356,6 +1348,8 @@ package org.stylekit.ui.element
 					this._contentContainer.addChild(this._contentSprites[j]);
 				}
 			}
+			
+			super.addChild(this._contentContainer);
 			
 			this.recalculateContentDimensions();
 		}

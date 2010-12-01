@@ -302,6 +302,13 @@ package org.stylekit.ui.element.layout
 		*/
 		public function layoutElements():void
 		{
+			// clear the canvas before we draw again, just incase we havent been recreated
+			// from scratch
+			for (var r:int = 0; r < super.numChildren; r++)
+			{
+				super.removeChildAt(r);
+			}
+			
 			var leftFloatXCollector:int = 0;
 			var rightFloatXCollector:int = 0;
 			
