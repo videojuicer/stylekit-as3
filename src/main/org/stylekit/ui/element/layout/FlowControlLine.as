@@ -189,16 +189,31 @@ package org.stylekit.ui.element.layout
 			{
 				this._elements.push(e);
 				
-				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)
+				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE && !e.flexible)
 				{
 					this._elementTotalEffectiveWidth += e.effectiveWidth;
 				}
 				
 				//this.layoutElements();
 				this.recalculateZIndex();
+				
+				this.refreshFlexibles();
 			}
 
 			return added;
+		}
+		
+		protected function refreshFlexibles():void
+		{
+			for (var i:int = 0; i < this._elements.length; i++)
+			{
+				var element:UIElement = this._elements[i];
+				
+				if (element.flexible)
+				{
+					element.recalculateEffectiveContentDimensions();
+				}
+			}
 		}
 		
 		/**
@@ -304,9 +319,12 @@ package org.stylekit.ui.element.layout
 		{
 			// clear the canvas before we draw again, just incase we havent been recreated
 			// from scratch
-			for (var r:int = 0; r < super.numChildren; r++)
+			for (var r:int = 0; r < this._elements.length; r++)
 			{
-				super.removeChildAt(r);
+				if (super.contains(this._elements[r]))
+				{
+					super.removeChild(this._elements[r]);
+				}
 			}
 			
 			var leftFloatXCollector:int = 0;
@@ -512,7 +530,7 @@ package org.stylekit.ui.element.layout
 					}
 				}
 				
-				e.recalculateEffectiveContentDimensions();
+				//e.recalculateEffectiveContentDimensions();
 
 				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
 			}

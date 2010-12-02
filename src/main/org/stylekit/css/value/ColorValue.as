@@ -218,7 +218,7 @@ package org.stylekit.css.value
 		public static function identify(str:String):Boolean
 		{
 			str = StringUtil.trim(str).toLowerCase();
-			if(str.charAt(0) == "#" || str.charAt(0) == "#" || str.substr(0,2) == "0x" || ColorValue.COLORS[str] != null)
+			if(str.charAt(0) == "#" || str.charAt(0) == "#" || str.substr(0,2) == "0x" || str.substr(0,3) == "rgb" || ColorValue.COLORS[str] != null)
 			{
 				return true;
 			}

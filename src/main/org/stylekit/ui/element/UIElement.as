@@ -30,6 +30,7 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FloatValue;
+	import org.stylekit.css.value.IntegerValue;
 	import org.stylekit.css.value.LineStyleValue;
 	import org.stylekit.css.value.NumericValue;
 	import org.stylekit.css.value.OverflowValue;
@@ -942,7 +943,7 @@ package org.stylekit.ui.element
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				var uiElement:UIElement = this.children[i];
-				var numericValue:NumericValue = (uiElement.getStyleValue("box-flex") as NumericValue);
+				var numericValue:IntegerValue = (uiElement.getStyleValue("box-flex") as IntegerValue);
 				
 				if ((uiElement.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
 				{
@@ -1030,13 +1031,13 @@ package org.stylekit.ui.element
 			/* TODO
 				After:
 					Width:
-						subtract vertical scrollbar if vertical scrollbar required
+				 		subtract vertical scrollbar if vertical scrollbar required
 					Height:
 						subtract horizontal scrollbar if horizontal scrollbar required
 			*/
-			
+
 			// Width
-			if (this.hasStyleProperty("box-flex") && (this.getStyleValue("box-flex") as NumericValue).value > 0)
+			if (this.hasStyleProperty("box-flex") && (this.getStyleValue("box-flex") as IntegerValue).value > 0)
 			{				
 				var flexCost:Number = this.parentElement.calculateBoxFlexSize(this);
 
@@ -1055,7 +1056,7 @@ package org.stylekit.ui.element
 				}
 			}
 			else if(this.hasStyleProperty("width") && !isNaN((this.getStyleValue("width") as SizeValue).value)) 
-			{
+			{				
 				w = this.evalStyleSize("width", SizeValue.DIMENSION_WIDTH);
 			}
 			else if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_BLOCK) // todo also trigger if float is set
@@ -1214,6 +1215,9 @@ package org.stylekit.ui.element
 			// create a new line
 			this.newControlLine(textAlign);
 			
+
+
+			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
 				var child:UIElement = this.children[i];
@@ -1314,15 +1318,7 @@ package org.stylekit.ui.element
 				// with each line taking up the entire width, so we only need to think about stacking
 				// the lines with there height.
 				var y:Number = 0;
-				
-				// position the content container
-				//this._contentContainer = new Sprite();
 
-				
-				//this._contentContainer.graphics.beginFill(0x000000, 0.8);
-				//this._contentContainer.graphics.drawRect(0, 0, this.effectiveContentWidth, this.effectiveContentHeight);
-				//this._contentContainer.graphics.endFill();
-				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
 					var line:FlowControlLine = this.controlLines[i];
@@ -1352,6 +1348,24 @@ package org.stylekit.ui.element
 			this.recalculateContentDimensions();
 		}
 		
+		public function get flexible():Boolean
+		{
+			var flexValue:IntegerValue = this.getStyleValue("box-flex") as IntegerValue;
+			var widthValue:SizeValue = this.getStyleValue("width") as SizeValue;
+			
+			if (flexValue.value >= 1)
+			{
+				return true;
+			}
+			
+			if (widthValue.auto || (widthValue.units == SizeValue.UNIT_PERCENTAGE))
+			{
+				return true;
+			}
+			
+			return false;
+		}
+		
 		public function redraw():void
 		{
 			this._painter.paint();
@@ -1360,8 +1374,6 @@ package org.stylekit.ui.element
 		protected function updateParentIndex(index:uint):void
 		{
 			this._parentIndex = index;
-			
-			//this.updateStyles();
 		}
 		
 		protected function updateChildrenIndex():void

@@ -57,7 +57,7 @@ package org.stylekit.ui.element.paint
 			// one monster method, alot of variables here because we have to retreive everything
 			// we skip some null checks because most properties should be set by default
 			// 
-			
+
 			var backgroundAlpha:Number = (uiElement.getStyleValue("background-color") as ColorValue).alphaValue;
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
@@ -85,10 +85,10 @@ package org.stylekit.ui.element.paint
 			var borderRightSize:int = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderRight.sizeValue.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH));
 			var borderBottomSize:int = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderBottom.sizeValue.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT));
 
-			var borderTopAlpha:Number = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
-			var borderLeftAlpha:Number = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
-			var borderRightAlpha:Number = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
-			var borderBottomAlpha:Number = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : 1.0);
+			var borderTopAlpha:Number = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderTop.colorValue.alphaValue);
+			var borderLeftAlpha:Number = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderLeft.colorValue.alphaValue);
+			var borderRightAlpha:Number = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderRight.colorValue.alphaValue);
+			var borderBottomAlpha:Number = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderBottom.colorValue.alphaValue);
 			
 			var topRightRadius:SizeValue = (radiusCompound.topRightValue as SizeValue);
 			var bottomRightRadius:SizeValue = (radiusCompound.bottomRightValue as SizeValue);

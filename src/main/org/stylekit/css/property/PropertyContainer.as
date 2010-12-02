@@ -179,7 +179,7 @@ package org.stylekit.css.property
 				"opacity": NumericValue.parse("1.0"),
 				
 				// box-flex
-				"box-flex": NumericValue.parse("0.0"),
+				"box-flex": IntegerValue.parse("0.0"),
 				
 				// font
 				"font-family": Value.parse("inherit"),

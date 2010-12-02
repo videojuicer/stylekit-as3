@@ -632,10 +632,10 @@ package org.stylekit.css.parse
 						property.value = FloatValue.parse(unparsedPropertyValue);
 						break;
 					case "box-flex":
-						property.value = NumericValue.parse(unparsedPropertyValue);
+						property.value = IntegerValue.parse(unparsedPropertyValue);
 						break;
 					case "box-flex-group":
-						property.value = NumericValue.parse(unparsedPropertyValue);
+						property.value = IntegerValue.parse(unparsedPropertyValue);
 						break;
 					case "box-align":
 					//case "box-ordinal-group":
