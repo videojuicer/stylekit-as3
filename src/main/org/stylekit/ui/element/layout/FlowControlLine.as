@@ -144,6 +144,11 @@ package org.stylekit.ui.element.layout
 			//StyleKit.logger.debug("appendElement >> ", e, e.effectiveContentWidth, e.effectiveContentHeight, e.effectiveWidth, e.effectiveHeight);
 			//StyleKit.logger.debug("appendElement >> ", this, this._maxWidth, this.elements.length, this._elementTotalEffectiveWidth, this._leftFloatElementCount, this._rightFloatElementCount);
 			
+			if (e.hasElementClassName("_viewport"))
+			{
+				trace("blahs");
+			}
+			
 			if(this.treatElementAsNonFloatedBlock(e))
 			{
 				if(this._occupiedByBlockElement == false && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
@@ -153,6 +158,10 @@ package org.stylekit.ui.element.layout
 					
 					this._occupiedByBlockElement = true;
 				}
+			}
+			else if ((e.getStyleValue("position") as PositionValue).position == PositionValue.POSITION_ABSOLUTE)
+			{
+				added = true;
 			}
 			else if(this._occupiedByBlockElement == false)
 			{
@@ -538,7 +547,7 @@ package org.stylekit.ui.element.layout
 		
 		public function treatElementAsNonFloatedBlock(e:UIElement):Boolean
 		{
-			if(e.hasStyleProperty("display") && (e.getStyleValue("display") as DisplayValue).display >= DisplayValue.DISPLAY_BLOCK)
+			if(e.hasStyleProperty("display") && (e.getStyleValue("display") as DisplayValue).display >= DisplayValue.DISPLAY_BLOCK && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)
 			{
 				if((!e.hasStyleProperty("float")) || ((e.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_NONE))
 				{
