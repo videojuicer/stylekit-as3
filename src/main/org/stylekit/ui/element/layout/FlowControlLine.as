@@ -144,11 +144,6 @@ package org.stylekit.ui.element.layout
 			//StyleKit.logger.debug("appendElement >> ", e, e.effectiveContentWidth, e.effectiveContentHeight, e.effectiveWidth, e.effectiveHeight);
 			//StyleKit.logger.debug("appendElement >> ", this, this._maxWidth, this.elements.length, this._elementTotalEffectiveWidth, this._leftFloatElementCount, this._rightFloatElementCount);
 			
-			if (e.hasElementClassName("_viewport"))
-			{
-				trace("blahs");
-			}
-			
 			if(this.treatElementAsNonFloatedBlock(e))
 			{
 				if(this._occupiedByBlockElement == false && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
