@@ -372,44 +372,35 @@ package org.stylekit.ui.element.layout
 				var zIndex:int = (e.getStyleValue("z-index") as IntegerValue).value;
 				var insertIndex:int = 0;
 				
-				if (zIndex > 0)
+				// the current z-index is higher than we have ever seen, so we can stick it at the end
+				if (zIndex >= highestZIndex)
 				{
-					// the current z-index is higher than we have ever seen, so we can stick it at the end
-					if (zIndex >= highestZIndex)
+					insertIndex = super.numChildren;
+					
+					highestZIndex = zIndex;
+				}
+				// the current z-index is lower than our highest, so we need to work out where it sits
+				else
+				{
+					for (var k:int = super.numChildren - 1; k >= 0; k--)
 					{
-						insertIndex = super.numChildren;
+						var displayObject:DisplayObject = super.getChildAt(k);
 						
-						highestZIndex = zIndex;
-					}
-					// the current z-index is lower than our highest, so we need to work out where it sits
-					else
-					{
-						for (var k:uint = super.numChildren - 1; k >= 0; k--)
+						if (displayObject is UIElement)
 						{
-							var displayObject:DisplayObject = super.getChildAt(k);
+							var el:UIElement = (displayObject as UIElement);
+							var elZIndex:int = (el.getStyleValue("z-index") as IntegerValue).value;
 							
-							if (displayObject is UIElement)
+							if (zIndex >= elZIndex)
 							{
-								var el:UIElement = (displayObject as UIElement);
-								var elZIndex:int = (el.getStyleValue("z-index") as IntegerValue).value;
+								insertIndex = k + 1;
 								
-								if (zIndex >= elZIndex)
-								{
-									insertIndex = k;
-									
-									break;
-								}
+								break;
 							}
 						}
 					}
 				}
-				else
-				{
-					insertIndex = 0;
-					
-					highest0Index++;
-				}
-				
+
 				super.addChildAt(e, insertIndex);
 
 				e.x = 0;

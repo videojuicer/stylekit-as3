@@ -1238,7 +1238,7 @@ package org.stylekit.ui.element
 			{
 				if (line1.highestZIndex < line2.highestZIndex)
 				{
-					return -11;
+					return -1;
 				}
 				else if (line1.highestZIndex > line2.highestZIndex)
 				{
