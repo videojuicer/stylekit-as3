@@ -525,7 +525,8 @@ package org.stylekit.ui.element.layout
 					}
 				}
 				
-				e.layoutChildren();
+				e.recalculateEffectiveContentDimensions();
+				//e.layoutChildren();
 
 				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
 			}

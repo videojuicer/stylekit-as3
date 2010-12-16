@@ -1101,7 +1101,7 @@ package org.stylekit.ui.element
 			{
 				this._children[i].recalculateEffectiveContentDimensions();
 			}
-			//this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
+			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
 		
