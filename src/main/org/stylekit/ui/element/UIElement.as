@@ -1146,6 +1146,10 @@ package org.stylekit.ui.element
 			{
 				this.parentElement.registerDescendantClassName(className, this);
 			}
+			else if (this is BaseUI)
+			{
+				this.registerDescendantClassName(className, this);
+			}
 			
 			return true;
 		}
@@ -1159,6 +1163,10 @@ package org.stylekit.ui.element
 				if(this.parentElement != null)
 				{
 					this.parentElement.unregisterDescendantClassName(className, this);
+				}
+				else if (this is BaseUI)
+				{
+					this.unregisterDescendantClassName(className, this);
 				}
 				
 				return true;
