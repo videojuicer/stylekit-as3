@@ -1104,7 +1104,7 @@ package org.stylekit.ui.element
 			{
 				this._children[i].recalculateEffectiveContentDimensions();
 			}
-			this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
+			//this.layoutChildren(); // warning: potential INFINITE LOOP OF DEATH
 			this.recalculateEffectiveDimensions();
 		}
 		
@@ -1302,79 +1302,84 @@ package org.stylekit.ui.element
 		{
 			if (!this._decoratingChildren)
 			{
-				this._decoratingChildren = true;
-				
-				for (var k:int = 0; k < super.numChildren; k++)
-				{
-					super.removeChildAt(k);
-				}
-				
-				if (this._contentContainer != null && this._contentContainer.parent != null)
-				{
-					this.removeChild(this._contentContainer);
-				}
-					
-				this._contentContainer = new Sprite();
-				
-				// calculate the effective dimensions of this object so we can layout the children correctly
-				this.recalculateEffectiveDimensions();
-				
-				this.refreshControlLines();
-				
-				this._contentContainer.x = this.calculateContentPoint().x;
-				this._contentContainer.y = this.calculateContentPoint().y;
-				
-				if (this.controlLines != null && this.controlLines.length > 0)
-				{				
-					// only we do now is stack the FlowControlLines onto the UIElements content space
-					// the FlowControlLines take care of laying out the indiviual UIElement children.
-					
-					// as were only dealing with lines all we need to do is stack the lines one by one
-					// with each line taking up the entire width, so we only need to think about stacking
-					// the lines with there height.
-					var y:Number = 0;
-	
-					for (var i:int = 0; i < this.controlLines.length; i++)
-					{
-						var line:FlowControlLine = this.controlLines[i];
-						
-						line.y = y;
-						
-						line.layoutElements();
-						
-						StyleKit.logger.debug("Adding FlowControlLine at "+y);
-						
-						y += line.lineHeight;
-						
-						this._contentContainer.addChild(line);
-					}
-				}
-				
-				if (this._contentSprites != null)
-				{
-					for (var j:int = 0; j < this._contentSprites.length; j++)
-					{
-						this._contentContainer.addChild(this._contentSprites[j]);
-					}
-				}
-				
-				super.addChild(this._contentContainer);
-				
-				this.recalculateContentDimensions();
-				
-				this._decoratingChildren = false;
+				this.decorateChildren();
 				
 				if (this._requiresAnotherDecorate)
 				{
 					this._requiresAnotherDecorate = false;
 					
-					this.layoutChildren();
+					this.decorateChildren();
 				}
 			}
 			else
 			{
 				this._requiresAnotherDecorate = true;
 			}
+		}
+		
+		protected function decorateChildren():void
+		{
+			this._decoratingChildren = true;
+			
+			for (var k:int = 0; k < super.numChildren; k++)
+			{
+				super.removeChildAt(k);
+			}
+			
+			if (this._contentContainer != null && this._contentContainer.parent != null)
+			{
+				this.removeChild(this._contentContainer);
+			}
+			
+			this._contentContainer = new Sprite();
+			
+			// calculate the effective dimensions of this object so we can layout the children correctly
+			//this.recalculateEffectiveDimensions();
+			
+			this.refreshControlLines();
+			
+			this._contentContainer.x = this.calculateContentPoint().x;
+			this._contentContainer.y = this.calculateContentPoint().y;
+			
+			if (this.controlLines != null && this.controlLines.length > 0)
+			{				
+				// only we do now is stack the FlowControlLines onto the UIElements content space
+				// the FlowControlLines take care of laying out the indiviual UIElement children.
+				
+				// as were only dealing with lines all we need to do is stack the lines one by one
+				// with each line taking up the entire width, so we only need to think about stacking
+				// the lines with there height.
+				var y:Number = 0;
+				
+				for (var i:int = 0; i < this.controlLines.length; i++)
+				{
+					var line:FlowControlLine = this.controlLines[i];
+					
+					line.y = y;
+					
+					line.layoutElements();
+					
+					StyleKit.logger.debug("Adding FlowControlLine at "+y);
+					
+					y += line.lineHeight;
+					
+					this._contentContainer.addChild(line);
+				}
+			}
+			
+			if (this._contentSprites != null)
+			{
+				for (var j:int = 0; j < this._contentSprites.length; j++)
+				{
+					this._contentContainer.addChild(this._contentSprites[j]);
+				}
+			}
+			
+			super.addChild(this._contentContainer);
+			
+			this.recalculateContentDimensions();
+
+			this._decoratingChildren = false;
 		}
 		
 		public function get flexible():Boolean
