@@ -173,7 +173,7 @@ package org.stylekit.css.property
 				"overflow": OverflowValue.parse("visible"),
 				
 				// display
-				"display": DisplayValue.parse("inline"),
+				"display": DisplayValue.parse("block"),
 				"color": ColorValue.parse("#000000"),
 				"visibility": VisibilityValue.parse("visible"),
 				"opacity": NumericValue.parse("1.0"),
