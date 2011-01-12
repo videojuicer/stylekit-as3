@@ -1366,7 +1366,7 @@ package org.stylekit.ui.element
 					this._contentContainer.addChild(line);
 				}
 			}
-			
+
 			if (this._contentSprites != null)
 			{
 				for (var j:int = 0; j < this._contentSprites.length; j++)
