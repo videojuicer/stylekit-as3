@@ -230,6 +230,9 @@ package org.stylekit.ui.element
 		// Evaluated size cache
 		protected var _computedSizes:Object;
 		
+		protected var _decoratingChildren:Boolean = false;
+		protected var _requiresAnotherDecorate:Boolean = false;
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
@@ -1297,63 +1300,81 @@ package org.stylekit.ui.element
 		
 		public function layoutChildren():void
 		{
-			for (var k:int = 0; k < super.numChildren; k++)
+			if (!this._decoratingChildren)
 			{
-				super.removeChildAt(k);
-			}
-			
-			if (this._contentContainer != null && this._contentContainer.parent != null)
-			{
-				this.removeChild(this._contentContainer);
-			}
+				this._decoratingChildren = true;
 				
-			this._contentContainer = new Sprite();
-			
-			// calculate the effective dimensions of this object so we can layout the children correctly
-			this.recalculateEffectiveDimensions();
-			
-			this.refreshControlLines();
-			
-			this._contentContainer.x = this.calculateContentPoint().x;
-			this._contentContainer.y = this.calculateContentPoint().y;
-			
-			if (this.controlLines != null && this.controlLines.length > 0)
-			{				
-				// only we do now is stack the FlowControlLines onto the UIElements content space
-				// the FlowControlLines take care of laying out the indiviual UIElement children.
-				
-				// as were only dealing with lines all we need to do is stack the lines one by one
-				// with each line taking up the entire width, so we only need to think about stacking
-				// the lines with there height.
-				var y:Number = 0;
-
-				for (var i:int = 0; i < this.controlLines.length; i++)
+				for (var k:int = 0; k < super.numChildren; k++)
 				{
-					var line:FlowControlLine = this.controlLines[i];
+					super.removeChildAt(k);
+				}
+				
+				if (this._contentContainer != null && this._contentContainer.parent != null)
+				{
+					this.removeChild(this._contentContainer);
+				}
 					
-					line.y = y;
+				this._contentContainer = new Sprite();
+				
+				// calculate the effective dimensions of this object so we can layout the children correctly
+				this.recalculateEffectiveDimensions();
+				
+				this.refreshControlLines();
+				
+				this._contentContainer.x = this.calculateContentPoint().x;
+				this._contentContainer.y = this.calculateContentPoint().y;
+				
+				if (this.controlLines != null && this.controlLines.length > 0)
+				{				
+					// only we do now is stack the FlowControlLines onto the UIElements content space
+					// the FlowControlLines take care of laying out the indiviual UIElement children.
 					
-					line.layoutElements();
+					// as were only dealing with lines all we need to do is stack the lines one by one
+					// with each line taking up the entire width, so we only need to think about stacking
+					// the lines with there height.
+					var y:Number = 0;
+	
+					for (var i:int = 0; i < this.controlLines.length; i++)
+					{
+						var line:FlowControlLine = this.controlLines[i];
+						
+						line.y = y;
+						
+						line.layoutElements();
+						
+						StyleKit.logger.debug("Adding FlowControlLine at "+y);
+						
+						y += line.lineHeight;
+						
+						this._contentContainer.addChild(line);
+					}
+				}
+				
+				if (this._contentSprites != null)
+				{
+					for (var j:int = 0; j < this._contentSprites.length; j++)
+					{
+						this._contentContainer.addChild(this._contentSprites[j]);
+					}
+				}
+				
+				super.addChild(this._contentContainer);
+				
+				this.recalculateContentDimensions();
+				
+				this._decoratingChildren = false;
+				
+				if (this._requiresAnotherDecorate)
+				{
+					this._requiresAnotherDecorate = false;
 					
-					StyleKit.logger.debug("Adding FlowControlLine at "+y);
-					
-					y += line.lineHeight;
-					
-					this._contentContainer.addChild(line);
+					this.layoutChildren();
 				}
 			}
-			
-			if (this._contentSprites != null)
+			else
 			{
-				for (var j:int = 0; j < this._contentSprites.length; j++)
-				{
-					this._contentContainer.addChild(this._contentSprites[j]);
-				}
+				this._requiresAnotherDecorate = true;
 			}
-			
-			super.addChild(this._contentContainer);
-			
-			this.recalculateContentDimensions();
 		}
 		
 		public function get flexible():Boolean
