@@ -1377,7 +1377,7 @@ package org.stylekit.ui.element
 			
 			super.addChild(this._contentContainer);
 			
-			this.recalculateContentDimensions();
+			//this.recalculateContentDimensions();
 
 			this._decoratingChildren = false;
 		}
