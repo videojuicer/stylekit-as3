@@ -1430,14 +1430,6 @@ package org.stylekit.ui.element
 				throw new IllegalOperationError("Child belongs to a different BaseUI, cannot add to this UIElement");
 			}
 			
-			child.parentElement = this;
-			child._baseUI = this.baseUI;
-			
-			child.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this.onChildDimensionsChanged);
-			
-			child.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
-			child.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
-			
 			if (index < this._children.length)
 			{
 				this._children.splice(index, 0, child);
@@ -1446,6 +1438,13 @@ package org.stylekit.ui.element
 			{
 				this._children.push(child);
 			}
+			
+			child.parentElement = this;
+			child._baseUI = this.baseUI;
+			
+			child.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this.onChildDimensionsChanged);
+			child.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
+			child.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			
 			this.updateChildrenIndex();
 			
