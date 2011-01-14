@@ -11,6 +11,7 @@ package org.stylekit.ui.element.paint
 	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
 	
+	import org.stylekit.StyleKit;
 	import org.stylekit.css.value.BackgroundPositionValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.PositionValue;
@@ -83,11 +84,11 @@ package org.stylekit.ui.element.paint
 			}
 			catch (e:IOError)
 			{
-				// image didnt load
+				StyleKit.logger.error("IOError when attempting to load background image from "+url, this);
 			}
 			catch (e:SecurityError)
 			{
-				
+				StyleKit.logger.error("SecurityError when attempting to load background image from "+url, this);
 			}
 
 		}
