@@ -195,6 +195,7 @@ package org.stylekit.ui.element
 		protected var _elementPseudoClasses:Vector.<String>;
 		
 		protected var _controlLines:Vector.<FlowControlLine>;
+		protected var _controlLinesUnsorted:Vector.<FlowControlLine>;
 		
 		protected var _painter:UIElementPainter;
 		
@@ -1220,14 +1221,12 @@ package org.stylekit.ui.element
 		protected function refreshControlLines():void
 		{
 			this._controlLines = new Vector.<FlowControlLine>();
+			this._controlLinesUnsorted = null;
 			
 			var textAlign:TextAlignValue = (this.getStyleValue("text-align") as TextAlignValue);
 
 			// create a new line
 			this.newControlLine(textAlign);
-			
-
-
 			
 			for (var i:int = 0; i < this.children.length; i++)
 			{
@@ -1244,6 +1243,8 @@ package org.stylekit.ui.element
 					}
 				}
 			}
+			
+			this._controlLinesUnsorted = this._controlLines.concat();
 			
 			this._controlLines.sort(function(line1:FlowControlLine, line2:FlowControlLine):int
 			{
@@ -1351,18 +1352,21 @@ package org.stylekit.ui.element
 				// the lines with there height.
 				var y:Number = 0;
 				
+				for (var l:int = 0; l < this._controlLinesUnsorted.length; l++)
+				{
+					var flow:FlowControlLine = this.controlLines[l];
+					
+					flow.y = y;
+					
+					y += flow.lineHeight;
+				}
+				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
 					var line:FlowControlLine = this.controlLines[i];
 					
-					line.y = y;
-					
 					line.layoutElements();
-					
-					StyleKit.logger.debug("Adding FlowControlLine at "+y);
-					
-					y += line.lineHeight;
-					
+
 					this._contentContainer.addChild(line);
 				}
 			}
