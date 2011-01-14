@@ -2239,9 +2239,8 @@ package org.stylekit.ui.element
 			switch (cursor)
 			{
 				case CursorValue.CURSOR_POINTER:
-					Mouse.cursor = MouseCursor.HAND;
+					Mouse.cursor = MouseCursor.BUTTON;
 					break;
-				
 			}
 		}
 		
