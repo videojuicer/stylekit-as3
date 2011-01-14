@@ -207,6 +207,7 @@ package org.stylekit.ui.element
 		protected var _rawContentHeight:int = 0;
 		
 		protected var _listensForHover:Boolean = false;
+		protected var _redrawDeferredUntilHasParent:Boolean = false;
 		
 		/**
 		* A reference to the Style object used to store this element's local styles. This Style is treated with a higher 
@@ -293,6 +294,11 @@ package org.stylekit.ui.element
 			this._parentElement = parent;
 			this._parentElement.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, this.onParentElementEvaluatedStylesModified);
 			this.movedToNewAncestorTree(prev, this._parentElement);
+			
+			if (this._redrawDeferredUntilHasParent)
+			{
+				this.redraw();
+			}
 		}
 		
 		public function get baseUI():BaseUI
@@ -1406,7 +1412,16 @@ package org.stylekit.ui.element
 		
 		public function redraw():void
 		{
-			this._painter.paint();
+			if (this.parentElement == null)
+			{
+				this._redrawDeferredUntilHasParent = true;
+			}
+			else
+			{
+				this._painter.paint();
+				
+				this._redrawDeferredUntilHasParent = false;
+			}
 		}
 		
 		protected function updateParentIndex(index:uint):void
