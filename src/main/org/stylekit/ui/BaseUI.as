@@ -362,7 +362,6 @@ package org.stylekit.ui
 					}
 				}
 			}
-			StyleKit.logger.debug("Enabled hover on "+enabled+"/"+this.descendants.length+" elements as required by styles.", this);
 		}
 		
 		public function allocateStyles(mutatedElement:UIElement):void

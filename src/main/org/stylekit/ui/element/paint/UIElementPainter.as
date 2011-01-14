@@ -129,7 +129,6 @@ package org.stylekit.ui.element.paint
 					
 					filler = new BackgroundFiller();
 					filler.addEventListener(Event.COMPLETE, this.onBackgroundFillerComplete);
-					
 					filler.load(backgroundImage);
 					
 					UIElementPainter.__backgroundFillers.push(filler);

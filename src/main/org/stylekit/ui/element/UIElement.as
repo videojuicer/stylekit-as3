@@ -1990,7 +1990,6 @@ package org.stylekit.ui.element
 		
 		public function flushStyles():void
 		{
-			StyleKit.logger.debug("Flushing styles ready for a fresh style push", this);
 			this._styles = new Vector.<Style>();
 			this._styleSelectors = new Vector.<ElementSelectorChain>();
 		}
@@ -2010,7 +2009,6 @@ package org.stylekit.ui.element
 		
 		public function commitStyles():void
 		{
-			StyleKit.logger.debug("Committing all pushed styles, going to evaluation stage.", this);
 			this.evaluateStyles();
 		}
 		
@@ -2040,7 +2038,7 @@ package org.stylekit.ui.element
 			
 			if(styleSetCacheKey == this._evaluatedStyleCurrentCacheKey)
 			{
-				StyleKit.logger.debug("Evaluating styles: cache key for selector set matches current cache key, using existing values: "+styleSetCacheKey, this);
+				//StyleKit.logger.debug("Evaluating styles: cache key for selector set matches current cache key, using existing values: "+styleSetCacheKey, this);
 			}
 			else if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
 			{
@@ -2236,7 +2234,14 @@ package org.stylekit.ui.element
 		
 		private function refreshCursor():void
 		{
-			var value:CursorValue = (this.getStyleValue("cursor") as CursorValue);
+			var cursorElement:UIElement = this;
+			var value:CursorValue;
+			
+			while(value == null && cursorElement != null)
+			{
+				value = (cursorElement.getStyleValue("cursor") as CursorValue);
+				cursorElement = cursorElement.parentElement;
+			}
 			
 			var cursor:int = (value == null ? CursorValue.CURSOR_DEFAULT : value.cursor);
 
@@ -2244,6 +2249,9 @@ package org.stylekit.ui.element
 			{
 				case CursorValue.CURSOR_POINTER:
 					Mouse.cursor = MouseCursor.BUTTON;
+					break;
+				default: 
+					Mouse.cursor = MouseCursor.ARROW;
 					break;
 			}
 		}
