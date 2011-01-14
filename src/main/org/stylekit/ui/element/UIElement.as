@@ -298,6 +298,8 @@ package org.stylekit.ui.element
 			if (this._redrawDeferredUntilHasParent)
 			{
 				this.redraw();
+				
+				this._redrawDeferredUntilHasParent = false;
 			}
 		}
 		
@@ -1412,15 +1414,13 @@ package org.stylekit.ui.element
 		
 		public function redraw():void
 		{
-			if (this.parentElement == null)
+			if (this.parentElement == null && this != this.baseUI)
 			{
 				this._redrawDeferredUntilHasParent = true;
 			}
 			else
 			{
 				this._painter.paint();
-				
-				this._redrawDeferredUntilHasParent = false;
 			}
 		}
 		
