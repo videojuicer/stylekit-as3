@@ -2250,15 +2250,21 @@ package org.stylekit.ui.element
 		private function refreshCursor():void
 		{
 			var cursor:int = this.getMouseCursorTypeId();
+			var flashCursor:String;
 			
 			switch (cursor)
 			{
 				case CursorValue.CURSOR_POINTER:
-					Mouse.cursor = MouseCursor.BUTTON;
+					flashCursor = MouseCursor.BUTTON;
 					break;
 				default: 
-					Mouse.cursor = MouseCursor.ARROW;
+					flashCursor = MouseCursor.ARROW;
 					break;
+			}
+			
+			if(Mouse.cursor != flashCursor)
+			{
+				Mouse.cursor = flashCursor;
 			}
 		}
 		
