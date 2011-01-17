@@ -430,7 +430,7 @@ package org.stylekit.ui.element.layout
 					{
 						var parentPosition:PositionValue = parent.getStyleValue("position") as PositionValue;
 						
-						if (parentPosition.position == PositionValue.POSITION_RELATIVE || parent == e.baseUI)
+						if (parentPosition.position != PositionValue.POSITION_STATIC || parent == e.baseUI)
 						{
 							relativeParent = parent;
 						}
