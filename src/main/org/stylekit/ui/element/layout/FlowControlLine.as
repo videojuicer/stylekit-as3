@@ -403,8 +403,23 @@ package org.stylekit.ui.element.layout
 
 				super.addChildAt(e, insertIndex);
 
-				e.x = 0;
-				e.y = 0;
+				var marginLeft:SizeValue = (e.getStyleValue("margin-left") as SizeValue);
+				var marginRight:SizeValue = (e.getStyleValue("margin-right") as SizeValue);
+				var marginTop:SizeValue = (e.getStyleValue("margin-top") as SizeValue);
+				var marginBottom:SizeValue = (e.getStyleValue("margin-bottom") as SizeValue);
+				
+				var marginLeftBump:Number = (marginLeft.auto ? ((this._maxWidth / 2) - (e.effectiveWidth / 2)) : 0);
+				var marginRightBump:Number = (marginRight.auto ? ((this._maxWidth / 2) - (e.effectiveWidth / 2)) : 0);
+				var marginTopBump:Number = (marginTop.auto ? ((e.parentElement.effectiveContentHeight / 2) - (e.effectiveHeight / 2)) : 0);
+				var marginBottomBump:Number = (marginBottom.auto ? ((e.parentElement.effectiveContentHeight / 2) - (e.effectiveHeight / 2)) : 0);
+				
+				e.x = marginLeftBump;
+				e.y = marginTopBump;
+				
+				if (marginTop.auto)
+				{
+					trace("HEYA");
+				}
 				
 				if (positionValue.position == PositionValue.POSITION_ABSOLUTE)
 				{
@@ -460,11 +475,11 @@ package org.stylekit.ui.element.layout
 				{
 					e.x = leftFloatXCollector;
 					
-					leftFloatXCollector += e.effectiveWidth;
+					leftFloatXCollector += e.effectiveWidth + marginLeftBump;
 				}
 				else if (floatValue.float == FloatValue.FLOAT_RIGHT)
 				{
-					e.x = (this._maxWidth - e.effectiveWidth - rightFloatXCollector);
+					e.x = (this._maxWidth - e.effectiveWidth - rightFloatXCollector) - marginRightBump;
 					
 					rightFloatXCollector += e.effectiveWidth;
 				}
@@ -472,8 +487,7 @@ package org.stylekit.ui.element.layout
 				{
 					if (displayValue.display == DisplayValue.DISPLAY_BLOCK)
 					{
-						e.x = leftFloatXCollector;
-						e.y = 0;
+						e.x = leftFloatXCollector + marginLeftBump;
 						
 						leftEdgeCollector += e.effectiveWidth;
 					}
@@ -486,13 +500,13 @@ package org.stylekit.ui.element.layout
 						else
 						if (this._flowDirection == FlowControlLine.FLOW_DIRECTION_RIGHT)
 						{
-							e.x = (this._maxWidth - rightEdgeCollector);
+							e.x = (this._maxWidth - rightEdgeCollector) - marginRightBump;
 							
 							rightEdgeCollector += e.effectiveWidth;
 						}
 						else
 						{
-							e.x = leftEdgeCollector + leftFloatXCollector;
+							e.x = leftEdgeCollector + leftFloatXCollector + marginLeftBump;
 							
 							leftEdgeCollector += e.effectiveWidth;
 						}
@@ -504,34 +518,34 @@ package org.stylekit.ui.element.layout
 					// we've positioned the element as normal, now we adjust relative to our current position
 					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = e.x + e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH);
+						e.x = e.x + e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH) + marginLeftBump;
 					}
 					
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = e.x - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
+						e.x = e.x - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH) - marginRightBump;
 						//e.x = (e.parentElement.effectiveWidth - e.effectiveWidth)  - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = e.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
+						e.y = e.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT) + marginTopBump;
 					}
 					
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
+						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) - marginBottomBump;
 						//e.y = ((e.parentElement.effectiveHeight - e.effectiveHeight) - (e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) * 2));
 					}
 				}
-				
+
 				e.recalculateEffectiveContentDimensions();
 				//e.layoutChildren();
 
 				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
 			}
 		}
-		
+			
 		public function treatElementAsNonFloatedBlock(e:UIElement):Boolean
 		{
 			if(e.hasStyleProperty("display") && (e.getStyleValue("display") as DisplayValue).display >= DisplayValue.DISPLAY_BLOCK && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)
