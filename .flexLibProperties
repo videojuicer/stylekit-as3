@@ -75,6 +75,7 @@
     <classEntry path="org.stylekit.ui.element.paint.BackgroundFiller"/>
     <classEntry path="org.stylekit.css.value.BackgroundPositionValue"/>
     <classEntry path="org.stylekit.css.value.IntegerValue"/>
+    <classEntry path="org.stylekit.css.value.BackgroundSizeValue"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

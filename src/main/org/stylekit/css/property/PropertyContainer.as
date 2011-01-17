@@ -10,6 +10,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.AnimationDirectionValue;
 	import org.stylekit.css.value.AnimationIterationCountValue;
 	import org.stylekit.css.value.BackgroundPositionValue;
+	import org.stylekit.css.value.BackgroundSizeValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
@@ -132,6 +133,7 @@ package org.stylekit.css.property
 				"background-image": null,
 				"background-position": BackgroundPositionValue.parse("0% 0%"),
 				"background-repeat": RepeatValue.parse("repeat"),
+				"background-size": BackgroundSizeValue.parse("auto"),
 				
 				// border-left
 				"border-left-width": SizeValue.parse("medium"),

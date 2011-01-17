@@ -24,6 +24,7 @@ package org.stylekit.css.parse
 	import org.stylekit.css.value.AnimationIterationCountValue;
 	import org.stylekit.css.value.BackgroundCompoundValue;
 	import org.stylekit.css.value.BackgroundPositionValue;
+	import org.stylekit.css.value.BackgroundSizeValue;
 	import org.stylekit.css.value.BorderCompoundValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.CornerCompoundValue;
@@ -620,6 +621,9 @@ package org.stylekit.css.parse
 					// Complex Compound values
 					case "background":
 						property.value = BackgroundCompoundValue.parse(unparsedPropertyValue);
+						break;
+					case "background-size":
+						property.value = BackgroundSizeValue.parse(unparsedPropertyValue);
 						break;
 					case "border":
 						var borderValue:BorderCompoundValue = BorderCompoundValue.parse(unparsedPropertyValue);

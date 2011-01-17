@@ -95,10 +95,10 @@ package org.stylekit.ui.element.paint
 			var bottomLeftRadius:SizeValue = (radiusCompound.bottomLeftValue as SizeValue);
 			var topLeftRadius:SizeValue = (radiusCompound.topLeftValue as SizeValue);
 			
-			var topRightR:Number = (borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderRight.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? topRightRadius.evaluateSize(uiElement) : 0);
-			var bottomRightR:Number = (borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderRight.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? bottomRightRadius.evaluateSize(uiElement) : 0);
-			var bottomLeftR:Number = (borderBottom.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? bottomLeftRadius.evaluateSize(uiElement) : 0);
-			var topLeftR:Number = (borderTop.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE && borderLeft.lineStyleValue.lineStyle != LineStyleValue.LINE_STYLE_NONE ? topLeftRadius.evaluateSize(uiElement) : 0);
+			var topRightR:Number = Math.max(0, topRightRadius.evaluateSize(uiElement));
+			var bottomRightR:Number = Math.max(0, bottomRightRadius.evaluateSize(uiElement));
+			var bottomLeftR:Number = Math.max(0, bottomLeftRadius.evaluateSize(uiElement));
+			var topLeftR:Number = Math.max(0, topLeftRadius.evaluateSize(uiElement));
 		
 			var alpha:Number = uiElement.hasStyleProperty("opacity") ? (uiElement.getStyleValue("opacity") as NumericValue).value : 1.0;
 	
@@ -162,6 +162,10 @@ package org.stylekit.ui.element.paint
 
 				graphics.lineTo(uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
 			}
+			else
+			{
+				graphics.moveTo(uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
+			}
 			
 			if (topRightR > 0)
 			{
@@ -173,6 +177,10 @@ package org.stylekit.ui.element.paint
 				graphics.lineStyle(borderRightSize, borderRightColor, borderRightAlpha);
 				
 				graphics.lineTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) - marginBottom);
+			}
+			else
+			{
+				graphics.moveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) - marginBottom);
 			}
 			
 			if (bottomRightR > 0)
@@ -186,6 +194,10 @@ package org.stylekit.ui.element.paint
 				
 				graphics.lineTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight - marginBottom);
 			}
+			else
+			{
+				graphics.moveTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight - marginBottom);
+			}
 			
 			if (bottomLeftR > 0)
 			{
@@ -197,6 +209,10 @@ package org.stylekit.ui.element.paint
 				graphics.lineStyle(borderLeftSize, borderLeftColor, borderLeftAlpha);
 			
 				graphics.lineTo(marginLeft, (topLeftR / 2) + marginTop);
+			}
+			else
+			{
+				graphics.moveTo(marginLeft, (topLeftR / 2) + marginTop);
 			}
 			
 			if (topLeftR > 0)

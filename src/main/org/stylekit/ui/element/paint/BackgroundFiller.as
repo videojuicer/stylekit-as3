@@ -7,12 +7,15 @@ package org.stylekit.ui.element.paint
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
+	import flash.geom.Matrix;
+	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
 	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
 	
 	import org.stylekit.StyleKit;
 	import org.stylekit.css.value.BackgroundPositionValue;
+	import org.stylekit.css.value.BackgroundSizeValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.PositionValue;
 	import org.stylekit.css.value.RepeatValue;
@@ -105,6 +108,22 @@ package org.stylekit.ui.element.paint
 			var backgroundVerticalRepeat:Boolean = (uiElement.getStyleValue("background-repeat") as RepeatValue).verticalRepeat;
 			
 			var backgroundPosition:BackgroundPositionValue = (uiElement.getStyleValue("background-position") as BackgroundPositionValue);
+			var backgroundSize:BackgroundSizeValue = (uiElement.getStyleValue("background-size") as BackgroundSizeValue);
+			
+			// need to work out size to stretch too
+			var formattedBitmap:BitmapData = this._bitmapData.clone();;
+			
+			if (backgroundSize.contain || backgroundSize.cover)
+			{
+				var rect:Rectangle = this.createMatrixFor(uiElement, this._bitmapData);
+				
+				formattedBitmap = new BitmapData(rect.width, rect.height, true);
+				
+				var matrix:Matrix = new Matrix();
+				matrix.scale((rect.width / this._bitmapData.width), (rect.height / this._bitmapData.height));
+				
+				formattedBitmap.draw(this._bitmapData, matrix);
+			}
 
 			var backgroundXRepeat:int = Math.ceil((backgroundHorizontalRepeat ? (elementEffectiveWidth / this._bitmapData.width) : 1));
 			var backgroundYRepeat:int = Math.ceil((backgroundVerticalRepeat ? (elementEffectiveHeight / this._bitmapData.height) : 1));
@@ -123,7 +142,7 @@ package org.stylekit.ui.element.paint
 					
 					if (backgroundPosition.positionX.units == "%" && backgroundPosition.positionX.value > 0)
 					{
-						positionX = positionX - (this._bitmapData.width / 2);
+						positionX = positionX - (formattedBitmap.width / 2);
 					}
 				}
 				
@@ -133,7 +152,7 @@ package org.stylekit.ui.element.paint
 					
 					if (backgroundPosition.positionY.units == "%" && backgroundPosition.positionY.value > 0)
 					{
-						positionY = positionY - (this._bitmapData.height / 2);
+						positionY = positionY - (formattedBitmap.height / 2);
 					}
 				}
 			}
@@ -142,11 +161,11 @@ package org.stylekit.ui.element.paint
 			{
 				for (var x:int = 0; x < backgroundXRepeat; x++)
 				{
-					var sectionWidth:int = (backgroundXRepeat == 1 ? this._bitmapData.width : (backgroundXRepeat - 1 == x ? (elementEffectiveWidth - (this._bitmapData.width * (backgroundXRepeat - 1))) : this._bitmapData.width));
-					var sectionHeight:int = (backgroundYRepeat == 1 ? this._bitmapData.height : (backgroundYRepeat - 1 == x ? (elementEffectiveHeight - (this._bitmapData.height * (backgroundYRepeat - 1))) : this._bitmapData.height));
+					var sectionWidth:int = (backgroundXRepeat == 1 ? formattedBitmap.width : (backgroundXRepeat - 1 == x ? (elementEffectiveWidth - (formattedBitmap.width * (backgroundXRepeat - 1))) : formattedBitmap.width));
+					var sectionHeight:int = (backgroundYRepeat == 1 ? formattedBitmap.height : (backgroundYRepeat - 1 == x ? (elementEffectiveHeight - (formattedBitmap.height * (backgroundYRepeat - 1))) : formattedBitmap.height));
 					
-					var sectionX:int = (positionX + elementContentX + (this._bitmapData.width * x));
-					var sectionY:int = (positionY + elementContentY + (this._bitmapData.height * y));
+					var sectionX:int = (positionX + elementContentX + (formattedBitmap.width * x));
+					var sectionY:int = (positionY + elementContentY + (formattedBitmap.height * y));
 					
 					//if (backgroundPosition != null && backgroundPosition.position == PositionValue.
 					
@@ -154,7 +173,7 @@ package org.stylekit.ui.element.paint
 					{
 						for (var w:int = sectionWidth; w >= 0; w--)
 						{
-							fillBitmapData.setPixel32(w + sectionX, h + sectionY, this._bitmapData.getPixel32(w, h));
+							fillBitmapData.setPixel32(w + sectionX, h + sectionY, formattedBitmap.getPixel32(w, h));
 						}
 					}
 				}
@@ -174,6 +193,32 @@ package org.stylekit.ui.element.paint
 		protected function onLoaderIOError(e:IOErrorEvent):void
 		{
 			this.dispatchEvent(e.clone());
+		}
+		
+		protected function createMatrixFor(uiElement:UIElement, bitmap:BitmapData):Rectangle
+		{
+			// this is where we do the logic for the fitting to a canvas and the like ...
+			// think of it like a zombie stretching your brains to fit the region
+			var ratio:Number = (bitmap.width / bitmap.height);
+			var aspectRatio:Number = (uiElement.effectiveContentWidth / uiElement.effectiveContentHeight);
+			var matrix:Rectangle = new Rectangle();
+			
+			if (aspectRatio < ratio)
+			{
+				matrix.width = uiElement.effectiveContentWidth;
+				matrix.height = Math.floor((uiElement.effectiveContentWidth / bitmap.width) * bitmap.height);
+				matrix.x = 0;
+				matrix.y = ((uiElement.effectiveContentHeight - matrix.height) / 2);
+			}
+			else
+			{
+				matrix.height = uiElement.effectiveContentHeight;
+				matrix.width = Math.floor((uiElement.effectiveContentHeight / bitmap.height) * bitmap.width);
+				matrix.y = 0;
+				matrix.x = ((uiElement.effectiveContentWidth - matrix.width) / 2);
+			}
+			
+			return matrix;
 		}
 	}
 }
