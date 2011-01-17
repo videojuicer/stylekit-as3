@@ -25,6 +25,7 @@ package org.stylekit.spec.tests.ui.element
 	import org.stylekit.css.value.TimeValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
+	import org.stylekit.css.value.CursorValue;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.spec.Fixtures;
 	import org.stylekit.ui.BaseUI;
@@ -518,6 +519,38 @@ package org.stylekit.spec.tests.ui.element
 			el.addElementPseudoClass("pseudo2");
 			
 			Assert.assertEquals("bar/foo/class1,class2/pseudo1,pseudo2/0", el.generateStateVectorKey());
+		}
+		
+		[Test(description="Ensures that special mouse cursors are inherited by all element children")]
+		public function mouseCursorsInherited():void
+		{
+			var parent:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			var grandchild:UIElement = new UIElement();
+			
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, parent.getLocalMouseCursorTypeId());
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, parent.getMouseCursorTypeId());
+			
+			parent.localStyleString = "cursor: pointer;";
+			
+			Assert.assertEquals(CursorValue.CURSOR_POINTER, parent.getLocalMouseCursorTypeId());
+			Assert.assertEquals(CursorValue.CURSOR_POINTER, parent.getMouseCursorTypeId());
+			
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, child.getLocalMouseCursorTypeId());
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, child.getMouseCursorTypeId());
+			
+			parent.addElement(child);
+			
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, child.getLocalMouseCursorTypeId());
+			Assert.assertEquals(CursorValue.CURSOR_POINTER, child.getMouseCursorTypeId());
+			
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, grandchild.getLocalMouseCursorTypeId());
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, grandchild.getMouseCursorTypeId());
+			
+			child.addElement(grandchild);
+			
+			Assert.assertEquals(CursorValue.CURSOR_DEFAULT, grandchild.getLocalMouseCursorTypeId());
+			Assert.assertEquals(CursorValue.CURSOR_POINTER, grandchild.getMouseCursorTypeId());
 		}
 		
 		[Test(description="Registers descendants being moved between trees")]

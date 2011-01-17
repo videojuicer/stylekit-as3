@@ -2249,17 +2249,8 @@ package org.stylekit.ui.element
 		
 		private function refreshCursor():void
 		{
-			var cursorElement:UIElement = this;
-			var value:CursorValue;
+			var cursor:int = this.getMouseCursorTypeId();
 			
-			while(value == null && cursorElement != null)
-			{
-				value = (cursorElement.getStyleValue("cursor") as CursorValue);
-				cursorElement = cursorElement.parentElement;
-			}
-			
-			var cursor:int = (value == null ? CursorValue.CURSOR_DEFAULT : value.cursor);
-
 			switch (cursor)
 			{
 				case CursorValue.CURSOR_POINTER:
@@ -2269,6 +2260,33 @@ package org.stylekit.ui.element
 					Mouse.cursor = MouseCursor.ARROW;
 					break;
 			}
+		}
+		
+		/**
+		* Returns the cursor that should be used for this element as a CursorValue static ID.
+		* Walks up the parent chain until a special cursor is found, or the top of the tree is encountered.
+		*/
+		public function getMouseCursorTypeId():int
+		{
+			var cursorElement:UIElement = this;
+			var cursor:int = cursorElement.getLocalMouseCursorTypeId();
+			
+			while(cursor == CursorValue.CURSOR_DEFAULT && cursorElement != null)
+			{
+				cursor = cursorElement.getLocalMouseCursorTypeId();
+				cursorElement = cursorElement.parentElement;
+			}
+			
+			return cursor;
+		}
+		
+		/**
+		* Returns the cursor associated with this element as a CursorValue static ID.
+		*/
+		public function getLocalMouseCursorTypeId():int
+		{
+			var cursorStyleValue:CursorValue = (this.getStyleValue("cursor") as CursorValue);
+			return (cursorStyleValue == null)? CursorValue.CURSOR_DEFAULT : cursorStyleValue.cursor;
 		}
 		
 		/* Overrides to block the Flash methods when they called outside of this class */
