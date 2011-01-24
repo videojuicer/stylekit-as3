@@ -13,6 +13,7 @@ package org.stylekit.css.property
 	import org.stylekit.css.value.BackgroundSizeValue;
 	import org.stylekit.css.value.ColorValue;
 	import org.stylekit.css.value.DisplayValue;
+	import org.stylekit.css.value.EdgeCompoundValue;
 	import org.stylekit.css.value.FloatValue;
 	import org.stylekit.css.value.FontStyleValue;
 	import org.stylekit.css.value.FontVariantValue;
@@ -208,10 +209,10 @@ package org.stylekit.css.property
 				"line-height": SizeValue.parse("normal"),
 				
 				// margin
-				"margin-left": SizeValue.parse("0"),
-				"margin-right": SizeValue.parse("0"),
-				"margin-bottom": SizeValue.parse("0"),
-				"margin-top": SizeValue.parse("0"),
+				"margin-left": SizeValue.parse("0px"),
+				"margin-right": SizeValue.parse("0px"),
+				"margin-bottom": SizeValue.parse("0px"),
+				"margin-top": SizeValue.parse("0px"),
 				
 				"outline-color": ColorValue.parse("invert"),
 				"outline-style": LineStyleValue.parse("none"),

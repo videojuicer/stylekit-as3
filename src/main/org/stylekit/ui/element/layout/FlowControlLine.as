@@ -1,6 +1,7 @@
 package org.stylekit.ui.element.layout
 {
 	import flash.display.DisplayObject;
+	import flash.display.InteractiveObject;
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.errors.IllegalOperationError;
@@ -382,7 +383,29 @@ package org.stylekit.ui.element.layout
 				// the current z-index is lower than our highest, so we need to work out where it sits
 				else
 				{
-					for (var k:int = super.numChildren - 1; k >= 0; k--)
+					var highest:int = super.numChildren;
+					
+					for (var m:int = 0; m < super.numChildren; m++)
+					{
+						var display:DisplayObject = super.getChildAt(m);
+						
+						if (display is UIElement)
+						{
+							var element:UIElement = (display as UIElement);
+							var elementIndex:int = (element.getStyleValue("z-index") as IntegerValue).value;
+							
+							if (zIndex <= elementIndex)
+							{
+								highest = m;
+								
+								break;
+							}
+						}
+					}
+					
+					insertIndex = highest;
+					
+					/*for (var k:int = super.numChildren - 1; k >= 0; k--)
 					{
 						var displayObject:DisplayObject = super.getChildAt(k);
 						
@@ -398,7 +421,7 @@ package org.stylekit.ui.element.layout
 								break;
 							}
 						}
-					}
+					} */
 				}
 
 				super.addChildAt(e, insertIndex);
@@ -415,12 +438,7 @@ package org.stylekit.ui.element.layout
 				
 				e.x = marginLeftBump;
 				e.y = marginTopBump;
-				
-				if (marginTop.auto)
-				{
-					trace("HEYA");
-				}
-				
+
 				if (positionValue.position == PositionValue.POSITION_ABSOLUTE)
 				{
 					var relativeParent:UIElement = null;
