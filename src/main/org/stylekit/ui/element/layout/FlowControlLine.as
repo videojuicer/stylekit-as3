@@ -363,12 +363,12 @@ package org.stylekit.ui.element.layout
 				
 				if (displayValue.display == DisplayValue.DISPLAY_NONE)
 				{
-					StyleKit.logger.debug("FlowControlLine - skipping UIElement due to display being set to none", e);
+					//StyleKit.logger.debug("FlowControlLine - skipping UIElement due to display being set to none", e);
 					
 					continue;
 				}
 				
-				StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
+				//StyleKit.logger.debug("FlowControlLine - adding UIElement to line contents", e);
 				
 				var zIndex:int = (e.getStyleValue("z-index") as IntegerValue).value;
 				var insertIndex:int = 0;
@@ -464,7 +464,7 @@ package org.stylekit.ui.element.layout
 					var lineX:Number = this.globalToLocal(point).x;
 					var lineY:Number = this.globalToLocal(point).y;
 					
-					StyleKit.logger.debug("Relative Parent -> "+point.x+"/"+point.y+"  "+lineX+"/"+lineY+" "+e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT));
+					//StyleKit.logger.debug("Relative Parent -> "+point.x+"/"+point.y+"  "+lineX+"/"+lineY+" "+e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT));
 					
 					// element exists at 0,0 in the line
 					// line exists at x,y

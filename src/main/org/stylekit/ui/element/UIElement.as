@@ -235,6 +235,9 @@ package org.stylekit.ui.element
 		protected var _decoratingChildren:Boolean = false;
 		protected var _requiresAnotherDecorate:Boolean = false;
 		
+		// Deferred style keys modified during a BaseUI style allocation transaction
+		protected var _deferredModifiedStyleKeys:Vector.<String>;
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
@@ -760,6 +763,33 @@ package org.stylekit.ui.element
 		*/
 		protected function onStylePropertyValuesChanged(alteredKeys:Vector.<String>):void
 		{
+			if(this._baseUI == null || !this.baseUI.styleAllocationInProgress)
+			{
+				// If there's no BaseUI attached, or if there's no transaction in progress, push through immediately
+				this.execCallbacksForModifiedStyleKeys(alteredKeys);
+			}
+			else
+			{
+				// Otherwise, log the keys on the deferred keys stack.
+				if(this._deferredModifiedStyleKeys == null)
+				{
+					this._deferredModifiedStyleKeys = alteredKeys;
+				}
+				else
+				{
+					this._deferredModifiedStyleKeys = this._deferredModifiedStyleKeys.concat(alteredKeys);
+				}
+				
+				// Register with the BaseUI to be notified when the style allocation is complete
+				this._baseUI.registerElementWithDeferredStyleModifications(this);
+			}
+		}
+		
+		/** 
+		* Actually executes the callbacks (recalculations, redraws, layout requests, whatever)
+		*/
+		protected function execCallbacksForModifiedStyleKeys(alteredKeys:Vector.<String>):void
+		{
 			var effectiveContentDimensionsRecalcKeys:Array = [];
 			var effectiveDimensionsRecalcKeys:Array = [];
 			var parentLayoutKeys:Array = [];
@@ -820,6 +850,19 @@ package org.stylekit.ui.element
 			}
 			
 			// TODO react to changes in animation and transition (change to transition-property, animation)
+		}
+		
+		/** 
+		* Executes any pending deferred style modification callbacks that were logged by #onStylePropertyValuesChanged
+		* while the BaseUI was in a style allocation transaction state.
+		*/
+		public function execCallbacksForDeferredStyleKeyModifications():void
+		{
+			if(this._deferredModifiedStyleKeys != null)
+			{
+				this.execCallbacksForModifiedStyleKeys(_deferredModifiedStyleKeys);
+				this._deferredModifiedStyleKeys = null;
+			}
 		}
 		
 		/**
@@ -1466,6 +1509,7 @@ package org.stylekit.ui.element
 			child.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			
 			this.updateChildrenIndex();
+			this.layoutChildren();
 			
 			return child;
 		}
@@ -1497,6 +1541,7 @@ package org.stylekit.ui.element
 			this._children.splice(index, 1);
 			
 			this.updateChildrenIndex();
+			this.layoutChildren();
 			
 			return child;
 		}

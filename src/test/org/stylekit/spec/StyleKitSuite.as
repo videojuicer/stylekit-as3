@@ -40,6 +40,8 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.ui.element.layout.FlowControlLineTestCase;
 	import org.stylekit.spec.tests.ui.element.worker.TransitionWorkerTestCase;
 	
+	import org.stylekit.spec.tests.integration.layout.AbsolutePositioningIntegrationTestCase;
+	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
 	public class StyleKitSuite
@@ -91,5 +93,9 @@ package org.stylekit.spec
 		public var cursorValueTest:CursorValueTestCase;
 		
 		public var transitionWorkerTest:TransitionWorkerTestCase;
+		
+		// LAYOUT INTEGRATION TESTS
+		public var absolutePositioningIntegrationTest:AbsolutePositioningIntegrationTestCase;
+		
 	}
 }

@@ -38,6 +38,18 @@ package org.stylekit.ui
 		protected var _domTransactionInProgress:Boolean = false;
 		protected var _domTransactionMutatedElements:Vector.<UIElement>;
 		
+		/**
+		* Set during the execution of #allocateStyles.
+		* Prevents elements from reacting to their newly-evaluated style properties until all styles have been pushed to
+		* all elements in the allocation push.
+		*/
+		protected var _styleAllocationInProgress:Boolean = false;
+		/**
+		* Stores a list of all elements which deferred their recalculations and redraws until the style allocation
+		* has concluded.
+		*/
+		protected var _styleAllocationDeferredElements:Vector.<UIElement>;
+		
 		public function BaseUI(styleSheetCollection:StyleSheetCollection = null, root:DisplayObject = null)
 		{
 			this._styleSheetCollection = styleSheetCollection;
@@ -68,6 +80,11 @@ package org.stylekit.ui
 		public override function get styleEligible():Boolean
 		{
 			return true;
+		}
+		
+		public function get styleAllocationInProgress():Boolean
+		{
+			return this._styleAllocationInProgress;
 		}
 		
 		public override function get styleParent():UIElement
@@ -364,11 +381,30 @@ package org.stylekit.ui
 			}
 		}
 		
+		/**
+		* Appends an element to the list of elements with deferred property modifications encountered
+		* during a style allocation - see #allocateStyles
+		*/
+		public function registerElementWithDeferredStyleModifications(e:UIElement):void
+		{
+			if(this._styleAllocationDeferredElements == null)
+			{
+				this._styleAllocationDeferredElements = new Vector.<UIElement>();
+			}
+			if(this._styleAllocationDeferredElements.indexOf(e) < 0)
+			{
+				this._styleAllocationDeferredElements.push(e);
+			}
+		}
+		
 		public function allocateStyles(mutatedElement:UIElement):void
 		{
 			StyleKit.logger.debug("Allocating styles after a mutation on "+mutatedElement, this);
 			
 			var encounteredElements:Vector.<UIElement> = new Vector.<UIElement>();
+			
+			// Reset the allocation transaction
+			this._styleAllocationInProgress = true;
 			
 			for(var i:uint = 0; i < this._collapsedSelectorChains.length; i++)
 			{
@@ -427,6 +463,19 @@ package org.stylekit.ui
 					encounteredElements[l].commitStyles();
 				}
 			}
+			
+			// Now that the transaction is complete, run through the deferred list and tell everything to start reacting to 
+			// any modified keys
+			if(this._styleAllocationDeferredElements != null)
+			{
+				for(var d:uint = 0; d < this._styleAllocationDeferredElements.length; d++)
+				{
+					this._styleAllocationDeferredElements[d].execCallbacksForDeferredStyleKeyModifications();
+				}
+			}
+			// Reset the deferred list and the transaction state now.
+			this._styleAllocationDeferredElements = null;
+			this._styleAllocationInProgress = false;
 		}
 		
 		protected function selectorChainApplicable(chain:ElementSelectorChain):Boolean
