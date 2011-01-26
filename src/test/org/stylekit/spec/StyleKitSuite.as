@@ -10,6 +10,9 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.selector.MediaSelectorTestCase;
 	import org.stylekit.spec.tests.css.style.AnimationTestCase;
 	import org.stylekit.spec.tests.css.value.AlignmentValueTestCase;
+	import org.stylekit.spec.tests.css.value.AnimationCompoundValueTestCase;
+	import org.stylekit.spec.tests.css.value.AnimationDirectionValueTestCase;
+	import org.stylekit.spec.tests.css.value.AnimationIterationCountValueTestCase;
 	import org.stylekit.spec.tests.css.value.BackgroundCompoundValueTestCase;
 	import org.stylekit.spec.tests.css.value.BorderCompoundValueTestCase;
 	import org.stylekit.spec.tests.css.value.ColorValueTestCase;
@@ -22,22 +25,20 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.css.value.LineStyleValueTestCase;
 	import org.stylekit.spec.tests.css.value.OverflowValueTestCase;
 	import org.stylekit.spec.tests.css.value.PositionValueTestCase;
-	import org.stylekit.spec.tests.css.value.SizeValueTestCase;
-	import org.stylekit.spec.tests.css.value.TimeValueTestCase;
 	import org.stylekit.spec.tests.css.value.PropertyListValueTestCase;
+	import org.stylekit.spec.tests.css.value.SizeValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextAlignValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextDecorationValueTestCase;
 	import org.stylekit.spec.tests.css.value.TextTransformValueTestCase;
+	import org.stylekit.spec.tests.css.value.TimeValueTestCase;
 	import org.stylekit.spec.tests.css.value.TimingFunctionValueTestCase;
-	import org.stylekit.spec.tests.css.value.AnimationIterationCountValueTestCase;
-	import org.stylekit.spec.tests.css.value.AnimationDirectionValueTestCase;
-	import org.stylekit.spec.tests.css.value.ValueArrayTestCase;
-	import org.stylekit.spec.tests.css.value.URLValueTestCase;
-	import org.stylekit.spec.tests.css.value.VisibilityValueTestCase;
 	import org.stylekit.spec.tests.css.value.TransitionCompoundValueTestCase;
-	import org.stylekit.spec.tests.css.value.AnimationCompoundValueTestCase;
+	import org.stylekit.spec.tests.css.value.URLValueTestCase;
+	import org.stylekit.spec.tests.css.value.ValueArrayTestCase;
+	import org.stylekit.spec.tests.css.value.VisibilityValueTestCase;
 	import org.stylekit.spec.tests.ui.element.UIElementTestCase;
 	import org.stylekit.spec.tests.ui.element.layout.FlowControlLineTestCase;
+	import org.stylekit.spec.tests.ui.element.paint.UIElementPainterTestCase;
 	import org.stylekit.spec.tests.ui.element.worker.TransitionWorkerTestCase;
 	
 	import org.stylekit.spec.tests.integration.layout.AbsolutePositioningIntegrationTestCase;
@@ -93,9 +94,9 @@ package org.stylekit.spec
 		public var cursorValueTest:CursorValueTestCase;
 		
 		public var transitionWorkerTest:TransitionWorkerTestCase;
-		
+
 		// LAYOUT INTEGRATION TESTS
 		public var absolutePositioningIntegrationTest:AbsolutePositioningIntegrationTestCase;
-		
+		public var uiElementPainterTest:UIElementPainterTestCase;
 	}
 }

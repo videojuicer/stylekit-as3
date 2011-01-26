@@ -94,7 +94,7 @@ package org.stylekit.ui.element.paint
 			var bottomRightRadius:SizeValue = (radiusCompound.bottomRightValue as SizeValue);
 			var bottomLeftRadius:SizeValue = (radiusCompound.bottomLeftValue as SizeValue);
 			var topLeftRadius:SizeValue = (radiusCompound.topLeftValue as SizeValue);
-			
+
 			var topRightR:Number = Math.max(0, topRightRadius.evaluateSize(uiElement));
 			var bottomRightR:Number = Math.max(0, bottomRightRadius.evaluateSize(uiElement));
 			var bottomLeftR:Number = Math.max(0, bottomLeftRadius.evaluateSize(uiElement));
@@ -106,7 +106,7 @@ package org.stylekit.ui.element.paint
 			
 			graphics.clear();
 			
-			graphics.moveTo(marginLeft + topLeftR / 2, marginTop);
+			graphics.moveTo(marginLeft + topLeftR, marginTop);
 		
 			if (uiElement.getStyleValue("background-color").rawValue == "transparent")
 			{
@@ -160,64 +160,64 @@ package org.stylekit.ui.element.paint
 			{
 				graphics.lineStyle(borderTopSize, borderTopColor, borderTopAlpha);
 
-				graphics.lineTo(uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
+				graphics.lineTo(uiElement.effectiveWidth - (topRightR) - marginRight, marginTop);
 			}
 			else
 			{
-				graphics.moveTo(uiElement.effectiveWidth - (topRightR / 2) - marginRight, marginTop);
+				graphics.moveTo(uiElement.effectiveWidth - (topRightR) - marginRight, marginTop);
 			}
 			
 			if (topRightR > 0)
 			{
-				graphics.curveTo(uiElement.effectiveWidth - marginRight, marginTop, uiElement.effectiveWidth - marginRight, marginTop + (topRightR / 2));
+				graphics.curveTo(uiElement.effectiveWidth - marginRight, marginTop, uiElement.effectiveWidth - marginRight, marginTop + (topRightR));
 			}
 			
 			if (borderRight != null)
 			{
 				graphics.lineStyle(borderRightSize, borderRightColor, borderRightAlpha);
 				
-				graphics.lineTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) - marginBottom);
+				graphics.lineTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR) - marginBottom);
 			}
 			else
 			{
-				graphics.moveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR / 2) - marginBottom);
+				graphics.moveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - (bottomRightR) - marginBottom);
 			}
 			
 			if (bottomRightR > 0)
 			{
-				graphics.curveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - marginBottom, uiElement.effectiveWidth - (bottomRightR / 2) - marginRight, uiElement.effectiveHeight - marginBottom);
+				graphics.curveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - marginBottom, uiElement.effectiveWidth - (bottomRightR) - marginRight, uiElement.effectiveHeight - marginBottom);
 			}
 			
 			if (borderBottom != null)
 			{
 				graphics.lineStyle(borderBottomSize, borderBottomColor, borderBottomAlpha);
 				
-				graphics.lineTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight - marginBottom);
+				graphics.lineTo(marginLeft + (bottomRightR), uiElement.effectiveHeight - marginBottom);
 			}
 			else
 			{
-				graphics.moveTo(marginLeft + (bottomRightR / 2), uiElement.effectiveHeight - marginBottom);
+				graphics.moveTo(marginLeft + (bottomRightR), uiElement.effectiveHeight - marginBottom);
 			}
 			
 			if (bottomLeftR > 0)
 			{
-				graphics.curveTo(marginLeft, uiElement.effectiveHeight - marginBottom, marginLeft, uiElement.effectiveHeight - (bottomLeftR / 2) - marginBottom);
+				graphics.curveTo(marginLeft, uiElement.effectiveHeight - marginBottom, marginLeft, uiElement.effectiveHeight - (bottomLeftR) - marginBottom);
 			}
 			
 			if (borderLeft != null)
 			{ 
 				graphics.lineStyle(borderLeftSize, borderLeftColor, borderLeftAlpha);
 			
-				graphics.lineTo(marginLeft, (topLeftR / 2) + marginTop);
+				graphics.lineTo(marginLeft, (topLeftR) + marginTop);
 			}
 			else
 			{
-				graphics.moveTo(marginLeft, (topLeftR / 2) + marginTop);
+				graphics.moveTo(marginLeft, (topLeftR) + marginTop);
 			}
 			
 			if (topLeftR > 0)
 			{
-				graphics.curveTo(marginLeft, marginTop, marginLeft + (topLeftR / 2), marginTop);
+				graphics.curveTo(marginLeft, marginTop, marginLeft + (topLeftR), marginTop);
 			}
 
 			graphics.endFill();
