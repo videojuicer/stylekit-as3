@@ -65,21 +65,21 @@ package org.stylekit.spec.tests.ui.element
 			var child:UIElement = new UIElement();
 			child.localStyleString = "margin: 10px; padding: 10px; border: solid 10px pink;";
 			
-			var point:Point = child.calculateContentPoint();
+			var point:Point = child.calculateContentOriginPoint();
 			
 			Assert.assertEquals(30, point.x);
 			Assert.assertEquals(30, point.y);
 			
 			child.localStyleString = "margin: 10px; padding: 10px; border: solid 10px pink; margin-top: 5px; padding-top: 5px; border-top-width: 5px;";
 			
-			point = child.calculateContentPoint();
+			point = child.calculateContentOriginPoint();
 			
 			Assert.assertEquals(30, point.x);
 			Assert.assertEquals(15, point.y);
 			
 			child.localStyleString = "margin: 10px; padding: 10px; border: solid 10px pink; margin-left: 5px; padding-left: 5px; border-left-width: 5px;";
 			
-			point = child.calculateContentPoint();
+			point = child.calculateContentOriginPoint();
 			
 			Assert.assertEquals(15, point.x);
 			Assert.assertEquals(30, point.y);			
@@ -764,6 +764,26 @@ package org.stylekit.spec.tests.ui.element
 			el.evaluatedStyles = {"padding-left": SizeValue.parse("1235px")};
 			
 			Assert.assertEquals(1235, (el.getStyleValue("padding-left") as SizeValue).evaluateSize(el))
+		}
+		
+		[Test(description="Correctly calculates the absolute origin point ommitting the padding")]
+		public function calculatesInsideBorderOriginPoint():void
+		{
+			var el:UIElement = new UIElement();
+			el.localStyleString = "margin-top: 50px; margin-left: 40px; padding: 70px; border: 10px solid red; border-left-width: 90px;";
+			
+			Assert.assertEquals(130, el.calculateInsideBorderOriginPoint().x);
+			Assert.assertEquals(60, el.calculateInsideBorderOriginPoint().y);
+		}
+		
+		[Test(description="Correctly calcualtes the absolute origin extent, ommitting the padding")]
+		public function calculatesInsideBorderExtentPoint():void
+		{
+			var el:UIElement = new UIElement();
+			el.localStyleString = "margin: 5px; margin-top: 50px; margin-left: 40px; padding: 70px; border: 10px solid red; border-left-width: 90px; width: 1000px; height: 2000px";
+			
+			Assert.assertEquals(1270, el.calculateInsideBorderExtentPoint().x);
+			Assert.assertEquals(2200, el.calculateInsideBorderExtentPoint().y);
 		}
 		
 		protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void

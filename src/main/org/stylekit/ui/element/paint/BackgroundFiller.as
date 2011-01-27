@@ -100,8 +100,8 @@ package org.stylekit.ui.element.paint
 		{
 			var elementEffectiveWidth:int = uiElement.effectiveWidth;
 			var elementEffectiveHeight:int = uiElement.effectiveHeight;
-			var elementContentX:Number = uiElement.calculateContentPoint().x;
-			var elementContentY:Number = uiElement.calculateContentPoint().y;
+			var elementContentX:Number = uiElement.calculateContentOriginPoint().x;
+			var elementContentY:Number = uiElement.calculateContentOriginPoint().y;
 			
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundHorizontalRepeat:Boolean = (uiElement.getStyleValue("background-repeat") as RepeatValue).horizontalRepeat;

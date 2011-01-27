@@ -8,6 +8,7 @@ package org.stylekit.spec.tests.ui.element.layout
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.DisplayValue;
 	import org.stylekit.css.value.FloatValue;
+	import org.stylekit.css.value.PositionValue;
 
 	import org.stylekit.ui.element.UIElement;
 	import org.stylekit.ui.element.layout.FlowControlLine;
@@ -15,6 +16,7 @@ package org.stylekit.spec.tests.ui.element.layout
 	public class FlowControlLineTestCase {
 		
 		protected var _blockElem:UIElement;
+		protected var _absElem:UIElement;
 		protected var _floatLeftElems:Vector.<UIElement>;
 		protected var _floatRightElems:Vector.<UIElement>;
 		
@@ -26,6 +28,13 @@ package org.stylekit.spec.tests.ui.element.layout
 					"width": SizeValue.parse("500px"),
 					"height": SizeValue.parse("500px"),
 					"display": DisplayValue.parse("block")
+				};
+				
+			this._absElem = new UIElement();
+				this._absElem.evaluatedStyles = {
+					"width": SizeValue.parse("500px"),
+					"height": SizeValue.parse("500px"),
+					"position": PositionValue.parse("absolute")
 				};
 			
 			this._floatLeftElems = new Vector.<UIElement>();
@@ -130,6 +139,23 @@ package org.stylekit.spec.tests.ui.element.layout
 			Assert.assertEquals(this._floatLeftElems[1], refunds[0]);
 		}
 		
-		[Test(description="Ensures that elements may be shifted to a new line")]
+		[Test(description="Ensures that lines are marked as occupied by absolute elements")]
+		public function occupiedByAbsoluteElements():void
+		{
+			var line:FlowControlLine = new FlowControlLine(150, "left");
+			Assert.assertTrue(line.treatElementAsAbsolute(this._absElem));
+			Assert.assertFalse(line.treatElementAsAbsolute(this._blockElem));
+			
+			Assert.assertFalse(line.occupiedByAbsoluteElement);
+			Assert.assertFalse(line.occupiedBySingleElement);
+			
+			Assert.assertTrue(line.appendElement(this._absElem));
+			
+			Assert.assertTrue(line.occupiedByAbsoluteElement);
+			Assert.assertTrue(line.occupiedBySingleElement);;
+			
+			Assert.assertFalse(line.appendElement(this._blockElem));
+			
+		}
 	}
 }

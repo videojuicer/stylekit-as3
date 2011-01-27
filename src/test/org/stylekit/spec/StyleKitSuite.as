@@ -42,6 +42,7 @@ package org.stylekit.spec
 	import org.stylekit.spec.tests.ui.element.worker.TransitionWorkerTestCase;
 	
 	import org.stylekit.spec.tests.integration.layout.AbsolutePositioningIntegrationTestCase;
+	import org.stylekit.spec.tests.integration.layout.ElementSizeIntegrationTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -94,9 +95,11 @@ package org.stylekit.spec
 		public var cursorValueTest:CursorValueTestCase;
 		
 		public var transitionWorkerTest:TransitionWorkerTestCase;
-
+		public var uiElementPainterTest:UIElementPainterTestCase;
+		
 		// LAYOUT INTEGRATION TESTS
 		public var absolutePositioningIntegrationTest:AbsolutePositioningIntegrationTestCase;
-		public var uiElementPainterTest:UIElementPainterTestCase;
+		public var elementSizeIntegrationTest:ElementSizeIntegrationTestCase;
+
 	}
 }

@@ -43,6 +43,10 @@ package org.stylekit.ui.element.layout
 		* any elements that match the description, and false when removing them.
 		*/
 		protected var _occupiedByBlockElement:Boolean = false;
+		/** 
+		* Lines may also be marked 'occupied' by absolutely-positioned elements
+		*/
+		protected var _occupiedByAbsoluteElement:Boolean = false;
 		
 		protected var _leftFloatElementCount:uint = 0;
 		protected var _rightFloatElementCount:uint = 0;
@@ -69,6 +73,21 @@ package org.stylekit.ui.element.layout
 		public function get elements():Vector.<UIElement>
 		{
 			return this._elements;
+		}
+		
+		public function get occupiedBySingleElement():Boolean
+		{
+			return (this.occupiedByAbsoluteElement || this.occupiedByBlockElement);
+		}
+		
+		public function get occupiedByBlockElement():Boolean
+		{
+			return this._occupiedByBlockElement;
+		}
+		
+		public function get occupiedByAbsoluteElement():Boolean
+		{
+			return this._occupiedByAbsoluteElement;
 		}
 		
 		public function get lineHeight():Number
@@ -145,21 +164,24 @@ package org.stylekit.ui.element.layout
 			//StyleKit.logger.debug("appendElement >> ", e, e.effectiveContentWidth, e.effectiveContentHeight, e.effectiveWidth, e.effectiveHeight);
 			//StyleKit.logger.debug("appendElement >> ", this, this._maxWidth, this.elements.length, this._elementTotalEffectiveWidth, this._leftFloatElementCount, this._rightFloatElementCount);
 			
-			if(this.treatElementAsNonFloatedBlock(e))
+			if (this.treatElementAsAbsolute(e))
 			{
-				if(this._occupiedByBlockElement == false && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
+				if(!this.occupiedBySingleElement)
+				{
+					added = true;
+					this._occupiedByAbsoluteElement = true;
+				}
+			}
+			else if(this.treatElementAsNonFloatedBlock(e))
+			{
+				if(!this.occupiedBySingleElement && (this._elements.length == (this._leftFloatElementCount + this._rightFloatElementCount)))
 				{
 					// BLOCK ELEMS
-					added = true;
-					
+					added = true;					
 					this._occupiedByBlockElement = true;
 				}
 			}
-			else if ((e.getStyleValue("position") as PositionValue).position == PositionValue.POSITION_ABSOLUTE)
-			{
-				added = true;
-			}
-			else if(this._occupiedByBlockElement == false)
+			else if(!this.occupiedBySingleElement)
 			{
 				if(this.treatElementAsLeftFloat(e) && this.widthAvailableForElement(e))
 				{
@@ -194,14 +216,13 @@ package org.stylekit.ui.element.layout
 			{
 				this._elements.push(e);
 				
-				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE && !e.flexible)
+				if ((e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE && !e.flexible)
 				{
 					this._elementTotalEffectiveWidth += e.effectiveWidth;
 				}
 				
 				//this.layoutElements();
-				this.recalculateZIndex();
-				
+				this.recalculateZIndex();				
 				this.refreshFlexibles();
 			}
 
@@ -404,24 +425,6 @@ package org.stylekit.ui.element.layout
 					}
 					
 					insertIndex = highest;
-					
-					/*for (var k:int = super.numChildren - 1; k >= 0; k--)
-					{
-						var displayObject:DisplayObject = super.getChildAt(k);
-						
-						if (displayObject is UIElement)
-						{
-							var el:UIElement = (displayObject as UIElement);
-							var elZIndex:int = (el.getStyleValue("z-index") as IntegerValue).value;
-							
-							if (zIndex >= elZIndex)
-							{
-								insertIndex = k + 1;
-								
-								break;
-							}
-						}
-					} */
 				}
 
 				super.addChildAt(e, insertIndex);
@@ -459,35 +462,33 @@ package org.stylekit.ui.element.layout
 					}
 					while (relativeParent == null);
 					
-					var point:Point = new Point(relativeParent.x, relativeParent.y);
+					var parentOriginPoint:Point = relativeParent.calculateInsideBorderOriginPoint();
+					var parentExtentPoint:Point = relativeParent.calculateInsideBorderExtentPoint();
 					
-					var lineX:Number = this.globalToLocal(point).x;
-					var lineY:Number = this.globalToLocal(point).y;
-					
-					//StyleKit.logger.debug("Relative Parent -> "+point.x+"/"+point.y+"  "+lineX+"/"+lineY+" "+e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)+"/"+e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT));
-					
-					// element exists at 0,0 in the line
-					// line exists at x,y
-					// 
+					// The parent's absolute positioning anchors, made local to this sprite
+					var originPoint:Point = this.globalToLocal(relativeParent.localToGlobal(parentOriginPoint)); // top/left
+					var extentPoint:Point = this.globalToLocal(relativeParent.localToGlobal(parentExtentPoint)); // bottom/right
+
 					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH));
+						e.x = originPoint.x + (e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH));
 					}
 					
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
-						e.x = (relativeParent.effectiveWidth - e.effectiveWidth) - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
+						e.x = extentPoint.x - (e.effectiveWidth + e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH));
 					}
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
+						e.y = originPoint.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
-						e.y = (relativeParent.effectiveContentHeight - e.effectiveHeight) - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) - this.y;
+						e.y = extentPoint.y - (e.effectiveHeight + e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT));
 					}
+					
 				}
 				else if (floatValue.float == FloatValue.FLOAT_LEFT)
 				{
@@ -564,6 +565,11 @@ package org.stylekit.ui.element.layout
 			}
 		}
 			
+		public function treatElementAsAbsolute(e:UIElement):Boolean
+		{
+			return (e.hasStyleProperty("position") && (e.getStyleValue("position") as PositionValue).position == PositionValue.POSITION_ABSOLUTE);
+		}
+
 		public function treatElementAsNonFloatedBlock(e:UIElement):Boolean
 		{
 			if(e.hasStyleProperty("display") && (e.getStyleValue("display") as DisplayValue).display >= DisplayValue.DISPLAY_BLOCK && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE)

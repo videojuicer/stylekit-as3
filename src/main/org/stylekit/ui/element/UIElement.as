@@ -948,16 +948,19 @@ package org.stylekit.ui.element
 					Search children to find greatest _y + effectiveHeight
 			*/
 			
-			for (var i:int = 0; i < this.controlLines.length; i++)
+			if(this.controlLines != null)
 			{
-				var line:FlowControlLine = this.controlLines[i];
-				
-				if (line.width > w)
+				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
-					w = line.width;
-				}
+					var line:FlowControlLine = this.controlLines[i];
 				
-				h += line.height;
+					if (line.width > w)
+					{
+						w = line.width;
+					}
+				
+					h += line.height;
+				}
 			}
 			
 			/*for (var i:int = 0; i < this.children.length; i++)
@@ -1330,22 +1333,62 @@ package org.stylekit.ui.element
 			return this._controlLines[this._controlLines.length - 1];
 		}
 		
-		public function calculateContentPoint():Point
+		public function calculateOutsideBorderOriginPoint():Point
 		{
-			var point:Point = new Point();
+			var point:Point = new Point(0,0);
 			
-			point.x = this.evalStyleSize("padding-left") + this.evalStyleSize("margin-left");
-			point.y = this.evalStyleSize("padding-top") + this.evalStyleSize("margin-top");
+			point.x = this.evalStyleSize("margin-left", SizeValue.DIMENSION_WIDTH);
+			point.y = this.evalStyleSize("margin-top", SizeValue.DIMENSION_HEIGHT);
+			
+			return point;			
+		}
+		
+		public function calculateInsideBorderOriginPoint():Point
+		{
+			var point:Point = this.calculateOutsideBorderOriginPoint();
 			
 			if ((this.getStyleValue("border-left-style") as LineStyleValue).lineStyle != LineStyleValue.LINE_STYLE_NONE)
 			{
-				point.x += this.evalStyleSize("border-left-width");
+				point.x += this.evalStyleSize("border-left-width", SizeValue.DIMENSION_WIDTH);
 			}
 			
 			if ((this.getStyleValue("border-top-style") as LineStyleValue).lineStyle != LineStyleValue.LINE_STYLE_NONE)
 			{
-				point.y += this.evalStyleSize("border-top-width");
+				point.y += this.evalStyleSize("border-top-width", SizeValue.DIMENSION_HEIGHT);
 			}
+			
+			return point;
+		}
+		
+		public function calculateContentOriginPoint():Point
+		{
+			var point:Point = this.calculateInsideBorderOriginPoint();
+
+			point.x += this.evalStyleSize("padding-left", SizeValue.DIMENSION_WIDTH);
+			point.y += this.evalStyleSize("padding-top", SizeValue.DIMENSION_HEIGHT);
+			
+			return point;
+		}
+		
+		public function calculateContentExtentPoint():Point
+		{
+			var point:Point = this.calculateContentOriginPoint();
+			
+			point.x += this.effectiveContentWidth;
+			point.y += this.effectiveContentHeight;
+			
+			return point;
+		}
+		
+		/**
+		* Returns the extent point (bottom right) for absolutely-positioned contents in this element. Excludes padding.
+		*/
+		public function calculateInsideBorderExtentPoint():Point
+		{
+			var point:Point = this.calculateContentExtentPoint();
+			
+			point.x += this.evalStyleSize("padding-right", SizeValue.DIMENSION_WIDTH);
+			point.y += this.evalStyleSize("padding-bottom", SizeValue.DIMENSION_HEIGHT);
 			
 			return point;
 		}
@@ -1390,8 +1433,10 @@ package org.stylekit.ui.element
 			
 			this.refreshControlLines();
 			
-			this._contentContainer.x = this.calculateContentPoint().x;
-			this._contentContainer.y = this.calculateContentPoint().y;
+			this._contentContainer.x = this.calculateContentOriginPoint().x;
+			this._contentContainer.y = this.calculateContentOriginPoint().y;
+			
+			super.addChild(this._contentContainer);
 			
 			if (this.controlLines != null && this.controlLines.length > 0)
 			{				
@@ -1407,18 +1452,24 @@ package org.stylekit.ui.element
 				{
 					var flow:FlowControlLine = this.controlLines[l];
 					
-					flow.y = y;
-					
-					y += flow.lineHeight;
+					if(flow.occupiedByAbsoluteElement)
+					{
+						flow.y = 0;
+					}
+					else
+					{
+						flow.y = y;
+						y += flow.lineHeight;
+					}
 				}
 				
 				for (var i:int = 0; i < this.controlLines.length; i++)
 				{
 					var line:FlowControlLine = this.controlLines[i];
 					
-					line.layoutElements();
-
 					this._contentContainer.addChild(line);
+					line.layoutElements();
+					
 				}
 			}
 
@@ -1430,9 +1481,7 @@ package org.stylekit.ui.element
 				}
 			}
 			
-			super.addChild(this._contentContainer);
-			
-			//this.recalculateContentDimensions();
+			this.recalculateContentDimensions();
 
 			this._decoratingChildren = false;
 		}
