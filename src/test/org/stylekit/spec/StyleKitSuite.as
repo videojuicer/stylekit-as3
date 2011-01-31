@@ -43,6 +43,7 @@ package org.stylekit.spec
 	
 	import org.stylekit.spec.tests.integration.layout.AbsolutePositioningIntegrationTestCase;
 	import org.stylekit.spec.tests.integration.layout.ElementSizeIntegrationTestCase;
+	import org.stylekit.spec.tests.integration.layout.ElementFlowIntegrationTestCase;
 	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
@@ -100,6 +101,7 @@ package org.stylekit.spec
 		// LAYOUT INTEGRATION TESTS
 		public var absolutePositioningIntegrationTest:AbsolutePositioningIntegrationTestCase;
 		public var elementSizeIntegrationTest:ElementSizeIntegrationTestCase;
+		public var elementFlowIntegrationTest:ElementFlowIntegrationTestCase;
 
 	}
 }

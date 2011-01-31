@@ -1450,7 +1450,7 @@ package org.stylekit.ui.element
 				
 				for (var l:int = 0; l < this._controlLinesUnsorted.length; l++)
 				{
-					var flow:FlowControlLine = this.controlLines[l];
+					var flow:FlowControlLine = this._controlLinesUnsorted[l];
 					
 					if(flow.occupiedByAbsoluteElement)
 					{
