@@ -1,9 +1,7 @@
 Stylekit - Skinnable UI for Flash using CSS3
 ============================================
 
-**WORK IN PROGRESS: CURRENTLY NOT FUNCTIONAL**
-
-Stylekit is a CSS3 parser intended for use in Actionscript 3 applications that provide a customisable user interface design.
+Stylekit is a CSS3 parser and rendering engine intended for use in Actionscript 3 applications that provide a customisable user interface design.
 
 The stated design goals of Stylekit are:
 
@@ -12,28 +10,74 @@ The stated design goals of Stylekit are:
 3. Provide basic UI elements that may be composed to produce bespoke UI elements with more advanced functionality.
 4. Avoid non-standard CSS declarations. CSS written for Stylekit should work just as well in the browser.
 
+![StyleKit screenshot](http://smil-fixtures.s3.amazonaws.com/smilkit-screenshot.png)
+
 The Magic Glue
 ==============
 
-Since Flash's DisplayObjects provide no semantic structure, Stylekit applies styles by providing a UIElement class for your UI elements to extend. Each UIElement subclass that you write may *classify as* one or more CSS classes, allowing UIElements to be matched by CSS selectors. Each UIElement instance may also have a single parent and one or more children, providing the tree structure that allows complex CSS selectors to function.
+Since Flash's DisplayObjects provide no semantic structure, Stylekit applies styles by providing a UIElement class for your UI elements to extend. Each UIElement instance may have a single parent and one or more children, providing the tree structure that allows complex CSS selectors to function. UIElements may have classes, pseudoclasses, an element name and an element ID.
+
+StyleKit will manage the rendering and positioning of all UIElements within the BaseUI you create.
+
+What does StyleKit support?
+===========================
+
+* Block-level box model including floats, borders, margins, padding and alignment
+* Static, absolute and relative positioning
+* Image backgrounds using http or data URIs
+* Opacity
+* [With glitches/issues] CSS3 Transitions
+
+What doesn't StyleKit support yet?
+==================================
+
+* CSS animations using the @keyframes selector
+* Inline positioning
 
 Using Stylekit
 ==============
 
     package org.myapplication
     {
-        public class MyUI()
+        import org.stylekit.css.parse.StyleSheetParser;
+        import org.stylekit.css.StyleSheet;
+      	import org.stylekit.ui.BaseUI;
+      	import org.stylekit.ui.element.UIElement;
+      
+        public class MyUI extends Sprite
         {
+            protected var _baseUI:BaseUI;
+            protected var _sampleWrapperElement:UIElement;
+            protected var _sampleChildElement:UIElement;
           
             public function MyUI()
             {
-              
+                // Create the BaseUI and add it to the stage.
+                // The BaseUI is the top-level StyleKit UI class and is analogous to the Document
+                // object in an HTML application.
+                
+                this._baseUI = new Base();
+                this.addChild(this._baseUI);
+                
+                // Create a couple of sample elements
+                this._sampleWrapperElement = new UIElement(this._baseUI);
+                this._sampleWrapperElement.elementId = "wrapper";
+                
+                this._sampleChildElement = new UIElement(this._baseUI);
+                this._sampleChildElement.addElementClassName("child");
+                
+                // Add the elements to the UI
+                this._baseUI.addElement(this._sampleWrapperElement);
+                this._sampleWrapperElement.addElement(this._sampleChildElement);
+                
+                // Now we can style it!
+                var css:String = "#wrapper { width: 50px; height: 50px; background: red; } #wrapper .child { width: 25px; height: 25px; background: blue; }";
+                
+                var parser:StyleSheetParser = new StyleSheetParser();
+                var cssParsed:StyleSheet = parser.parse(css);
+                
+                this._baseUI.styleSheetCollection.addStyleSheet(cssParsed);                
             }
           
         }
     }
-  
-TODO:
-1. How to write a UI element
-2. UI atoms - boxes, labels, images
-3. 
