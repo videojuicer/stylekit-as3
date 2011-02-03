@@ -155,7 +155,22 @@ package org.stylekit.spec.tests.ui.element.layout
 			Assert.assertTrue(line.occupiedBySingleElement);;
 			
 			Assert.assertFalse(line.appendElement(this._blockElem));
-			
+		}
+		
+		[Test(description="Ensures that negative z-indexes are computed when added")]
+		public function negativeZIndexesRespected():void
+		{
+			var line:FlowControlLine = new FlowControlLine(150, "left");
+			var negElem:UIElement = new UIElement();
+				negElem.localStyleString = "z-index: -200; float: left; width: 20px;";
+			var posElem:UIElement = new UIElement();
+				posElem.localStyleString = "z-index: 50; float: left; width: 20px;";
+				
+			Assert.assertEquals(0, line.highestZIndex);
+			Assert.assertTrue(line.appendElement(negElem));
+			Assert.assertEquals(-200, line.highestZIndex);
+			Assert.assertTrue(line.appendElement(posElem));
+			Assert.assertEquals(50, line.highestZIndex);
 		}
 	}
 }

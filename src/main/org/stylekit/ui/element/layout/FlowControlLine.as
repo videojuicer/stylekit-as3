@@ -51,7 +51,7 @@ package org.stylekit.ui.element.layout
 		protected var _leftFloatElementCount:uint = 0;
 		protected var _rightFloatElementCount:uint = 0;
 		protected var _elementTotalEffectiveWidth:uint = 0;
-		protected var _elementHighestZIndex:int = 0;
+		protected var _elementHighestZIndex:Number = Number.NEGATIVE_INFINITY;
 		
 		/**
 		* Instantiates a new line with the given flow direction (available options are left or right)
@@ -320,13 +320,14 @@ package org.stylekit.ui.element.layout
 			}
 		}
 		
-		public function get highestZIndex():int
+		public function get highestZIndex():Number
 		{
-			return this._elementHighestZIndex;
+			return (this._elementHighestZIndex != Number.NEGATIVE_INFINITY)? this._elementHighestZIndex : 0;
 		}
 		
 		protected function recalculateZIndex():void
 		{
+			this._elementHighestZIndex = Number.NEGATIVE_INFINITY;
 			for (var i:int = 0; i < this._elements.length; i++)
 			{
 				var zIndex:int = (this._elements[i].getStyleValue("z-index") as IntegerValue).value;
