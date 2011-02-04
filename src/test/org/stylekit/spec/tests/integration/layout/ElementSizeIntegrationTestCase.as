@@ -66,5 +66,30 @@ package org.stylekit.spec.tests.integration.layout
 			// It should now be wrapped onto three lines
 			Assert.assertEquals(30, wrapper.contentHeight);
 		}
+		
+		[Test(description="Ensures that padding and margin correctly influence an element's effectiveContentWidth when width: auto")]
+		public function paddingSubtractedFromEffectiveContentWidth():void
+		{
+			// refers to http://www.bugtails.com/projects/253/tickets/1186.html
+			var wrapper:UIElement = new UIElement(this._baseUI);
+			var autoElem:UIElement = new UIElement(this._baseUI);
+				wrapper.addElement(autoElem);
+
+			// Assert that the basics are all good
+			wrapper.localStyleString = "width: 500px; height: 200px; padding: 50px;";
+			Assert.assertEquals(500, wrapper.effectiveContentWidth);
+			
+			// Padding okay?
+			autoElem.localStyleString = "width: auto; padding: 50px;";
+			Assert.assertEquals(400, autoElem.effectiveContentWidth);
+
+			// Margin okay?
+			autoElem.localStyleString = "width: auto; margin: 25px;";
+			Assert.assertEquals(450, autoElem.effectiveContentWidth);
+			
+			// Padding AND margin okay?
+			autoElem.localStyleString = "width: auto; padding: 50px; margin: 25px;";
+			Assert.assertEquals(350, autoElem.effectiveContentWidth);
+		}
 	}
 }

@@ -1110,7 +1110,7 @@ package org.stylekit.ui.element
 				}
 				else if (this.parentElement != null)
 				{
-					w = this.parentElement.contentWidth - extraEffectiveWidth;
+					w = this.parentElement.effectiveContentWidth - extraEffectiveWidth;
 				}
 			}
 			else if(this.hasStyleProperty("width") && !isNaN((this.getStyleValue("width") as SizeValue).value)) 
