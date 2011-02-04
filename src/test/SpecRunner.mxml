@@ -3,19 +3,31 @@
 	xmlns:adobe="http://www.adobe.com/2009/flexUnitUIRunner" width="100%" height="100%" creationComplete="this.onCreationComplete()" xmlns:flexui="flexunit.flexui.*" >	
 	<mx:Script>
 		<![CDATA[
+			import mx.core.UIComponent;
+			
 			import org.flexunit.listeners.CIListener;
 			import org.flexunit.runner.FlexUnitCore;
 			import org.flexunit.runner.Request;
-			
 			import org.stylekit.spec.StyleKitSuite;
 			
 			protected var _core:FlexUnitCore;
 			
+			protected static var __root:UIComponent;
+			
 			private function onCreationComplete():void
 			{
+				SpecRunner.__root = new UIComponent();
+				
+				this.addChild(SpecRunner.__root);
+				
 				this._core = new FlexUnitCore();
 				this._core.addListener(new CIListener());
 				this._core.run(org.stylekit.spec.StyleKitSuite);
+			}
+			
+			public static function get root():Sprite
+			{
+				return (SpecRunner.__root as Sprite);
 			}
 	]]>
 	</mx:Script>
