@@ -562,7 +562,7 @@ package org.stylekit.ui.element.layout
 				e.recalculateEffectiveContentDimensions();
 				//e.layoutChildren();
 
-				StyleKit.logger.debug("Adding UIElement to FlowControlLine contents ... "+e.x+"/"+e.y, e);
+				StyleKit.logger.debug("Adding "+e+" to FlowControlLine contents ... "+e.x+"/"+e.y, this);
 			}
 		}
 			

@@ -68,7 +68,7 @@ package org.stylekit.spec.tests.integration.layout
 		}
 		
 		[Test(description="Ensures that padding and margin correctly influence an element's effectiveContentWidth when width: auto")]
-		public function paddingSubtractedFromEffectiveContentWidth():void
+		public function paddingSubtractedFromEffectiveContentWidthOnWidthAuto():void
 		{
 			// refers to http://www.bugtails.com/projects/253/tickets/1186.html
 			var wrapper:UIElement = new UIElement(this._baseUI);
