@@ -11,6 +11,12 @@
 	<property name="util.src.loc" location="${lib.loc}/utilkit-as3/src/main" />
 	<property name="output.loc" location="${basedir}/target" />
 	
+	<property name="util.edge.loc" location="${basedir}/../utilkit-as3" />
+	<property name="util.edge.src.loc" location="${basedir}/../utilkit-as3/src/main" />
+	
+	<property name="as3crypto.loc" location="${util.edge.loc}/libs/as3crypto" />
+	<property name="as3crypto.src.loc" location="${util.edge.loc}/libs/as3crypto/src" />
+	
 	<property name="bin.loc" location="${output.loc}/bin" />
 	<property name="dist.loc" location="${output.loc}/dist" />
 	
@@ -58,8 +64,10 @@
 		<compc output="${bin.loc}/stylekit-as3.swc" fork="false">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${util.src.loc}" />
+			<source-path path-element="${as3crypto.src.loc}" />
+			
 			<include-sources dir="${main.src.loc}" includes="*" />
-      <include-sources dir="${util.src.loc}" includes="*" />
+      		<include-sources dir="${util.src.loc}" includes="*" />
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
 			<compiler.headless-server>true</compiler.headless-server>
 		</compc>
@@ -70,6 +78,7 @@
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
 			<source-path path-element="${util.src.loc}" />
+			<source-path path-element="${as3crypto.src.loc}" />
 			<library-path dir="${lib.loc}" append="true">
 				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
 				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
