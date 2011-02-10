@@ -85,6 +85,10 @@ package org.stylekit.ui.element.paint
 					this._loader.load(new URLRequest(parserURI.url), new LoaderContext(true));
 				}
 			}
+			catch (e:Event)
+			{
+				StyleKit.logger.error("Error when attempting to load background image from "+url, this);
+			}
 			catch (e:IOError)
 			{
 				StyleKit.logger.error("IOError when attempting to load background image from "+url, this);
@@ -192,7 +196,7 @@ package org.stylekit.ui.element.paint
 		
 		protected function onLoaderIOError(e:IOErrorEvent):void
 		{
-			this.dispatchEvent(e.clone());
+			StyleKit.logger.error("IOError when attempting to load background image from "+this._url, this);
 		}
 		
 		protected function createMatrixFor(uiElement:UIElement, bitmap:BitmapData):Rectangle

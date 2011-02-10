@@ -1,20 +1,19 @@
 package org.stylekit.spec.tests.integration.layout
 {
 	
+	import flash.geom.Point;
+	
 	import flexunit.framework.Assert;
 	import flexunit.framework.AsyncTestHelper;
-	
-	import flash.geom.Point;
 	
 	import org.flexunit.async.Async;
 	import org.stylekit.css.StyleSheet;
 	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.parse.StyleSheetParser;
+	import org.stylekit.spec.Fixtures;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.UIElement;
 	import org.stylekit.ui.element.layout.FlowControlLine;
-	
-	import org.stylekit.spec.Fixtures;
 	
 	public class ElementFlowIntegrationTestCase
 	{
@@ -33,6 +32,42 @@ package org.stylekit.spec.tests.integration.layout
 		public function tearDown():void
 		{
 			this._baseUI = null;
+		}
+
+		[Test(description="Tests margin:auto is applied correctly to a child")]
+		public function marginAutoIsAppliedCorrectly():void
+		{
+			var wrapper:UIElement = this._baseUI.createUIElement();
+			wrapper.localStyleString = "width: 100px; height: 20px;";
+			
+			this._baseUI.addElement(wrapper);
+			
+			var absoluteChild:UIElement = this._baseUI.createUIElement();
+			absoluteChild.localStyleString = "width: 20px; height: 20px; margin: auto; position: absolute;";
+			wrapper.addElement(absoluteChild);
+			
+			Assert.assertEquals(40, absoluteChild.x);
+			Assert.assertEquals(60, absoluteChild.x + absoluteChild.effectiveWidth);
+			
+			wrapper.removeElement(absoluteChild);
+			
+			var relativeChild:UIElement = this._baseUI.createUIElement();
+			relativeChild.localStyleString = "width: 20px; height: 20px; left: 10px; margin: auto; position: relative;";
+			wrapper.addElement(relativeChild);
+			
+			Assert.assertEquals(50, relativeChild.x);
+			Assert.assertEquals(70, relativeChild.x + relativeChild.effectiveWidth);
+			
+			wrapper.removeElement(relativeChild);
+			
+			var staticChild:UIElement = this._baseUI.createUIElement();
+			staticChild.localStyleString = "width: 20px; height: 20px; margin: auto; position: static; display: block;";
+			wrapper.addElement(absoluteChild);
+			
+			//Assert.assertEquals(40, staticChild.x);
+			//Assert.assertEquals(60, staticChild.x + staticChild.effectiveWidth);
+			
+			wrapper.removeElement(staticChild);
 		}
 		
 		[Test(description="Tests a regression in which flow control lines may be positioned in the wrong order")]
