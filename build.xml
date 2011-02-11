@@ -14,8 +14,8 @@
 	<property name="util.edge.loc" location="${basedir}/../utilkit-as3" />
 	<property name="util.edge.src.loc" location="${basedir}/../utilkit-as3/src/main" />
 	
-	<property name="as3crypto.loc" location="${util.edge.loc}/libs/as3crypto" />
-	<property name="as3crypto.src.loc" location="${util.edge.loc}/libs/as3crypto/src" />
+	<property name="as3crypto.loc" location="${basedir}/libs/as3crypto" />
+	<property name="as3crypto.src.loc" location="${basedir}/libs/as3crypto/src" />
 	
 	<property name="bin.loc" location="${output.loc}/bin" />
 	<property name="dist.loc" location="${output.loc}/dist" />
@@ -89,7 +89,7 @@
 		</mxmlc>
 	</target>
 	
-	<target name="update" description="Updates the StyleKit local repo and the submodules contained within">
+	<target name="update" depends="fetch-crypto" description="Updates the StyleKit local repo and the submodules contained within">
 		<exec executable="git" spawn="false" dir="${basedir}">
 			<arg line="pull --rebase" />
 		</exec>
@@ -97,6 +97,14 @@
 			<arg line="pull origin master" />
 		</exec>
 	</target>
+	
+	<target name="fetch-crypto" description="Fetches the AS3 Crypto from subversion and exports into libs/">
+	  <exec executable="svn" spawn="false" dir="${basedir}">
+	    <arg line="export" />
+	    <arg line="http://as3crypto.googlecode.com/svn/trunk/as3crypto/" />
+	    <arg line="${as3crypto.loc}" />
+	  </exec>
+  	</target>
 	
 	<target name="setup" description="Sets up the StyleKit local repo and the submodules contained within">
 		<exec executable="git" spawn="false" dir="${basedir}">
