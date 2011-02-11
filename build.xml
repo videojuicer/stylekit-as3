@@ -26,10 +26,15 @@
 	<property name="report.unit.loc" location="${report.loc}/unit" />
 	
 	<property name="FLEX_HOME" location="${env.FLEX_HOME}" />
-	<property name="FLEX_HEADLESS" location="${env.headless}" />
+	<property name="FLEX_HEADLESS" value="${env.FLEX_HEADLESS}" />
+	<property name="FLASH_HEADLESS" value="${env.FLASH_HEADLESS}" />
 	
-	<condition property="headless" value="${FLEX_HEADLESS}" else="false">
+	<condition property="FLEX_HEADLESS" value="${FLEX_HEADLESS}" else="false">
 		<isset property="FLEX_HEADLESS" />
+	</condition>
+	
+	<condition property="FLASH_HEADLESS" value="${FLASH_HEADLESS}" else="false">
+		<isset property="FLASH_HEADLESS" />
 	</condition>
 	
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
@@ -181,7 +186,7 @@
 	
 	<target name="test-only" depends="test-compile">
 		<flexunit swf="${bin.loc}/stylekit-as3-specs.swf" toDir="${report.unit.loc}"
-				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless}" />
+				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}" />
 	</target>
 	
 	<target name="report" description="Generates HTML reports for the last ran test specs">
