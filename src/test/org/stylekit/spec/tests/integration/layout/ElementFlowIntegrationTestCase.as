@@ -43,11 +43,11 @@ package org.stylekit.spec.tests.integration.layout
 			this._baseUI.addElement(wrapper);
 			
 			var absoluteChild:UIElement = this._baseUI.createUIElement();
-			absoluteChild.localStyleString = "width: 20px; height: 20px; margin: auto; position: absolute;";
+			absoluteChild.localStyleString = "width: 20px; height: 20px; margin: auto; position: absolute; left: 0px;";
 			wrapper.addElement(absoluteChild);
 			
-			Assert.assertEquals(40, absoluteChild.x);
-			Assert.assertEquals(60, absoluteChild.x + absoluteChild.effectiveWidth);
+			Assert.assertEquals(-20, absoluteChild.x);
+			Assert.assertEquals(0, absoluteChild.x + absoluteChild.effectiveWidth);
 			
 			wrapper.removeElement(absoluteChild);
 			
