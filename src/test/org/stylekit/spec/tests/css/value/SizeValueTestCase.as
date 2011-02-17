@@ -46,6 +46,15 @@ package org.stylekit.spec.tests.css.value
 			Assert.assertEquals("px", result.units);
 		}
 		
+		[Test(description="Ensures a SizeValue with auto evaluates to 0, as the auto margin is calculated else where")]
+		public function ensureAutoEvaluatesToZero():void
+		{
+			var result:SizeValue = SizeValue.parse("auto");
+			
+			Assert.assertEquals(0, result.value);
+			Assert.assertTrue(result.auto);
+		}
+		
 		[Test(description="Ensures that a string value may be identified as valid for parsing as a SizeValue.")]
 		public function stringIdentifiesCorrectly():void
 		{

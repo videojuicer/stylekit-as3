@@ -435,11 +435,16 @@ package org.stylekit.ui.element.layout
 				var marginTop:SizeValue = (e.getStyleValue("margin-top") as SizeValue);
 				var marginBottom:SizeValue = (e.getStyleValue("margin-bottom") as SizeValue);
 				
-				var marginLeftBump:Number = (marginLeft.auto ? ((this._maxWidth / 2) - (e.effectiveWidth / 2)) : 0);
-				var marginRightBump:Number = (marginRight.auto && !marginLeft.auto ? ((this._maxWidth / 2) - (e.effectiveWidth / 2)) : 0);
+				var marginLeftBump:Number = (marginLeft.auto ? ((this._maxWidth / (marginRight.auto ? 2 : 1)) - (e.effectiveWidth / (marginRight.auto ? 2 : 1))) : 0);
+				var marginTopBump:Number = (marginTop.auto ? ((this._maxWidth / (marginBottom.auto ? 2 : 1)) - (e.effectiveWidth / (marginBottom.auto ? 2 : 1))) : 0);
 				
-				var marginTopBump:Number = (marginTop.auto ? ((e.parentElement.effectiveContentHeight / 2) - (e.effectiveHeight / 2)) : 0);
-				var marginBottomBump:Number = (marginBottom.auto && !marginTop.auto ? ((e.parentElement.effectiveContentHeight / 2) - (e.effectiveHeight / 2)) : 0);
+				var marginRightBump:Number = 0;
+				
+				//var marginLeftBump:Number = (marginLeft.auto ? ((this._maxWidth / 2) - (e.effectiveWidth / 2)) : 0);
+				//var marginRightBump:Number = (marginRight.auto && !marginLeft.auto ? ((this._maxWidth / 2) - (e.effectiveWidth / 2)) : 0);
+				
+				//var marginTopBump:Number = (marginTop.auto ? ((e.parentElement.effectiveContentHeight / 2) - (e.effectiveHeight / 2)) : 0);
+				//var marginBottomBump:Number = (marginBottom.auto && !marginTop.auto ? ((e.parentElement.effectiveContentHeight / 2) - (e.effectiveHeight / 2)) : 0);
 				
 				e.x = marginLeftBump;
 				e.y = marginTopBump;

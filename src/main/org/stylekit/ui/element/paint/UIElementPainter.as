@@ -61,13 +61,7 @@ package org.stylekit.ui.element.paint
 			var backgroundAlpha:Number = (uiElement.getStyleValue("background-color") as ColorValue).alphaValue;
 			var backgroundColor:uint = (uiElement.getStyleValue("background-color") as ColorValue).hexValue;
 			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
-			
-			
-			if ((uiElement.getStyleValue("margin-left") as SizeValue).auto)
-			{
-				trace("ROAR");
-			}
-			
+
 			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT);
 			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
 			var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);

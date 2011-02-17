@@ -105,6 +105,11 @@ package org.stylekit.css.value
 		
 		public function get value():Number
 		{
+			if (this.auto)
+			{
+				return 0;
+			}
+			
 			return this._value;
 		}
 		
@@ -120,7 +125,12 @@ package org.stylekit.css.value
 		* Pass a UIElement instance to the method to allow relative percentage or fontsize-based calculations.
 		*/
 		public function evaluateSize(e:UIElement = null, dimension:String = null):Number
-		{			
+		{
+			if (this.auto)
+			{
+				return 0;
+			}
+			
 			if(dimension == null) dimension = SizeValue.DIMENSION_WIDTH;
 			var baseVal:Number;
 			
