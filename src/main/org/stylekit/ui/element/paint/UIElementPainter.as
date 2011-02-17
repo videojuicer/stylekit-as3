@@ -63,9 +63,14 @@ package org.stylekit.ui.element.paint
 			var backgroundImage:URLValue = (uiElement.getStyleValue("background-image") as URLValue);
 
 			var marginTop:Number = (uiElement.getStyleValue("margin-top") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT);
-			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
 			var marginLeft:Number = (uiElement.getStyleValue("margin-left") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
+			var marginRight:Number = (uiElement.getStyleValue("margin-right") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH);
 			var marginBottom:Number = (uiElement.getStyleValue("margin-bottom") as SizeValue).evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT);
+			
+			if (isNaN(marginTop)) marginTop = 0;
+			if (isNaN(marginLeft)) marginLeft = 0;
+			if (isNaN(marginRight)) marginRight = 0;
+			if (isNaN(marginBottom)) marginBottom = 0;
 			
 			var borderCompound:EdgeCompoundValue = (uiElement.getStyleValue("border") as EdgeCompoundValue);
 			var radiusCompound:CornerCompoundValue = (uiElement.getStyleValue("border-radius") as CornerCompoundValue);

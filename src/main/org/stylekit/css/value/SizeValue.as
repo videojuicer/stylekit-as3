@@ -105,11 +105,6 @@ package org.stylekit.css.value
 		
 		public function get value():Number
 		{
-			if (this.auto)
-			{
-				return 0;
-			}
-			
 			return this._value;
 		}
 		
@@ -126,10 +121,13 @@ package org.stylekit.css.value
 		*/
 		public function evaluateSize(e:UIElement = null, dimension:String = null):Number
 		{
+			// this messes up padding calculations + automatic height calculations based on the children
+			/*
 			if (this.auto)
 			{
-				return 0;
+			return 0;
 			}
+			*/
 			
 			if(dimension == null) dimension = SizeValue.DIMENSION_WIDTH;
 			var baseVal:Number;
