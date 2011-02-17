@@ -62,10 +62,10 @@ package org.stylekit.spec.tests.integration.layout
 			
 			var staticChild:UIElement = this._baseUI.createUIElement();
 			staticChild.localStyleString = "width: 20px; height: 20px; margin: auto; position: static; display: block;";
-			wrapper.addElement(absoluteChild);
+			wrapper.addElement(staticChild);
 			
-			//Assert.assertEquals(40, staticChild.x);
-			//Assert.assertEquals(60, staticChild.x + staticChild.effectiveWidth);
+			Assert.assertEquals(40, staticChild.x);
+			Assert.assertEquals(60, staticChild.x + staticChild.effectiveWidth);
 			
 			wrapper.removeElement(staticChild);
 		}

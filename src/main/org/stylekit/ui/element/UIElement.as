@@ -1058,6 +1058,7 @@ package org.stylekit.ui.element
 		{
 			// TODO update scrollbars
 			StyleKit.logger.debug("content dimensions modified: "+this.contentWidth+","+this.contentHeight, this);
+			this.dispatchEvent(new UIElementEvent(UIElementEvent.CONTENT_DIMENSIONS_CHANGED, this));
 			this.recalculateEffectiveContentDimensions();
 		}
 		
@@ -1154,6 +1155,8 @@ package org.stylekit.ui.element
 		{
 			this._controlLines = null;
 			StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
+			
+			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_CONTENT_DIMENSIONS_CHANGED, this));
 			
 			for(var i:uint=0; i < this._children.length; i++)
 			{

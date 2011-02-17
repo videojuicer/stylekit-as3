@@ -426,6 +426,15 @@ package org.stylekit.spec.tests.ui.element
 			
 			child.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, child));
 		}
+			protected function onEffectiveDimensionsChanged(e:UIElementEvent, passThru:Object):void
+			{
+				Assert.assertEquals(e.uiElement, passThru.child);
+				Assert.assertEquals(e.uiElement.parentElement, passThru.parent);
+			}
+			protected function onEffectiveDimensionsChangedTimeout(passThru:Object):void
+			{
+				Assert.fail("Timeout reached whilst waiting for UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED to be dispatched.");
+			}
 		
 		[Test(async, description="Tests that a UIElement dispatches an EVALUATED_STYLES_MODIFIED event when new keys are added")]
 		public function dispatchesEvaluatedStylesModifiedOnNewKeys():void
@@ -437,6 +446,15 @@ package org.stylekit.spec.tests.ui.element
 			element.addEventListener(UIElementEvent.EVALUATED_STYLES_MODIFIED, asyncCallback);
 			element.evaluatedStyles = {"fake-size-value": SizeValue.parse("10px"), "added-value": SizeValue.parse("5%")};
 		}
+			protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void
+			{
+				Assert.assertEquals(e.uiElement, passThru.element);
+			}
+			protected function onEvaluatedStylesModifiedTimeout(passThru:Object):void
+			{
+				Assert.fail("Timed out waiting for UIElement instance to dispatch EVALUATED_STYLES_MODIFIED");
+			}
+			
 		
 		[Test(description="Ensures that a UIElement allows its size to be bounded by the min- and max- width/height CSS properties")]
 		public function effectiveContentDimensionsMayBeBounded():void
@@ -786,25 +804,99 @@ package org.stylekit.spec.tests.ui.element
 			Assert.assertEquals(2200, el.calculateInsideBorderExtentPoint().y);
 		}
 		
-		protected function onEvaluatedStylesModified(e:UIElementEvent, passThru:Object):void
+		[Test(async, description="Ensures that sizing events are dispatched correctly from an element when the child elements change")]
+		public function contentDimensionsEventDispatched():void
 		{
-			Assert.assertEquals(e.uiElement, passThru.element);
+			var parent:UIElement = new UIElement();
+			var child:UIElement = new UIElement();
+			
+			parent.localStyleString = "width: 50px; height: 50px;";
+			child.localStyleString = "width: 50px; height: 50px;";
+			
+			parent.addElement(child);
+			
+			var asyncHandler:Function = Async.asyncHandler(
+				this, 
+				this.contentDimensionsEventDispatched_onContentDimensionsChanged, 
+				2000, 
+				{ child: child, parent: parent }, 
+				this.contentDimensionsEventDispatched_onContentDimensionsChangedTimeout
+			);
+			parent.addEventListener(UIElementEvent.CONTENT_DIMENSIONS_CHANGED, asyncHandler)
+			
+			child.localStyleString = "width: 100px; height: 50px;";
 		}
+			protected function contentDimensionsEventDispatched_onContentDimensionsChanged(e:UIElementEvent, passthru:Object):void
+			{
+				var parent:UIElement = passthru["parent"] as UIElement;
+				var child:UIElement = passthru["child"] as UIElement;
+				
+				Assert.assertEquals(100, child.effectiveWidth);
+				Assert.assertEquals(50, child.effectiveHeight);
+				Assert.assertEquals(100, parent.contentWidth);
+				Assert.assertEquals(50, parent.contentHeight);
+			}
+			protected function contentDimensionsEventDispatched_onContentDimensionsChangedTimeout(passthru:Object):void
+			{
+				Assert.fail("Timed out waiting for CONTENT_DIMENSIONS_CHANGED event");
+			}
 		
-		protected function onEvaluatedStylesModifiedTimeout(passThru:Object):void
+		[Test(async, description="Ensures that sizing events are dispatched correctly when the effective content dimensions change")]
+		public function effectiveContentDimensionsEventDispatched():void
 		{
-			Assert.fail("Timed out waiting for UIElement instance to dispatch EVALUATED_STYLES_MODIFIED");
+			var el:UIElement = new UIElement();
+				el.localStyleString = "width: 75px; height: 75px;";
+						
+			var asyncHandler:Function = Async.asyncHandler(
+				this, 
+				this.effectiveContentDimensionsEventDispatched_onEffectiveContentDimensionsChanged, 
+				2000, 
+				{ el: el }, 
+				this.effectiveContentDimensionsEventDispatched_onEffectiveContentDimensionsChangedTimeout
+			);
+			el.addEventListener(UIElementEvent.EFFECTIVE_CONTENT_DIMENSIONS_CHANGED, asyncHandler)
+			
+			el.localStyleString = "width: 25px; height: 26px;";
 		}
+			protected function effectiveContentDimensionsEventDispatched_onEffectiveContentDimensionsChanged(e:UIElementEvent, passthru:Object):void
+			{
+				var el:UIElement = passthru["el"] as UIElement;
+				
+				Assert.assertEquals(25, el.effectiveContentWidth);
+				Assert.assertEquals(26, el.effectiveContentHeight);
+			}
+			protected function effectiveContentDimensionsEventDispatched_onEffectiveContentDimensionsChangedTimeout(passthru:Object):void
+			{
+				Assert.fail("Timed out waiting for EFFECTIVE_CONTENT_DIMENSIONS_CHANGED event")
+			}
 		
-		protected function onEffectiveDimensionsChanged(e:UIElementEvent, passThru:Object):void
+		[Test(async, description="Ensures that sizing events are dispatched correctly when the total effective dimensions change")]
+		public function effectiveDimensionsEventDispatched():void
 		{
-			Assert.assertEquals(e.uiElement, passThru.child);
-			Assert.assertEquals(e.uiElement.parentElement, passThru.parent);
+			var el:UIElement = new UIElement();
+				el.localStyleString = "width: 70px; height: 70px;";
+						
+			var asyncHandler:Function = Async.asyncHandler(
+				this, 
+				this.effectiveDimensionsEventDispatched_onEffectiveDimensionsChanged, 
+				2000, 
+				{ el: el }, 
+				this.effectiveDimensionsEventDispatched_onEffectiveDimensionsChangedTimeout
+			);
+			el.addEventListener(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, asyncHandler)
+			
+			el.localStyleString = "width: 70px; height: 70px; padding: 5px; margin: 20px;";
 		}
-		
-		protected function onEffectiveDimensionsChangedTimeout(passThru:Object):void
-		{
-			Assert.fail("Timeout reached whilst waiting for UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED to be dispatched.");
-		}
+			protected function effectiveDimensionsEventDispatched_onEffectiveDimensionsChanged(e:UIElementEvent, passthru:Object):void
+			{
+				var el:UIElement = passthru["el"] as UIElement;
+				Assert.assertEquals(120, el.effectiveWidth);
+				Assert.assertEquals(120, el.effectiveHeight);
+			}
+			protected function effectiveDimensionsEventDispatched_onEffectiveDimensionsChangedTimeout(passthru:Object):void
+			{
+				Assert.fail("Timed out waiting for EFFECTIVE_DIMENSIONS_CHANGED event");
+			}
+
 	}
 }
