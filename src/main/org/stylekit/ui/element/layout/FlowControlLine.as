@@ -436,7 +436,7 @@ package org.stylekit.ui.element.layout
 				var marginBottom:SizeValue = (e.getStyleValue("margin-bottom") as SizeValue);
 				
 				var marginLeftBump:Number = (marginLeft.auto ? ((this._maxWidth / (marginRight.auto ? 2 : 1)) - (e.effectiveWidth / (marginRight.auto ? 2 : 1))) : 0);
-				var marginTopBump:Number = (marginTop.auto ? ((this._maxWidth / (marginBottom.auto ? 2 : 1)) - (e.effectiveWidth / (marginBottom.auto ? 2 : 1))) : 0);
+				var marginTopBump:Number = (marginTop.auto ? ((e.parentElement.effectiveHeight / (marginBottom.auto ? 2 : 1)) - (e.effectiveHeight / (marginBottom.auto ? 2 : 1))) : 0);
 				
 				var marginRightBump:Number = 0;
 				
@@ -505,7 +505,7 @@ package org.stylekit.ui.element.layout
 				}
 				else if (floatValue.float == FloatValue.FLOAT_RIGHT)
 				{
-					e.x = (this._maxWidth - e.effectiveWidth - rightFloatXCollector) - marginRightBump;
+					e.x = (this._maxWidth - e.effectiveWidth - rightFloatXCollector) - marginLeftBump; // right
 					
 					rightFloatXCollector += e.effectiveWidth;
 				}
@@ -525,7 +525,7 @@ package org.stylekit.ui.element.layout
 						}
 						else if (this._flowDirection == FlowControlLine.FLOW_DIRECTION_RIGHT)
 						{
-							e.x = (this._maxWidth - rightEdgeCollector) - marginRightBump;
+							e.x = (this._maxWidth - rightEdgeCollector) + marginLeftBump; //right
 							
 							rightEdgeCollector += e.effectiveWidth;
 						}
