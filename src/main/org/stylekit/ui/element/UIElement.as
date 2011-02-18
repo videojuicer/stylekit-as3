@@ -2337,11 +2337,23 @@ package org.stylekit.ui.element
 		protected function onMouseDown(e:MouseEvent):void
 		{
 			this.addElementPseudoClass("active");
+			
+			this.baseUI.addEventListener(MouseEvent.MOUSE_UP, this.onBaseUIMouseUp);
 		}
 		
 		protected function onMouseUp(e:MouseEvent):void
 		{
-			this.removeElementPseudoClass("active");
+			//this.removeElementPseudoClass("active");
+		}
+		
+		private function onBaseUIMouseUp(e:MouseEvent):void
+		{
+			if (this.hasElementPseudoClass("active"))
+			{
+				this.removeElementPseudoClass("active");
+			
+				this.baseUI.removeEventListener(MouseEvent.MOUSE_UP, this.onBaseUIMouseUp);
+			}
 		}
 		
 		private function refreshCursor():void
