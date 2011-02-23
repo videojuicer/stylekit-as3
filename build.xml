@@ -37,6 +37,10 @@
 		<isset property="FLASH_HEADLESS" />
 	</condition>
 	
+	<echo>FLEX_HOME: ${FLEX_HOME}</echo>
+	<echo>FLEX_HEADLESS: ${FLEX_HEADLESS}</echo>
+	<echo>FLASH_HEADLESS: ${FLASH_HEADLESS}</echo>
+	
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
 	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
 	
@@ -186,7 +190,9 @@
 	
 	<target name="test-only" depends="test-compile">
 		<flexunit swf="${bin.loc}/stylekit-as3-specs.swf" toDir="${report.unit.loc}"
-				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}" />
+				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}"
+				timeout="40000" />
+		<sleep seconds="10"/>
 	</target>
 	
 	<target name="report" description="Generates HTML reports for the last ran test specs">
