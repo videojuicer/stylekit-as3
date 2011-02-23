@@ -46,8 +46,8 @@ package org.stylekit.spec.tests.integration.layout
 			absoluteChild.localStyleString = "width: 20px; height: 20px; margin: auto; position: absolute; left: 0px;";
 			wrapper.addElement(absoluteChild);
 			
-			Assert.assertEquals(-20, absoluteChild.x);
-			Assert.assertEquals(0, absoluteChild.x + absoluteChild.effectiveWidth);
+			Assert.assertEquals(0, absoluteChild.x);
+			Assert.assertEquals(20, absoluteChild.x + absoluteChild.effectiveWidth);
 			
 			wrapper.removeElement(absoluteChild);
 			
