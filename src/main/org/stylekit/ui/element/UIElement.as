@@ -954,12 +954,12 @@ package org.stylekit.ui.element
 				{
 					var line:FlowControlLine = this.controlLines[i];
 				
-					if (line.width > w)
+					if (line.lineWidth > w)
 					{
-						w = line.width;
+						w = line.lineWidth;
 					}
 				
-					h += line.height;
+					h += line.lineHeight;
 				}
 			}
 			
@@ -1138,6 +1138,7 @@ package org.stylekit.ui.element
 			}
 			else
 			{
+				// Also accounts for height: auto
 				h = this.contentHeight;
 			}
 			// Apply height constraints

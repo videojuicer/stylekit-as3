@@ -34,6 +34,30 @@ package org.stylekit.spec.tests.integration.layout
 			this._baseUI = null;
 		}
 
+		[Test(description="Margin-bottom is included in the content dimension calculations")]
+		public function contentDimensionsIncludeChildMargins():void 
+		{
+			var wrapper:UIElement = this._baseUI.createUIElement();
+			wrapper.localStyleString = "width: 100px; height: auto;";
+			
+			this._baseUI.addElement(wrapper);
+			
+			Assert.assertEquals(0, wrapper.contentHeight);
+			
+			var inner1:UIElement = this._baseUI.createUIElement();
+				inner1.localStyleString = "height: 10px; margin: 10px;"; // total height: 30px
+			var inner2:UIElement = this._baseUI.createUIElement();
+				inner2.localStyleString = "height: 10px; margin: 10px;"; // total height: 30px
+				
+			Assert.assertEquals(30, inner1.effectiveHeight);
+			Assert.assertEquals(30, inner2.effectiveHeight);
+			
+			wrapper.addElement(inner1);
+			wrapper.addElement(inner2);
+			
+			Assert.assertEquals(60, wrapper.contentHeight);
+		}
+
 		[Test(description="Tests margin:auto is applied correctly to a child")]
 		public function marginAutoIsAppliedCorrectly():void
 		{

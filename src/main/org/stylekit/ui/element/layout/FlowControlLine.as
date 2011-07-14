@@ -90,6 +90,24 @@ package org.stylekit.ui.element.layout
 			return this._occupiedByAbsoluteElement;
 		}
 		
+		public function get lineWidth():Number
+		{
+			var w:int = 0;
+			
+			for(var i:uint=0; i < this._elements.length; i++)
+			{
+				var e:UIElement = this._elements[i];
+				
+				// TODO: should include the relative height but only the amount that exists inside the current box
+				if(e.effectiveWidth > w && this.elementContributesToLineWidth(e))
+				{
+					w = e.effectiveWidth;
+				}
+			}
+			
+			return w;
+		}
+		
 		public function get lineHeight():Number
 		{
 			var h:int = 0;
@@ -99,7 +117,7 @@ package org.stylekit.ui.element.layout
 				var e:UIElement = this._elements[i];
 				
 				// TODO: should include the relative height but only the amount that exists inside the current box
-				if(e.effectiveHeight > h && (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE && (e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE)
+				if(e.effectiveHeight > h && this.elementContributesToLineHeight(e))
 				{
 					h = e.effectiveHeight;
 				}
@@ -569,6 +587,16 @@ package org.stylekit.ui.element.layout
 
 				StyleKit.logger.debug("Adding "+e+" to FlowControlLine contents ... "+e.x+"/"+e.y, this);
 			}
+		}
+		
+		public function elementContributesToLineHeight(e:UIElement):Boolean
+		{
+			return (e.getStyleValue("position") as PositionValue).position != PositionValue.POSITION_ABSOLUTE && (e.getStyleValue("display") as DisplayValue).display != DisplayValue.DISPLAY_NONE;
+		}
+		
+		public function elementContributesToLineWidth(e:UIElement):Boolean
+		{
+			return this.elementContributesToLineHeight(e);
 		}
 			
 		public function treatElementAsAbsolute(e:UIElement):Boolean
