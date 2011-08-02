@@ -938,15 +938,18 @@ package org.stylekit.ui.element
 		*/
 		protected function recalculateContentDimensions():void
 		{
-			var w:int = this._rawContentWidth;
-			var h:int = this._rawContentHeight;
+			// The raw dimensions are used by objects that want to provide a forceful "shim"
+			// on their content areas - mostly those which use custom inner sprites. 
+			var rawWidth:int = this._rawContentWidth;
+			var rawHeight:int = this._rawContentHeight;
 			
-			/* TODO
-				Width:
-					Search children to find greatest _x + effectiveWidth
-				Height:
-					Search children to find greatest _y + effectiveHeight
-			*/
+			// We're going to take whichever width value is largest, and whichever height
+			// value is largest. 
+			
+			// We calculate the width of the child UIElements by taking the width of the widest line.
+			var lineMaxWidth:int = 0;
+			// We calculate the height of the child UIElements by adding the height of each line.
+			var lineTotalHeight:int = 0;
 			
 			if(this.controlLines != null)
 			{
@@ -954,35 +957,20 @@ package org.stylekit.ui.element
 				{
 					var line:FlowControlLine = this.controlLines[i];
 				
-					if (line.lineWidth > w)
+					if (line.lineWidth > lineMaxWidth)
 					{
-						w = line.lineWidth;
+						lineMaxWidth = line.lineWidth;
 					}
 				
-					h += line.lineHeight;
+					lineTotalHeight += line.lineHeight;
 				}
 			}
 			
-			/*for (var i:int = 0; i < this.children.length; i++)
-			{
-				var child:UIElement = this.children[i];
-				
-				if ((child.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_LEFT || (child.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_RIGHT)
-				{
-					continue;
-				}
-				
-				if ((child.x + child.effectiveWidth) > w)
-				{
-					w = child.x + child.effectiveWidth;
-				}
-				
-				if ((child.y + child.effectiveHeight) > h)
-				{
-					h = child.y + child.effectiveHeight;
-				}
-			}*/
+			// Now the found values will be compared
+			var w:int = Math.max(rawWidth, lineMaxWidth);
+			var h:int = Math.max(rawHeight, lineTotalHeight);
 			
+			// And that's our content dimension pair.
 			this.setContentDimensions(w, h);
 		}
 
