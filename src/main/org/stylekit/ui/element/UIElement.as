@@ -2312,7 +2312,7 @@ package org.stylekit.ui.element
 				this.addElementPseudoClass("hover");
 			}
 			
-			this.refreshCursor();
+			this.applyCustomCursor();
 		}
 		
 		protected function onMouseOut(e:MouseEvent):void
@@ -2320,7 +2320,7 @@ package org.stylekit.ui.element
 			this.removeElementPseudoClass("hover");
 			this.removeElementPseudoClass("active");
 			
-			this.resetCursor();
+			this.removeCustomCursor();
 			
 			Mouse.cursor = MouseCursor.AUTO;
 		}
@@ -2362,7 +2362,7 @@ package org.stylekit.ui.element
 		 * Due to the way flash mouse events are bubbled, this routine actually ignores the 
 		 * "default" cursor type and only makes an application if this element requires a special cursor.
 		 **/
-		private function refreshCursor():void
+		private function applyCustomCursor():void
 		{
 			var cursor:int = this.getLocalMouseCursorTypeId();
 			var flashCursor:String;
@@ -2387,7 +2387,7 @@ package org.stylekit.ui.element
 		/**
 		 * Called on mouseOut to remove any custom cursor properties applied by this element.
 		 **/
-		private function resetCursor():void
+		private function removeCustomCursor():void
 		{
 			if(this._cursorApplied)
 			{
