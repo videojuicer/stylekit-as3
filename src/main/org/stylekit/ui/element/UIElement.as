@@ -238,6 +238,12 @@ package org.stylekit.ui.element
 		// Deferred style keys modified during a BaseUI style allocation transaction
 		protected var _deferredModifiedStyleKeys:Vector.<String>;
 		
+		/**
+		 * Tracks whether or not this element has currently applied a custom cursor to the flash
+		 * mouse pointer.
+		 **/
+		private var _cursorApplied:Boolean = false;
+		
 		public function UIElement(baseUI:BaseUI = null)
 		{
 			super();
@@ -828,21 +834,25 @@ package org.stylekit.ui.element
 			{
 				this.alpha = (this.getStyleValue("opacity") as NumericValue).value
 			}
+						
 			if(effectiveContentDimensionsRecalcKeys.length > 0) 
 			{
 				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveContentDimensionsRecalcKeys.join(", ")+")", this);
 				this.recalculateEffectiveContentDimensions();
 			}
+			
 			if(parentLayoutKeys.length > 0 && (this.parentElement != null)) 
 			{
 				StyleKit.logger.debug("A layout property was modified ("+parentLayoutKeys.join(", ")+") calling to the parent's layoutChildren method", this);
 				this.parentElement.layoutChildren();
 			}
+			
 			if(effectiveDimensionsRecalcKeys.length > 0)
 			{
 				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveDimensionsRecalcKeys.join(", ")+")", this);
 				this.recalculateEffectiveDimensions();
 			}
+			
 			if(redrawKeys.length > 0)
 			{
 				StyleKit.logger.debug("A property was modified that requires a redraw. ("+redrawKeys.join(", ")+")", this);
@@ -2310,6 +2320,8 @@ package org.stylekit.ui.element
 			this.removeElementPseudoClass("hover");
 			this.removeElementPseudoClass("active");
 			
+			this.resetCursor();
+			
 			Mouse.cursor = MouseCursor.AUTO;
 		}
 		
@@ -2344,10 +2356,15 @@ package org.stylekit.ui.element
 				this.baseUI.removeEventListener(MouseEvent.MOUSE_UP, this.onBaseUIMouseUp);
 			}
 		}
-		
+			
+		/**
+		 * Called on mouseOver to apply any special cursor types needed by this element.
+		 * Due to the way flash mouse events are bubbled, this routine actually ignores the 
+		 * "default" cursor type and only makes an application if this element requires a special cursor.
+		 **/
 		private function refreshCursor():void
 		{
-			var cursor:int = this.getMouseCursorTypeId();
+			var cursor:int = this.getLocalMouseCursorTypeId();
 			var flashCursor:String;
 			
 			switch (cursor)
@@ -2356,32 +2373,27 @@ package org.stylekit.ui.element
 					flashCursor = MouseCursor.BUTTON;
 					break;
 				default: 
-					flashCursor = MouseCursor.ARROW;
+					// Ignore, and allow upchain elements to set instead
 					break;
 			}
 			
-			if(Mouse.cursor != flashCursor)
+			if(flashCursor != null && Mouse.cursor != flashCursor)
 			{
+				this._cursorApplied = true;
 				Mouse.cursor = flashCursor;
 			}
 		}
 		
 		/**
-		* Returns the cursor that should be used for this element as a CursorValue static ID.
-		* Walks up the parent chain until a special cursor is found, or the top of the tree is encountered.
-		*/
-		public function getMouseCursorTypeId():int
+		 * Called on mouseOut to remove any custom cursor properties applied by this element.
+		 **/
+		private function resetCursor():void
 		{
-			var cursorElement:UIElement = this;
-			var cursor:int = cursorElement.getLocalMouseCursorTypeId();
-			
-			while(cursor == CursorValue.CURSOR_DEFAULT && cursorElement != null)
+			if(this._cursorApplied)
 			{
-				cursor = cursorElement.getLocalMouseCursorTypeId();
-				cursorElement = cursorElement.parentElement;
+				this._cursorApplied = false;
+				Mouse.cursor = MouseCursor.ARROW;
 			}
-			
-			return cursor;
 		}
 		
 		/**
