@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="stylekit" basedir=".">
+    <description>Provides build tasks for StyleKit-as3, cannot be used standalone.</description>
+    
+    <property name="stylekit.target" value="stylekit-as3.swc" />
+    <property name="stylekit.libs" value="${basedir}/libs" />
+    <property name="stylekit.src.main" value="${basedir}/src/main" />
+    <property name="stylekit.src.test" value="${basedir}/src/test" />
+    
+    <property name="as3crypto.path" value="${tmp.path}/stylekit-as3crypto-trunk-src" />
+    
+    <property file="build.properties" />
+    
+    <taskdef resource="flexTasks.tasks" classpath="${flex.path}/ant/lib/flexTasks.jar" />
+    
+	<!--><import file="${stylekit.libs}/utilkit-as3/tasks.xml" />-->
+
+    <target name="stylekit.setup">
+        
+    </target>
+    
+	<target name="stylekit.dependencies">
+		<!-- call utilkit to compile -->
+		<ant antfile="${stylekit.libs}/utilkit-as3/tasks.xml" target="utilkit.compile" inheritAll="true" useNativeBasedir="true" />
+	</target>
+
+    <target name="stylekit.compile">		
+        <echo>Compiling into ${target.path}/${stylekit.target} ...</echo>
+        
+        <compc output="${target.path}/${stylekit.target}"  
+            as3="true" benchmark="${build.verbose}" debug="${build.debug}" incremental="false" fork="false"
+            keep-generated-actionscript="${build.debug}" link-report="${report.path}/link-report.xml"
+            locale="en_US" optimize="${build.optimise}" target-player="10.0.0" warnings="true">
+            
+            <define name="BUILD::DEBUG" value="${build.debug}" />
+            <define name="BUILD::SSL" value="${build.ssl}" />
+            
+            <source-path path-element="${stylekit.src.main}" />
+            <include-sources dir="${stylekit.src.main}" includes="*" />
+            
+            <library-path dir="${target.path}" append="true">
+				<include name="utilkit-as3.swc" />
+			</library-path>
+            
+            <compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+            <compiler.headless-server>true</compiler.headless-server>
+        </compc>
+        
+        <echo>Finished compiling: ${stylekit.target}</echo>
+    </target>
+    
+    <target name="stylekit.optimise">
+        
+    </target>
+    
+    <target name="stylekit.compile.test">
+        <echo>Compiling tests into SWF ...</echo>
+        
+        <mxmlc output="${target.path}/stylekit-as3-specs.swf" file="${stylekit.src.test}/SpecRunner.mxml"
+            as3="true" benchmark="${build.verbose}" debug="${build.debug}" incremental="false" fork="false"
+            keep-generated-actionscript="true"
+            locale="en_US" optimize="${build.optimise}" target-player="10.0.0" warnings="true">
+            
+            <define name="BUILD::DEBUG" value="${build.debug}" />
+            <define name="BUILD::SSL" value="${build.ssl}" />
+            
+            <source-path path-element="${stylekit.src.main}" />
+            <source-path path-element="${stylekit.src.test}" />
+
+            <library-path dir="${target.path}" append="true">
+				<include name="utilkit-as3.swc" />
+			</library-path>
+            
+            <library-path dir="${stylekit.libs}" append="true">
+				<include name="flexunit-4.1.0_RC2-4-as3_4.1.0.16076.swc" />
+				<include name="flexunit-cilistener-4.1.0_RC2-4-4.1.0.16076.swc" />
+			</library-path>
+            
+            <compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+            <compiler.headless-server>true</compiler.headless-server>
+        </mxmlc>
+        
+        <echo>Finished compiling tests into SWF</echo>
+    </target>
+</project>
