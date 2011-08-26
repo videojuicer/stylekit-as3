@@ -49,6 +49,7 @@
 			
 			<mkdir dir="${target.path}" />
 			<mkdir dir="${report.path}" />
+			<mkdir dir="${report.unit.path}" />
 			<mkdir dir="${tmp.path}" />
     </target>
     
