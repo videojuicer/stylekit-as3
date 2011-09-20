@@ -474,22 +474,15 @@ package org.stylekit.ui.element.layout
 					
 					do
 					{
-						if(parent == null)
-						{
-							StyleKit.logger.error("FlowControlLine is attempting to positing an element that should be orphaned. The BaseUI will be used as the relativeParent for this element.", this);
-							relativeParent = e.baseUI;
-						}
-						else {
-							var parentPosition:PositionValue = parent.getStyleValue("position") as PositionValue;
+						var parentPosition:PositionValue = parent.getStyleValue("position") as PositionValue;
 						
-							if (parentPosition.position != PositionValue.POSITION_STATIC || parent == e.baseUI)
-							{
-								relativeParent = parent;
-							}
-							else
-							{
-								parent = parent.parentElement;
-							}	
+						if (parentPosition.position != PositionValue.POSITION_STATIC || parent == e.baseUI)
+						{
+							relativeParent = parent;
+						}
+						else
+						{
+							parent = parent.parentElement;
 						}
 					}
 					while (relativeParent == null);
