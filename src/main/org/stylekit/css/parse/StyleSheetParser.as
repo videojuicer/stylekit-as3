@@ -725,7 +725,7 @@ package org.stylekit.css.parse
 					case "background-position":
 						property.value = BackgroundPositionValue.parse(unparsedPropertyValue);
 						break;
-					case "padding": case "margin": case "border-width": case "border-radius":
+					case "padding": case "margin": case "border-width":
 						property.value = this._valueParser.parseEdgeSizeCompoundValue(unparsedPropertyValue);
 						break;
 					case "border-top": case "border-left": case "border-right": case "border-bottom":

@@ -96,33 +96,42 @@ package org.stylekit.ui.element.paint
 			if (isNaN(marginBottom)) marginBottom = 0;
 			
 			var borderCompound:EdgeCompoundValue = (uiElement.getStyleValue("border") as EdgeCompoundValue);
-			var radiusCompound:CornerCompoundValue = (uiElement.getStyleValue("border-radius") as CornerCompoundValue);
 			
-			var borderTop:BorderCompoundValue = (borderCompound.topValue as BorderCompoundValue);
-			var borderLeft:BorderCompoundValue = (borderCompound.leftValue as BorderCompoundValue);
-			var borderRight:BorderCompoundValue = (borderCompound.rightValue as BorderCompoundValue);
-			var borderBottom:BorderCompoundValue = (borderCompound.bottomValue as BorderCompoundValue);
+			var borderTopColorValue:ColorValue = (uiElement.getStyleValue("border-top-color") as ColorValue);
+			var borderLeftColorValue:ColorValue = (uiElement.getStyleValue("border-left-color") as ColorValue);
+			var borderRightColorValue:ColorValue = (uiElement.getStyleValue("border-right-color") as ColorValue);
+			var borderBottomColorValue:ColorValue = (uiElement.getStyleValue("border-bottom-color") as ColorValue);
 			
-			var borderTopColor:uint = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderTop.colorValue.hexValue);
-			var borderLeftColor:uint = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderLeft.colorValue.hexValue);
-			var borderRightColor:uint = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderRight.colorValue.hexValue);
-			var borderBottomColor:uint = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderBottom.colorValue.hexValue);
+			var borderTopStyleValue:LineStyleValue = (uiElement.getStyleValue("border-top-style") as LineStyleValue);
+			var borderLeftStyleValue:LineStyleValue = (uiElement.getStyleValue("border-left-style") as LineStyleValue);
+			var borderRightStyleValue:LineStyleValue = (uiElement.getStyleValue("border-right-style") as LineStyleValue);
+			var borderBottomStyleValue:LineStyleValue = (uiElement.getStyleValue("border-bottom-style") as LineStyleValue);
 			
-			var borderTopSize:int = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderTop.sizeValue.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT));
-			var borderLeftSize:int = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderLeft.sizeValue.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH));
-			var borderRightSize:int = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderRight.sizeValue.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH));
-			var borderBottomSize:int = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderBottom.sizeValue.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT));
+			var borderTopWidthValue:SizeValue = (uiElement.getStyleValue("border-top-width") as SizeValue);
+			var borderLeftWidthValue:SizeValue = (uiElement.getStyleValue("border-left-width") as SizeValue);
+			var borderRightWidthValue:SizeValue = (uiElement.getStyleValue("border-right-width") as SizeValue);
+			var borderBottomWidthValue:SizeValue = (uiElement.getStyleValue("border-bottom-width") as SizeValue);
+			
+			var topRightRadius:SizeValue = (uiElement.getStyleValue("border-top-right-radius") as SizeValue);
+			var bottomRightRadius:SizeValue = (uiElement.getStyleValue("border-bottom-right-radius") as SizeValue);
+			var bottomLeftRadius:SizeValue = (uiElement.getStyleValue("border-bottom-left-radius") as SizeValue);
+			var topLeftRadius:SizeValue = (uiElement.getStyleValue("border-top-left-radius") as SizeValue);
+			
+			var borderTopColor:uint = (borderTopColorValue == null || borderTopStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderTopColorValue.hexValue);
+			var borderLeftColor:uint = (borderLeftColorValue == null || borderLeftStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderLeftColorValue.hexValue);
+			var borderRightColor:uint = (borderRightColorValue == null || borderRightStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderRightColorValue.hexValue);
+			var borderBottomColor:uint = (borderBottomColorValue == null || borderBottomStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? backgroundColor : borderBottomColorValue.hexValue);
+			
+			var borderTopSize:int = (borderTopWidthValue == null || borderTopStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderTopWidthValue.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT));
+			var borderLeftSize:int = (borderLeftWidthValue == null || borderLeftStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderLeftWidthValue.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH));
+			var borderRightSize:int = (borderRightWidthValue == null || borderRightStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderRightWidthValue.evaluateSize(uiElement, SizeValue.DIMENSION_WIDTH));
+			var borderBottomSize:int = (borderBottomWidthValue == null || borderBottomStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0 : borderBottomWidthValue.evaluateSize(uiElement, SizeValue.DIMENSION_HEIGHT));
 
-			var borderTopAlpha:Number = (borderTop.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderTop.colorValue.alphaValue);
-			var borderLeftAlpha:Number = (borderLeft.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderLeft.colorValue.alphaValue);
-			var borderRightAlpha:Number = (borderRight.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderRight.colorValue.alphaValue);
-			var borderBottomAlpha:Number = (borderBottom.lineStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderBottom.colorValue.alphaValue);
+			var borderTopAlpha:Number = (borderTopColorValue == null || borderTopStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderTopColorValue.alphaValue);
+			var borderLeftAlpha:Number = (borderLeftColorValue == null || borderLeftStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderLeftColorValue.alphaValue);
+			var borderRightAlpha:Number = (borderRightColorValue == null || borderRightStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderRightColorValue.alphaValue);
+			var borderBottomAlpha:Number = (borderBottomColorValue == null || borderBottomStyleValue.lineStyle == LineStyleValue.LINE_STYLE_NONE ? 0.0 : borderBottomColorValue.alphaValue);
 			
-			var topRightRadius:SizeValue = (radiusCompound.topRightValue as SizeValue);
-			var bottomRightRadius:SizeValue = (radiusCompound.bottomRightValue as SizeValue);
-			var bottomLeftRadius:SizeValue = (radiusCompound.bottomLeftValue as SizeValue);
-			var topLeftRadius:SizeValue = (radiusCompound.topLeftValue as SizeValue);
-
 			var topRightR:Number = Math.max(0, topRightRadius.evaluateSize(uiElement));
 			var bottomRightR:Number = Math.max(0, bottomRightRadius.evaluateSize(uiElement));
 			var bottomLeftR:Number = Math.max(0, bottomLeftRadius.evaluateSize(uiElement));
@@ -184,7 +193,7 @@ package org.stylekit.ui.element.paint
 			
 			StyleKit.logger.debug("Painting ...", uiElement);
 			
-			if (borderTop != null)
+			if (borderTopStyleValue != null)
 			{
 				graphics.lineStyle(borderTopSize, borderTopColor, borderTopAlpha);
 
@@ -200,7 +209,7 @@ package org.stylekit.ui.element.paint
 				graphics.curveTo(uiElement.effectiveWidth - marginRight, marginTop, uiElement.effectiveWidth - marginRight, marginTop + (topRightR));
 			}
 			
-			if (borderRight != null)
+			if (borderRightStyleValue != null)
 			{
 				graphics.lineStyle(borderRightSize, borderRightColor, borderRightAlpha);
 				
@@ -216,7 +225,7 @@ package org.stylekit.ui.element.paint
 				graphics.curveTo(uiElement.effectiveWidth - marginRight, uiElement.effectiveHeight - marginBottom, uiElement.effectiveWidth - (bottomRightR) - marginRight, uiElement.effectiveHeight - marginBottom);
 			}
 			
-			if (borderBottom != null)
+			if (borderBottomStyleValue != null)
 			{
 				graphics.lineStyle(borderBottomSize, borderBottomColor, borderBottomAlpha);
 				
@@ -232,7 +241,7 @@ package org.stylekit.ui.element.paint
 				graphics.curveTo(marginLeft, uiElement.effectiveHeight - marginBottom, marginLeft, uiElement.effectiveHeight - (bottomLeftR) - marginBottom);
 			}
 			
-			if (borderLeft != null)
+			if (borderLeftStyleValue != null)
 			{ 
 				graphics.lineStyle(borderLeftSize, borderLeftColor, borderLeftAlpha);
 			

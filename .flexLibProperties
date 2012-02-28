@@ -77,6 +77,7 @@
     <classEntry path="org.stylekit.css.value.IntegerValue"/>
     <classEntry path="org.stylekit.css.value.BackgroundSizeValue"/>
     <classEntry path="org.stylekit.spec.tests.ui.element.paint.UIElementPainterTestCase"/>
+    <classEntry path="org.stylekit.spec.tests.css.value.CornerCompoundValueTestCase"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

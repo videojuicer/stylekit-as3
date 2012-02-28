@@ -24,61 +24,62 @@
 package org.stylekit.css.value
 {
 	import org.stylekit.css.parse.ValueParser;
+	import org.utilkit.util.StringUtil;
 
 	public class CornerCompoundValue extends Value
 	{
-		protected var _topRightValue:Value;
-		protected var _bottomRightValue:Value;
-		protected var _bottomLeftValue:Value;
-		protected var _topLeftValue:Value;
+		protected var _topRightValue:SizeValue;
+		protected var _bottomRightValue:SizeValue;
+		protected var _bottomLeftValue:SizeValue;
+		protected var _topLeftValue:SizeValue;
 		
 		public function CornerCompoundValue()
 		{
 			super();
 		}
 		
-		public function get topRightValue():Value
+		public function get topRightValue():SizeValue
 		{
 			return this._topRightValue;
 		}
 		
-		public function set topRightValue(v:Value):void
+		public function set topRightValue(v:SizeValue):void
 		{
 			this._topRightValue = v;
 			
 			this.modified();
 		}
 		
-		public function get bottomRightValue():Value
+		public function get bottomRightValue():SizeValue
 		{
 			return this._bottomRightValue;
 		}
 		
-		public function set bottomRightValue(v:Value):void
+		public function set bottomRightValue(v:SizeValue):void
 		{
 			this._bottomRightValue = v;
 			
 			this.modified();
 		}
 		
-		public function get bottomLeftValue():Value
+		public function get bottomLeftValue():SizeValue
 		{
 			return this._bottomLeftValue;
 		}
 		
-		public function set bottomLeftValue(v:Value):void
+		public function set bottomLeftValue(v:SizeValue):void
 		{
 			this._bottomLeftValue = v;
 			
 			this.modified();
 		}
 		
-		public function get topLeftValue():Value
+		public function get topLeftValue():SizeValue
 		{
 			return this._topLeftValue;
 		}
 		
-		public function set topLeftValue(v:Value):void
+		public function set topLeftValue(v:SizeValue):void
 		{
 			this._topLeftValue = v;
 			
@@ -87,8 +88,11 @@ package org.stylekit.css.value
 		
 		public static function parse(str:String):CornerCompoundValue
 		{
+			str = StringUtil.trim(str.toLowerCase());
+			
 			var sizeStrings:Vector.<String> = ValueParser.parseSpaceDelimitedString(str);
 			var val:CornerCompoundValue = new CornerCompoundValue();
+			val.rawValue = str;
 			
 			var sizeValues:Vector.<SizeValue> = new Vector.<SizeValue>();
 			
@@ -108,8 +112,8 @@ package org.stylekit.css.value
 					break;
 				case 3:
 					val.topRightValue = sizeValues[0];
-					val.bottomRightValue = sizeValues[3];
-					val.topLeftValue = val.bottomLeftValue = sizeValues[2];
+					val.bottomRightValue = sizeValues[2];
+					val.topLeftValue = val.bottomLeftValue = sizeValues[1];
 					break;
 				case 4:
 					val.topRightValue = sizeValues[0];
