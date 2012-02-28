@@ -188,6 +188,11 @@ package org.stylekit.css.value
 					return this.value * baseVal;
 					break;
 				default:
+					if (isNaN(this.value))
+					{
+						return 0;
+					}
+					
 					return this.value;
 					break;
 			}

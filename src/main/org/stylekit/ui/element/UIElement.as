@@ -1412,8 +1412,8 @@ package org.stylekit.ui.element
 		{
 			var point:Point = this.calculateContentExtentPoint();
 			
-			point.x += this.evalStyleSize("padding-right", SizeValue.DIMENSION_WIDTH);
-			point.y += this.evalStyleSize("padding-bottom", SizeValue.DIMENSION_HEIGHT);
+			point.x += Math.max(0, this.evalStyleSize("padding-right", SizeValue.DIMENSION_WIDTH));
+			point.y += Math.max(0, this.evalStyleSize("padding-bottom", SizeValue.DIMENSION_HEIGHT));
 			
 			return point;
 		}
