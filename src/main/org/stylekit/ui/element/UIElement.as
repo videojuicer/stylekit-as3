@@ -1115,6 +1115,8 @@ package org.stylekit.ui.element
 					Height:
 						subtract horizontal scrollbar if horizontal scrollbar required
 			*/
+			
+			var displayValue:uint = (this.getStyleValue("display") as DisplayValue).display;
 
 			// Width
 			if (this.hasStyleProperty("box-flex") && (this.getStyleValue("box-flex") as IntegerValue).value > 0)
@@ -1124,7 +1126,7 @@ package org.stylekit.ui.element
 				// flexxxxxo
 				w = flexCost - extraEffectiveWidth;
 			}
-			else if (this.hasStyleProperty("width") && (this.getStyleValue("width") as SizeValue).auto)
+			else if (this.hasStyleProperty("width") && (this.getStyleValue("width") as SizeValue).auto && displayValue != DisplayValue.DISPLAY_INLINE_BLOCK)
 			{
 				if (this.hasStyleProperty("float") && ((this.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_LEFT || (this.getStyleValue("float") as FloatValue).float == FloatValue.FLOAT_RIGHT))
 				{
@@ -1139,13 +1141,13 @@ package org.stylekit.ui.element
 			{				
 				w = this.evalStyleSize("width", SizeValue.DIMENSION_WIDTH);
 			}
-			else if((this.getStyleValue("display") as DisplayValue).display == DisplayValue.DISPLAY_BLOCK) // todo also trigger if float is set
+			else if(displayValue == DisplayValue.DISPLAY_BLOCK) // todo also trigger if float is set
 			{
 				w = this.parentElement.effectiveContentWidth;
 			}
 			else
 			{
-				w = this.contentWidth;
+				w = this.contentWidth + extraEffectiveWidth;
 			}
 			
 			// Apply width constraints
