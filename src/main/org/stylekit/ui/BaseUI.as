@@ -136,6 +136,8 @@ package org.stylekit.ui
 			StyleKit.logger.debug("BaseUI caught stylesheet modification, recollapsing styles into flattened list.", this);
 			this.collapseStyles();
 			this.domModified(this);
+			
+			Platform.gc();
 		}
 		
 		/**
@@ -553,6 +555,8 @@ package org.stylekit.ui
 			
 			StyleKit.logger.debug("Stage size -> "+this.stageRoot.stage.width+"/"+this.stageRoot.stage.height);
 			StyleKit.logger.info("BaseUI resized to "+this.effectiveContentWidth+"/"+this.effectiveContentHeight);
+			
+			Platform.gc();
 		}
 	}
 }
