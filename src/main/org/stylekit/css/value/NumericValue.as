@@ -67,5 +67,15 @@ package org.stylekit.css.value
 			
 			return index == 0;
 		}
+		
+		public override function isEquivalent(other:Value):Boolean
+		{
+			if (other is NumericValue)
+			{
+				return (this.value == (other as NumericValue).value);
+			}
+			
+			return super.isEquivalent(other);
+		}
 	}
 }

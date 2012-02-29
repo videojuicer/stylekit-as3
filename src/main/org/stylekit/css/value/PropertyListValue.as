@@ -51,7 +51,7 @@ package org.stylekit.css.value
 		public static function newInitialValue():PropertyListValue
 		{
 			var pl:PropertyListValue = new PropertyListValue();
-				pl._all = true;
+				pl._all = false;
 			return pl;
 		}
 		

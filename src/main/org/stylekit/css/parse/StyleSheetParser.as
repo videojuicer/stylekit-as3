@@ -767,6 +767,9 @@ package org.stylekit.css.parse
 					case "transition-property":
 						property.value = PropertyListValue.parse(unparsedPropertyValue);
 						break;
+					case "transition-duration": case "transition-delay":
+						property.value = ValueArray.parse(unparsedPropertyValue, TimeValue);
+						break;
 					default:
 						// overflow, overflow-x, overflow-y, text-overflow
 						if (propN.indexOf("overflow") > -1)

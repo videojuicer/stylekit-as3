@@ -273,7 +273,7 @@ package org.stylekit.ui.element
 			
 			this._baseUI = baseUI;
 			this.evaluatedStyles = {};
-			this._runTransitions = false;
+			this._runTransitions = true;
 			
 			this._children = new Vector.<UIElement>();
 			this._controlLines = new Vector.<FlowControlLine>();

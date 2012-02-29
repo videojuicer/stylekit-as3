@@ -23,11 +23,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.stylekit.css.value
 {
-	import org.utilkit.util.StringUtil;
-	import org.stylekit.css.value.Value;
-	import org.stylekit.css.parse.ValueParser;
-	
 	import flash.geom.Point;
+	
+	import org.stylekit.css.parse.ValueParser;
+	import org.stylekit.css.value.Value;
+	import org.utilkit.util.StringUtil;
 	
 	public class TimingFunctionValue extends Value
 	{
@@ -44,8 +44,11 @@ package org.stylekit.css.value
 		protected var _timingFunction:String = "linear";
 		
 		// cubic values - p0 is always 0,0 and p3 is always 1,1
-		protected var _p1:Point;
-		protected var _p2:Point;
+		protected var _p1:Point = null;
+		protected var _p2:Point = null;
+		
+		protected var _p0:Point = new Point(0, 0);
+		protected var _p3:Point = new Point(1, 1);
 		
 		public function TimingFunctionValue()
 		{
@@ -70,6 +73,16 @@ package org.stylekit.css.value
 		public function set p2(p:Point):void
 		{
 			this._p2 = p;
+		}
+		
+		public function get p0():Point
+		{
+			return this._p0;
+		}
+		
+		public function get p3():Point
+		{
+			return this._p3;
 		}
 		
 		public function get timingFunction():String
@@ -133,12 +146,38 @@ package org.stylekit.css.value
 		{
 			switch(this._timingFunction)
 			{
+				case TimingFunctionValue.EASING_EASE:
+					this.p1 = new Point(0.25, 0.1);
+					this.p2 = new Point(0.25, 1.0);
+					break;
+				case TimingFunctionValue.EASING_EASE_IN:
+					this.p1 = new Point(0.42, 0.0);
+					this.p2 = new Point(1.0, 1.0);
+					break;
+				case TimingFunctionValue.EASING_EASE_IN_OUT:
+					this.p1 = new Point(0.42, 0.0);
+					this.p2 = new Point(0.58, 1.0);
+					break;
+				case TimingFunctionValue.EASING_EASE_OUT:
+					this.p1 = new Point(0.0, 0.0);
+					this.p2 = new Point(0.58, 1.0);
+					break;
+				case TimingFunctionValue.EASING_CUSTOM:
+					// p1 + p2 should already be set
+					break;
+				case TimingFunctionValue.EASING_LINEAR:
 				default:
-					// LINEAR
-					return t;
+					this.p1 = new Point(0.0, 0.0);
+					this.p2 = new Point(1.0, 1.0);
 					break;
 			}
-			return 0;
+			
+			var x:Number = Math.pow(1 - t, 3) * this.p0.x + 3 * Math.pow(1 - t, 2) * t * this.p1.x + 3 * (1 - t) * Math.pow(t, 2) * this.p2.x + Math.pow(t, 3) * this.p3.x;
+			var y:Number = Math.pow(1 - t, 3) * this.p0.y + 3 * Math.pow(1 - t, 2) * t * this.p1.y + 3 * (1 - t) * Math.pow(t, 2) * this.p2.y + Math.pow(t, 3) * this.p3.y;
+			
+			trace("compute->"+x+"/"+y);
+			
+			return x + y;
 		}
 	}
 }

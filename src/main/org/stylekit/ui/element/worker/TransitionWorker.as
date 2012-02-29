@@ -48,7 +48,7 @@ package org.stylekit.ui.element.worker
 	public class TransitionWorker extends EventDispatcher
 	{
 		
-		protected static var FRAMERATE:Number = 10;
+		protected static var FRAMERATE:Number = 20;
 		
 		protected var _element:UIElement;
 		protected var _initialValue:Value;
@@ -223,7 +223,7 @@ package org.stylekit.ui.element.worker
 					
 						// calcualte intermediate size value
 						var startVal:Number = (this._initialValue as NumericValue).value;
-						var endVal:Number = (this._endValue as SizeValue).value;
+						var endVal:Number = (this._endValue as NumericValue).value;
 					
 					iNumVal.value = startVal+((endVal-startVal)*tValue);
 				
