@@ -524,22 +524,22 @@ package org.stylekit.ui.element.layout
 					var originPoint:Point = this.globalToLocal(relativeParent.localToGlobal(parentOriginPoint)); // top/left
 					var extentPoint:Point = this.globalToLocal(relativeParent.localToGlobal(parentExtentPoint)); // bottom/right
 
-					if (e.hasStyleProperty("left") && !isNaN(e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH)))
+					if (e.hasStyleProperty("left") && !(e.getStyleValue("left") as SizeValue).auto)
 					{
 						e.x = originPoint.x + (e.evalStyleSize("left", SizeValue.DIMENSION_WIDTH));
 					}
 					
-					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
+					if (e.hasStyleProperty("right") && !(e.getStyleValue("right") as SizeValue).auto)
 					{
 						e.x = extentPoint.x - (e.effectiveWidth + e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH));
 					}
 					
-					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
+					if (e.hasStyleProperty("top") && !(e.getStyleValue("top") as SizeValue).auto)
 					{
 						e.y = originPoint.y + e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT);
 					}
 
-					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
+					if (e.hasStyleProperty("bottom") && !(e.getStyleValue("bottom") as SizeValue).auto)
 					{
 						e.y = extentPoint.y - (e.effectiveHeight + e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT));
 					}
