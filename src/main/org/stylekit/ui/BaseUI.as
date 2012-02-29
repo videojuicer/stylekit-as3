@@ -27,13 +27,14 @@ package org.stylekit.ui
 	import flash.events.Event;
 	
 	import org.stylekit.StyleKit;
-	import org.stylekit.css.StyleSheetCollection;
 	import org.stylekit.css.StyleSheet;
+	import org.stylekit.css.StyleSheetCollection;
+	import org.stylekit.css.selector.ElementSelector;
+	import org.stylekit.css.selector.ElementSelectorChain;
 	import org.stylekit.css.style.Style;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.ui.element.UIElement;
-	import org.stylekit.css.selector.ElementSelectorChain;
-	import org.stylekit.css.selector.ElementSelector;
+	import org.utilkit.util.Platform;
 	
 	public class BaseUI extends UIElement
 	{
