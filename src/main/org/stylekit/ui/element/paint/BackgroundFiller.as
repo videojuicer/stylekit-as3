@@ -104,10 +104,6 @@ package org.stylekit.ui.element.paint
 						
 						this._loader.loadBytes(bufferBytes);
 					}
-					else
-					{
-						this._loaderComplete = true;
-					}
 				}
 				else
 				{
