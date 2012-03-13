@@ -97,9 +97,17 @@ package org.stylekit.ui.element.paint
 				{
 					var dataParserURI:DataURIParser = new DataURIParser(this._url.url);
 					var bufferBytes:ByteArray = Base64.decodeToByteArray(dataParserURI.rawData);
-					bufferBytes.position = 0;
 					
-					this._loader.loadBytes(bufferBytes);
+					if (bufferBytes != null)
+					{
+						bufferBytes.position = 0;
+						
+						this._loader.loadBytes(bufferBytes);
+					}
+					else
+					{
+						this._loaderComplete = true;
+					}
 				}
 				else
 				{
