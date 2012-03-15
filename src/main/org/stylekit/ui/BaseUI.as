@@ -492,11 +492,13 @@ package org.stylekit.ui
 			
 			// Now that the transaction is complete, run through the deferred list and tell everything to start reacting to 
 			// any modified keys
-			if(this._styleAllocationDeferredElements != null)
+			var styleAllocationDeferredElements:Vector.<UIElement> = this._styleAllocationDeferredElements
+			
+			if(styleAllocationDeferredElements != null)
 			{
-				for(var d:uint = 0; d < this._styleAllocationDeferredElements.length; d++)
+				for(var d:uint = 0; d < styleAllocationDeferredElements.length; d++)
 				{
-					this._styleAllocationDeferredElements[d].execCallbacksForDeferredStyleKeyModifications();
+					styleAllocationDeferredElements[d].execCallbacksForDeferredStyleKeyModifications();
 				}
 			}
 			// Reset the deferred list and the transaction state now.
