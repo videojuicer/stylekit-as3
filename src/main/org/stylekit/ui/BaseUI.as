@@ -492,7 +492,10 @@ package org.stylekit.ui
 			
 			// Now that the transaction is complete, run through the deferred list and tell everything to start reacting to 
 			// any modified keys
-			var styleAllocationDeferredElements:Vector.<UIElement> = this._styleAllocationDeferredElements
+			var styleAllocationDeferredElements:Vector.<UIElement> = this._styleAllocationDeferredElements;
+			
+			this._styleAllocationDeferredElements = null;
+			this._styleAllocationInProgress = false;
 			
 			if(styleAllocationDeferredElements != null)
 			{
@@ -502,8 +505,6 @@ package org.stylekit.ui
 				}
 			}
 			// Reset the deferred list and the transaction state now.
-			this._styleAllocationDeferredElements = null;
-			this._styleAllocationInProgress = false;
 		}
 		
 		protected function selectorChainApplicable(chain:ElementSelectorChain):Boolean
