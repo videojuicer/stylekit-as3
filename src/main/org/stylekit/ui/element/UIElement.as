@@ -2342,6 +2342,8 @@ package org.stylekit.ui.element
 		
 		protected function onMouseOut(e:MouseEvent):void
 		{
+			StyleKit.logger.debug("onMouseOut:"+this);
+			
 			this.removeElementPseudoClass("hover");
 			this.removeElementPseudoClass("active");
 			
