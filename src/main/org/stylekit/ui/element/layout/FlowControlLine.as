@@ -41,7 +41,9 @@ package org.stylekit.ui.element.layout
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.TextAlignValue;
 	import org.stylekit.css.value.Value;
+	import org.stylekit.events.Benchmarks;
 	import org.stylekit.ui.element.UIElement;
+	import org.utilkit.logger.Benchmark;
 	
 	/**
 	* A FlowControlLine is used for the purposes of line wrapping and content flow control when laying out child elements
@@ -152,6 +154,8 @@ package org.stylekit.ui.element.layout
 		// clears the line, removing all elements and resetting all counters
 		public function clear():void
 		{
+			Benchmark.begin(Benchmarks.ORIGIN_LINE, Benchmarks.ACTION_CLEAR);
+			
 			for(var i:uint = 0; i < super.numChildren; i++)
 			{
 				// remove sprites
@@ -163,6 +167,8 @@ package org.stylekit.ui.element.layout
 			this._elementTotalEffectiveWidth = 0;
 			this._leftFloatElementCount = 0;
 			this._rightFloatElementCount = 0;
+			
+			Benchmark.finish(Benchmarks.ORIGIN_LINE, Benchmarks.ACTION_CLEAR);
 		}
 		
 		public function setMaxWidth(w:Number):Vector.<UIElement>
@@ -317,6 +323,7 @@ package org.stylekit.ui.element.layout
 			for(var i:uint=0; i < this._elements.length; i++)
 			{
 				var e:UIElement = this._elements[i];
+				
 				if(destinationLine.appendElement(e))
 				{
 					// Remove the element from this line if the addition was successful
@@ -336,6 +343,7 @@ package org.stylekit.ui.element.layout
 		public function removeElement(e:UIElement):void
 		{
 			var lists:Array = [this._elements];
+			
 			for(var i:uint=0; i < lists.length; i++)
 			{
 				var f:int = lists[i].indexOf(e);
@@ -369,6 +377,7 @@ package org.stylekit.ui.element.layout
 		protected function recalculateZIndex():void
 		{
 			this._elementHighestZIndex = Number.NEGATIVE_INFINITY;
+			
 			for (var i:int = 0; i < this._elements.length; i++)
 			{
 				var zIndex:int = (this._elements[i].getStyleValue("z-index") as IntegerValue).value;
@@ -597,7 +606,6 @@ package org.stylekit.ui.element.layout
 					if (e.hasStyleProperty("right") && !isNaN(e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH)))
 					{
 						e.x = e.x - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
-						//e.x = (e.parentElement.effectiveWidth - e.effectiveWidth)  - e.evalStyleSize("right", SizeValue.DIMENSION_WIDTH);
 					}
 					
 					if (e.hasStyleProperty("top") && !isNaN(e.evalStyleSize("top", SizeValue.DIMENSION_HEIGHT)))
@@ -608,14 +616,10 @@ package org.stylekit.ui.element.layout
 					if (e.hasStyleProperty("bottom") && !isNaN(e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT)))
 					{
 						e.y = e.y - e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT);
-						//e.y = ((e.parentElement.effectiveHeight - e.effectiveHeight) - (e.evalStyleSize("bottom", SizeValue.DIMENSION_HEIGHT) * 2));
 					}
 				}
 
 				e.recalculateEffectiveContentDimensions();
-				//e.layoutChildren();
-
-				StyleKit.logger.debug("Adding "+e+" to FlowControlLine contents ... "+e.x+"/"+e.y, this);
 			}
 		}
 		

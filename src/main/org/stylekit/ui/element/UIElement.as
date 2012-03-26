@@ -66,12 +66,14 @@ package org.stylekit.ui.element
 	import org.stylekit.css.value.TransitionCompoundValue;
 	import org.stylekit.css.value.Value;
 	import org.stylekit.css.value.ValueArray;
+	import org.stylekit.events.Benchmarks;
 	import org.stylekit.events.TransitionWorkerEvent;
 	import org.stylekit.events.UIElementEvent;
 	import org.stylekit.ui.BaseUI;
 	import org.stylekit.ui.element.layout.FlowControlLine;
 	import org.stylekit.ui.element.paint.UIElementPainter;
 	import org.stylekit.ui.element.worker.TransitionWorker;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.ObjectUtil;
 	
 	/**
@@ -731,7 +733,6 @@ package org.stylekit.ui.element
 			{
 				if((previousEvaluatedStyles[newKey] == null && newEvaluatedStyles[newKey] != null) || (newEvaluatedStyles[newKey] != null && !newEvaluatedStyles[newKey].isEquivalent(previousEvaluatedStyles[newKey])))
 				{
-					StyleKit.logger.debug("Found new or modified style prop for "+newKey+" ("+previousEvaluatedStyles[newKey]+" > "+newEvaluatedStyles[newKey]+")", this)
 					changeFound = true;
 					alteredKeys.push(newKey);
 				}
@@ -741,7 +742,6 @@ package org.stylekit.ui.element
 			{
 				if(newEvaluatedStyles[prevKey] == null && previousEvaluatedStyles[prevKey] != null)
 				{
-					StyleKit.logger.debug("Found deleted style prop for "+prevKey+" ("+previousEvaluatedStyles[prevKey]+" > "+newEvaluatedStyles[prevKey]+")", this)
 					changeFound = true;
 					alteredKeys.push(prevKey);
 				}
@@ -860,25 +860,25 @@ package org.stylekit.ui.element
 						
 			if(effectiveContentDimensionsRecalcKeys.length > 0) 
 			{
-				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveContentDimensionsRecalcKeys.join(", ")+")", this);
+				//StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveContentDimensionsRecalcKeys.join(", ")+")", this);
 				this.recalculateEffectiveContentDimensions();
 			}
 			
 			if(parentLayoutKeys.length > 0 && (this.parentElement != null)) 
 			{
-				StyleKit.logger.debug("A layout property was modified ("+parentLayoutKeys.join(", ")+") calling to the parent's layoutChildren method", this);
+				//StyleKit.logger.debug("A layout property was modified ("+parentLayoutKeys.join(", ")+") calling to the parent's layoutChildren method", this);
 				this.parentElement.layoutChildren();
 			}
 			
 			if(effectiveDimensionsRecalcKeys.length > 0)
 			{
-				StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveDimensionsRecalcKeys.join(", ")+")", this);
+				//StyleKit.logger.debug("A property was modified that requires the effectiveContentDimensions to be recalced. ("+effectiveDimensionsRecalcKeys.join(", ")+")", this);
 				this.recalculateEffectiveDimensions();
 			}
 			
 			if(redrawKeys.length > 0)
 			{
-				StyleKit.logger.debug("A property was modified that requires a redraw. ("+redrawKeys.join(", ")+")", this);
+				//StyleKit.logger.debug("A property was modified that requires a redraw. ("+redrawKeys.join(", ")+")", this);
 				this.redraw();
 			}
 			
@@ -962,7 +962,7 @@ package org.stylekit.ui.element
 		protected function onEffectiveDimensionsModified():void
 		{
 			this.redraw();
-			StyleKit.logger.debug("effective dimensions modified: "+this.effectiveWidth+","+this.effectiveHeight, this);
+			//StyleKit.logger.debug("effective dimensions modified: "+this.effectiveWidth+","+this.effectiveHeight, this);
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_DIMENSIONS_CHANGED, this));
 		}
 		
@@ -1078,7 +1078,7 @@ package org.stylekit.ui.element
 		protected function onContentDimensionsModified():void
 		{
 			// TODO update scrollbars
-			StyleKit.logger.debug("content dimensions modified: "+this.contentWidth+","+this.contentHeight, this);
+			//StyleKit.logger.debug("content dimensions modified: "+this.contentWidth+","+this.contentHeight, this);
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.CONTENT_DIMENSIONS_CHANGED, this));
 			this.recalculateEffectiveContentDimensions();
 		}
@@ -1178,7 +1178,7 @@ package org.stylekit.ui.element
 		protected function onEffectiveContentDimensionsModified():void
 		{
 			this._controlLines = null;
-			StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
+			//StyleKit.logger.debug("effective content dimensions modified: "+this.effectiveContentWidth+","+this.effectiveContentHeight, this);
 			
 			this.dispatchEvent(new UIElementEvent(UIElementEvent.EFFECTIVE_CONTENT_DIMENSIONS_CHANGED, this));
 			
@@ -1301,6 +1301,8 @@ package org.stylekit.ui.element
 		
 		protected function refreshControlLines():void
 		{
+			//Benchmark.begin(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_CALCULATE, Benchmarks.ON_LINES);
+			
 			this._controlLines = new Vector.<FlowControlLine>();
 			this._controlLinesUnsorted = null;
 			
@@ -1343,9 +1345,11 @@ package org.stylekit.ui.element
 				}
 			});
 			
+			//Benchmark.finish(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_CALCULATE, Benchmarks.ON_LINES);
+			
 			//this._controlLines.reverse();
 
-			StyleKit.logger.debug("Added "+this._controlLines.length+" control lines");
+			//StyleKit.logger.debug("Added "+this._controlLines.length+" control lines");
 		}
 		
 		protected function newControlLine(textAlign:TextAlignValue):void
@@ -1422,7 +1426,7 @@ package org.stylekit.ui.element
 		
 		public function layoutChildren():void
 		{
-			if (!this._decoratingChildren)
+			if (!this._decoratingChildren && !this.baseUI.domTransactionInProgress)
 			{
 				this.decorateChildren();
 				
@@ -1441,6 +1445,8 @@ package org.stylekit.ui.element
 		
 		protected function decorateChildren():void
 		{
+			//Benchmark.begin(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_CLEAR, Benchmarks.ON_CONTENT);
+			
 			this._decoratingChildren = true;
 			
 			for (var k:int = 0; k < super.numChildren; k++)
@@ -1458,7 +1464,11 @@ package org.stylekit.ui.element
 			// calculate the effective dimensions of this object so we can layout the children correctly
 			//this.recalculateEffectiveDimensions();
 			
+			//Benchmark.finish(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_CLEAR, Benchmarks.ON_CONTENT);
+			
 			this.refreshControlLines();
+			
+			//Benchmark.begin(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_DRAW, Benchmarks.ON_CONTENT);
 			
 			this._contentContainer.x = this.calculateContentOriginPoint().x;
 			this._contentContainer.y = this.calculateContentOriginPoint().y;
@@ -1507,6 +1517,8 @@ package org.stylekit.ui.element
 					this._contentContainer.addChild(this._contentSprites[j]);
 				}
 			}
+			
+			//Benchmark.finish(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_DRAW, Benchmarks.ON_CONTENT);
 			
 			this.recalculateContentDimensions();
 
@@ -1584,8 +1596,11 @@ package org.stylekit.ui.element
 			child.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
 			child.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			
-			this.updateChildrenIndex();
-			this.layoutChildren();
+			if (!this.baseUI.domTransactionInProgress)
+			{
+				this.updateChildrenIndex();
+				this.layoutChildren();
+			}
 			
 			return child;
 		}
@@ -2121,6 +2136,7 @@ package org.stylekit.ui.element
 				return recursedSet;
 				
 			}
+			
 			return null;
 		}
 		
@@ -2145,6 +2161,11 @@ package org.stylekit.ui.element
 		
 		public function commitStyles():void
 		{
+			if (this._requiresAnotherDecorate && !this._decoratingChildren)
+			{
+				this.layoutChildren();
+			}
+			
 			this.evaluateStyles();
 		}
 		
@@ -2164,6 +2185,7 @@ package org.stylekit.ui.element
 		
 		protected function evaluateStyles():void
 		{
+			//Benchmark.begin(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_PARSE, Benchmarks.ON_STYLES);
 			
 			// Build a cache key based on the styles currently applied to this element
 			var styleSetCacheKey:String = this.cacheKeyForSelectorsAndStyles(this._styles, this._styleSelectors, this._localStyle);
@@ -2178,7 +2200,7 @@ package org.stylekit.ui.element
 			}
 			else if(this._evaluatedNetworkStyleCache[styleSetCacheKey] != null)
 			{
-				StyleKit.logger.debug("Evaluating styles: retrieving cached computed styles for cache key: "+styleSetCacheKey, this);
+				//StyleKit.logger.debug("Evaluating styles: retrieving cached computed styles for cache key: "+styleSetCacheKey, this);
 				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey;
 				this.evaluatedStyles = this._evaluatedNetworkStyleCache[styleSetCacheKey] as Object;
 			}
@@ -2200,13 +2222,15 @@ package org.stylekit.ui.element
 				}
 				
 				// Cache it
-				StyleKit.logger.debug("Evaluating styles: caching newly-computed styles for selector set: "+styleSetCacheKey, this);
+				//StyleKit.logger.debug("Evaluating styles: caching newly-computed styles for selector set: "+styleSetCacheKey, this);
 				this._evaluatedNetworkStyleCache[styleSetCacheKey] = evaluatedNetworkStyles;
 				this._evaluatedStyleCurrentCacheKey = styleSetCacheKey; // Set the current cache key
 				
 				// Compare it
 				this.evaluatedStyles = evaluatedNetworkStyles;
 			}
+			
+			//Benchmark.finish(Benchmarks.ORIGIN_ELEMENT, Benchmarks.ACTION_PARSE, Benchmarks.ON_STYLES);
 		}
 		
 		public function beginPropertyTransition(propertyName:String, initialValue:Value, endValue:Value):void
@@ -2333,7 +2357,6 @@ package org.stylekit.ui.element
 		{
 			if(this._listensForHover)
 			{
-				StyleKit.logger.debug("Hoverin'", this);
 				this.addElementPseudoClass("hover");
 			}
 			

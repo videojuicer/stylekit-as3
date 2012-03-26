@@ -44,9 +44,11 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
+	import org.stylekit.events.Benchmarks;
 	import org.stylekit.ui.element.UIElement;
 	import org.utilkit.crypto.Base64;
 	import org.utilkit.crypto.MD5;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.parser.URLParser;
 
@@ -217,7 +219,7 @@ package org.stylekit.ui.element.paint
 		{
 			this._bitmapData = (this._loader.content as Bitmap).bitmapData;
 			this._loaderComplete = true;
-			
+				
 			this.dispatchEvent(e.clone());
 		}
 		

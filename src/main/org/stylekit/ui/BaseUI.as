@@ -101,6 +101,11 @@ package org.stylekit.ui
 			return this;
 		}
 		
+		public function get domTransactionInProgress():Boolean
+		{
+			return this._domTransactionInProgress;
+		}
+		
 		public override function get styleEligible():Boolean
 		{
 			return true;
@@ -293,9 +298,19 @@ package org.stylekit.ui
 		*/
 		public function runDomTransaction(routine:Function, mutatingElement:UIElement, thisObj:*):void
 		{
-			this.enterDomTransaction();
+			var alreadyInProgress:Boolean = this._domTransactionInProgress;
+			
+			if (!alreadyInProgress)
+			{
+				this.enterDomTransaction();
+			}
+			
 			routine.apply(thisObj, [this]);
-			this.commitDomTransaction(mutatingElement);
+			
+			if (!alreadyInProgress)
+			{
+				this.commitDomTransaction(mutatingElement);
+			}
 		}
 		
 		public function enterDomTransaction():void
@@ -307,8 +322,7 @@ package org.stylekit.ui
 		public function commitDomTransaction(mutatingElement:UIElement = null):void
 		{
 			this._domTransactionInProgress = false;
-
-
+			
 			if(this._domTransactionMutatedElements.length > 0)
 			{
 				StyleKit.logger.debug("Committing DOM transaction with "+this._domTransactionMutatedElements.length+" elements modified during transaction.", this);
@@ -425,7 +439,7 @@ package org.stylekit.ui
 		
 		public function allocateStyles(mutatedElement:UIElement):void
 		{
-			StyleKit.logger.debug("Allocating styles after a mutation on "+mutatedElement, this);
+			//StyleKit.logger.debug("Allocating styles after a mutation on "+mutatedElement, this);
 			
 			var encounteredElements:Vector.<UIElement> = new Vector.<UIElement>();
 			
@@ -483,7 +497,8 @@ package org.stylekit.ui
 					return y.descendants.length - x.descendants.length; 
 				});
 				
-				StyleKit.logger.debug("Committing new styles on "+encounteredElements.length+" encountered elements.", this);
+				//StyleKit.logger.debug("Committing new styles on "+encounteredElements.length+" encountered elements.", this);
+				
 				for(var l:int = 0; l < encounteredElements.length; l++)
 				{
 					encounteredElements[l].commitStyles();

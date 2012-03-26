@@ -48,9 +48,11 @@ package org.stylekit.ui.element.paint
 	import org.stylekit.css.value.RepeatValue;
 	import org.stylekit.css.value.SizeValue;
 	import org.stylekit.css.value.URLValue;
+	import org.stylekit.events.Benchmarks;
 	import org.stylekit.ui.element.UIElement;
 	import org.utilkit.crypto.Base64;
 	import org.utilkit.crypto.MD5;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.parser.URLParser;
 	
@@ -74,6 +76,8 @@ package org.stylekit.ui.element.paint
 		
 		public function paint():void
 		{
+			//Benchmark.begin(Benchmarks.ORIGIN_PAINTER, Benchmarks.ACTION_DRAW);
+			
 			var uiElement:UIElement = this._uiElement;
 			var graphics:Graphics = uiElement.graphics;
 			
@@ -191,7 +195,7 @@ package org.stylekit.ui.element.paint
 
 			graphics.lineStyle(0, 0);
 			
-			StyleKit.logger.debug("Painting ...", uiElement);
+			//StyleKit.logger.debug("Painting ...", uiElement);
 			
 			if (borderTopStyleValue != null)
 			{
@@ -258,6 +262,8 @@ package org.stylekit.ui.element.paint
 			}
 
 			graphics.endFill();
+			
+			//Benchmark.finish(Benchmarks.ORIGIN_PAINTER, Benchmarks.ACTION_DRAW);
 		}
 		
 		protected static function findBackgroundFillerBySignature(signature:String):BackgroundFiller
