@@ -245,7 +245,7 @@ package org.stylekit.ui
 			
 			if (this._collapsedSelectorChains.length > 0)
 			{
-				Benchmark.begin("styles.collapse.sort.split");
+				//Benchmark.begin("styles.collapse.sort.split");
 				
 				var selectors:Vector.<Object> = new Vector.<Object>();
 				
@@ -273,7 +273,7 @@ package org.stylekit.ui
 					this._collapsedStyles.push(selectors[l].style);
 				}
 				
-				Benchmark.finish("styles.collapse.sort.split");
+				//Benchmark.finish("styles.collapse.sort.split");
 			}
 			
 			// Now refresh the hover listeners
@@ -380,11 +380,11 @@ package org.stylekit.ui
 				this.enterDomTransaction();
 			}
 			
-			Benchmark.begin("baseui", "dom", "transaction");
+			//Benchmark.begin("baseui", "dom", "transaction");
 			
 			routine.apply(thisObj, [this]);
 			
-			Benchmark.finish("baseui", "dom", "transaction");
+			//Benchmark.finish("baseui", "dom", "transaction");
 			
 			if (!alreadyInProgress)
 			{
