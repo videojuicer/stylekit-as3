@@ -34,7 +34,9 @@ package org.stylekit.ui
 	import org.stylekit.css.style.Style;
 	import org.stylekit.events.StyleSheetEvent;
 	import org.stylekit.ui.element.UIElement;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.Platform;
+	import org.utilkit.util.VectorUtil;
 	
 	public class BaseUI extends UIElement
 	{
@@ -176,6 +178,9 @@ package org.stylekit.ui
 				}	
 			}
 			
+			/*
+			Benchmark.begin("styles.collapse.sort.bubble");
+			
 			// Sort
 			// Do a litle bubble sort thingy, since AS3's sort won't cut it for sorting multiple lists
 			var n:int = this._collapsedSelectorChains.length-1;
@@ -200,6 +205,76 @@ package org.stylekit.ui
 			}
 			// End specificity sort
 			
+			Benchmark.finish("styles.collapse.sort.bubble");
+			*/
+			
+			/*
+			if (this._collapsedSelectorChains.length > 0)
+			{
+				Benchmark.begin("styles.collapse.sort.plain");
+				
+				var selectors:Vector.<Object> = new Vector.<Object>();
+				
+				for (var u:uint = 0; u < this._collapsedSelectorChains.length; ++u)
+				{
+					selectors.push( { chain: this._collapsedSelectorChains[u], style: this._collapsedStyles[u] } );
+				}
+				
+				selectors.sort(function(a1:Object, a2:Object):int
+				{
+					if (a1.chain.specificity > a2.chain.specificity)
+					{
+						return 1;
+					}
+					
+					return -1;
+				});
+				
+				this._collapsedSelectorChains = new Vector.<ElementSelectorChain>();
+				this._collapsedStyles = new Vector.<Style>();
+				
+				for (var l:uint = 0; l < selectors.length; ++l)
+				{
+					this._collapsedSelectorChains.push(selectors[l].chain);
+					this._collapsedStyles.push(selectors[l].style);
+				}
+				
+				Benchmark.finish("styles.collapse.sort.plain");
+			}
+			*/
+			
+			if (this._collapsedSelectorChains.length > 0)
+			{
+				Benchmark.begin("styles.collapse.sort.split");
+				
+				var selectors:Vector.<Object> = new Vector.<Object>();
+				
+				for (var u:uint = 0; u < this._collapsedSelectorChains.length; ++u)
+				{
+					selectors.push( { chain: this._collapsedSelectorChains[u], style: this._collapsedStyles[u] } );
+				}
+				
+				VectorUtil.sort(selectors, function(a1:Object, a2:Object):int
+				{
+					if (a1.chain.specificity > a2.chain.specificity)
+					{
+						return 1;
+					}
+					
+					return -1;
+				});
+				
+				this._collapsedSelectorChains = new Vector.<ElementSelectorChain>();
+				this._collapsedStyles = new Vector.<Style>();
+				
+				for (var l:uint = 0; l < selectors.length; ++l)
+				{
+					this._collapsedSelectorChains.push(selectors[l].chain);
+					this._collapsedStyles.push(selectors[l].style);
+				}
+				
+				Benchmark.finish("styles.collapse.sort.split");
+			}
 			
 			// Now refresh the hover listeners
 			this.populateHoverListeners();
@@ -305,7 +380,11 @@ package org.stylekit.ui
 				this.enterDomTransaction();
 			}
 			
+			Benchmark.begin("baseui", "dom", "transaction");
+			
 			routine.apply(thisObj, [this]);
+			
+			Benchmark.finish("baseui", "dom", "transaction");
 			
 			if (!alreadyInProgress)
 			{

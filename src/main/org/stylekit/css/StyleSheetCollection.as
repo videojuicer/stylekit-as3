@@ -113,5 +113,17 @@ package org.stylekit.css {
 		{
 			this.dispatchEvent(e);
 		}
+		
+		public function clone():StyleSheetCollection
+		{
+			var collection:StyleSheetCollection = new StyleSheetCollection();
+			
+			for (var i:uint = 0; i < this._styleSheets.length; i++)
+			{
+				collection.addStyleSheet(this._styleSheets[i]);
+			}
+			
+			return collection;
+		}
 	}
 }
