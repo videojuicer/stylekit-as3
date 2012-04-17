@@ -655,12 +655,15 @@ package org.stylekit.ui
 		
 		protected function onRootResized(e:Event):void
 		{
-			StyleKit.logger.info("BaseUI resizing from "+this.effectiveContentWidth+"/"+this.effectiveContentHeight+" ...");
+			StyleKit.logger.info(this.toString() + " resizing from "+this.effectiveContentWidth+"/"+this.effectiveContentHeight+" ...");
 			
+			this.recalculateContentDimensions();
 			this.recalculateEffectiveContentDimensions();
 			
+			this.layoutChildren();
+			
 			StyleKit.logger.debug("Stage size -> "+this.stageRoot.stage.width+"/"+this.stageRoot.stage.height);
-			StyleKit.logger.info("BaseUI resized to "+this.effectiveContentWidth+"/"+this.effectiveContentHeight);
+			StyleKit.logger.info(this.toString() + " resized to "+this.effectiveContentWidth+"/"+this.effectiveContentHeight);
 			
 			Platform.gc();
 		}
