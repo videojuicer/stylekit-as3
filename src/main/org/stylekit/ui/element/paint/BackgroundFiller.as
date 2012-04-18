@@ -217,10 +217,17 @@ package org.stylekit.ui.element.paint
 		
 		protected function onLoaderComplete(e:Event):void
 		{
-			this._bitmapData = (this._loader.content as Bitmap).bitmapData;
-			this._loaderComplete = true;
+			try
+			{
+				this._bitmapData = (this._loader.content as Bitmap).bitmapData;
+				this._loaderComplete = true;
 				
-			this.dispatchEvent(e.clone());
+				this.dispatchEvent(e.clone());
+			}
+			catch (e:Error)
+			{
+				StyleKit.logger.error("Security error when attempting to load background image from "+this._url, this);
+			}
 		}
 		
 		protected function onLoaderIOError(e:IOErrorEvent):void
