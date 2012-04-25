@@ -306,6 +306,9 @@ package org.stylekit.ui.element
 			this.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			this.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
 			
+			this.addEventListener(MouseEvent.ROLL_OVER, this.onMouseOver);
+			this.addEventListener(MouseEvent.ROLL_OUT, this.onMouseOut);
+			
 			this.addEventListener(MouseEvent.CLICK, this.onMouseClick);
 			this.addEventListener(MouseEvent.DOUBLE_CLICK, this.onMouseDoubleClick);
 			
@@ -2365,14 +2368,17 @@ package org.stylekit.ui.element
 		
 		protected function onMouseOut(e:MouseEvent):void
 		{
+			if (e.type == MouseEvent.ROLL_OUT)
+			{
+				this.removeElementPseudoClass("hover");
+				this.removeElementPseudoClass("active");
+				
+				this.removeCustomCursor();
+				
+				Mouse.cursor = MouseCursor.AUTO;
+			}
+			
 			StyleKit.logger.debug("onMouseOut:"+this);
-			
-			this.removeElementPseudoClass("hover");
-			this.removeElementPseudoClass("active");
-			
-			this.removeCustomCursor();
-			
-			Mouse.cursor = MouseCursor.AUTO;
 		}
 		
 		protected function onMouseClick(e:MouseEvent):void
