@@ -213,7 +213,7 @@ package org.stylekit.css.parse
 			this.resetState();
 			
 			// Do some basic filtering on the css string
-			css = css.replace(/\\(n|t|r)/g, " ");
+			css = css.replace(/[\r|\n|\t]/gi, "");
 			
 			// Token collectors
 			var currentProperty:String = "";
