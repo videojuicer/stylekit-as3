@@ -1429,7 +1429,7 @@ package org.stylekit.ui.element
 		
 		public function layoutChildren():void
 		{
-			if (!this._decoratingChildren && !this.baseUI.domTransactionInProgress)
+			if (!this._decoratingChildren && this.baseUI != null && !this.baseUI.domTransactionInProgress)
 			{
 				this.decorateChildren();
 				
